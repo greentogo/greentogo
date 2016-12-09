@@ -2,5 +2,5 @@ from django.shortcuts import render
 
 
 def payment(request):
-    return render(request, 'index.html')
+    return render(request, 'mockup.html')
 
