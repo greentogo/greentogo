@@ -36,11 +36,13 @@
                 <option>3 boxes: $35/year</option>
                 <option>4 boxes: $40/year</option>
             </select>
+                <input id="name" type="text" name="name" placeholder="Your Name">
                 <button type="submit" class="button">Subscribe</button>
             </form>
         <script src="https://checkout.stripe.com/checkout.js"></script>
+        <script src="https://checkout.stripe.com/checkout.js"></script>
 
-        <button id="customButton">Make this Button Work</button>
+        <button id="customButton">Purchase</button>
 
         <script>
         var handler = StripeCheckout.configure({
@@ -56,7 +58,7 @@
         document.getElementById('customButton').addEventListener('click', function(e) {
           // Open Checkout with further options:
           handler.open({
-            name: "Subscriber's Name",
+            name: 'Jane Subscriber',
             description: 'some plan',
             zipCode: true,
             amount: 2000

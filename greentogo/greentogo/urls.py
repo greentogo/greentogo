@@ -22,5 +22,5 @@ from . import views
 urlpatterns = [
     url(r'^$', views.payment, name='payment'),
     url(r'^admin/', admin.site.urls),
-    url(r'^mockup/', TemplateView.as_view(template_name="mockup.html"))
+    url(r'^mockup/', TemplateView.as_view(template_name="subscription.html"))
 ]
