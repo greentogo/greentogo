@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static "foundation-sites/dist/foundation.css" %}">
+    <link rel="stylesheet" href="{% static "signup.css" %}">
+    <script src="{% static "foundation.js" %}"></script>
+    <link rel='stylesheet' id='resonar-fonts-css' href='https://fonts.googleapis.com/css?family=Libre+Baskerville%3A400%2C700%2C400italic%7CLato%3A400%2C700%2C900%2C400italic%2C700italic%2C900italic%7CPlayfair+Display%3A400%2C700%2C400italic%2C700italic%7CInconsolata%3A400&#038;subset=latin%2Clatin-ext'
+        type='text/css' media='all' />
+</head>
+
+<body>
+    <div class="banner">
+        <img src="{% static "testimonial.jpg" %}" alt="GreenToGo being used on a wooden table with a beer">
+    </div>
+    <div class="row">
+        <div class="large-offset-2 large-8 small-12 columns">
+            <h2>Buy a GreenToGo membership</h2>
+            <p>
+                You can buy a GreenToGo membership today! Buying one now helps us get GreenToGo off the ground that much quicker. Your membership
+                will not be rebilled until 1 year after the program launches.
+            </p>
+
+            <p>Your membership includes the GreenToGo mobile app for your phone and GreenToGo check-out/check-in privileges at participating restaurants in Durham!</p>
+
+            <p>Membership fees support the cost of buying the GreenToGo boxes, building a drop-off bin for each restaurant, and operating and managing the GreenToGo service in our community. We also want to employ people at a living wage, buy carbon-neutral transportation (like cargo bicycles or solar-powered Elf vehicles with trailers) to carry the reusable containers to/from the wash facility and restaurants. And finally, we’ll need to pay rent for some office space for our team.</p>
+
+            <form>
+                <label for="plan">Subscription plan</label>
+                <select id="plan" name="plan">
+                <option>1 box: $25/year</option>
+                <option>2 boxes: $30/year</option>
+                <option>3 boxes: $35/year</option>
+                <option>4 boxes: $40/year</option>
+            </select>
+                <button type="submit" class="button">Subscribe</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

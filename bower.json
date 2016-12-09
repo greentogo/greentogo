@@ -1,0 +1,21 @@
+{
+  "name": "greentogo",
+  "authors": [
+    "Clinton Dreisbach <clinton@dreisbach.us>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "foundation-sites": "^6.2.4"
+  }
+}
