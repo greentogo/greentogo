@@ -91,3 +91,6 @@ ENV/
 
 .idea/
 notes
+
+# bower_components/
+db.sqlite3
