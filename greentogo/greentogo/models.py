@@ -4,17 +4,10 @@ from django.db import models
 
 
 class Plan(models.Model):
-    PLANA = 'A'
-    PLANB = 'B'
-    PLANC = 'C'
-    PLAN_CHOICES = (
-        (PLANA, 'Plan A'),
-        (PLANB, 'Plan B'),
-        (PLANC, 'Plan C'),
-    )
     slug = models.CharField(max_length=30)
-    name = models.CharField(choices=PLAN_CHOICES, max_length=1)
-    amount = models.DecimalField(decimal_places=2, max_digits=10)
+    name = models.CharField(max_length=30)
+    amount = models.DecimalField(decimal_places=0, max_digits=3)
+    display_price = models.CharField(max_length=30)
 
 
 class Customer(models.Model):
