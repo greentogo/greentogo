@@ -29,15 +29,14 @@
             <p>Membership fees support the cost of buying the GreenToGo boxes, building a drop-off bin for each restaurant, and operating and managing the GreenToGo service in our community. We also want to employ people at a living wage, buy carbon-neutral transportation (like cargo bicycles or solar-powered Elf vehicles with trailers) to carry the reusable containers to/from the wash facility and restaurants. And finally, we’ll need to pay rent for some office space for our team.</p>
 
             <form>
-                <label for="plan">Subscription plan</label>
+                <label for="plan">Subscription</label>
                 <select id="plan" name="plan">
-                <option>1 box: $25/year</option>
-                <option>2 boxes: $30/year</option>
-                <option>3 boxes: $35/year</option>
-                <option>4 boxes: $40/year</option>
-            </select>
-                <input id="name" type="text" name="name" placeholder="Your Name">
-                <button type="submit" class="button">Subscribe</button>
+                    {% for plan in plans %}
+                        <option>{{ plan.name }} : {{plan.display_price}}</option>
+                    {% endfor %}
+                </select>
+                    <input id="name" type="text" name="name" placeholder="Your Name">
+                    <button type="submit" class="button">Subscribe</button>
             </form>
         <script src="https://checkout.stripe.com/checkout.js"></script>
         <script src="https://checkout.stripe.com/checkout.js"></script>

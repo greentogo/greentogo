@@ -20,7 +20,6 @@ from django.views.generic import TemplateView
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.payment, name='payment'),
+    url(r'^$', views.SubscriptionView.as_view(), name='payment'),
     url(r'^admin/', admin.site.urls),
-    url(r'^mockup/', TemplateView.as_view(template_name="subscription.html"))
 ]
