@@ -3,6 +3,7 @@ from django.views.generic import TemplateView
 
 from .models import Plan
 
+
 class SubscriptionView(TemplateView):
     template_name = "subscription.html"
 

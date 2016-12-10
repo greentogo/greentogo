@@ -15,9 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from django.views.generic import TemplateView
 
-from . import views
+from beta_signup import views
 
 urlpatterns = [
     url(r'^$', views.SubscriptionView.as_view(), name='payment'),

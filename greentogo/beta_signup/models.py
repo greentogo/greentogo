@@ -12,6 +12,7 @@ class Plan(models.Model):
     def __str__(self):
         return self.name
 
+
 class Customer(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
@@ -26,8 +27,6 @@ class Subscription(models.Model):
     customer = models.ForeignKey(Customer)
     plan = models.ForeignKey(Plan)
     started_on = models.DateField(auto_now_add=True)
-    internal_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    internal_id = models.UUIDField(
+        default=uuid.uuid4, editable=False, unique=True)
     stripe_id = models.CharField(max_length=100)
-
-
-

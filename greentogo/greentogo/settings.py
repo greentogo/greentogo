@@ -43,9 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'compressor',
     'django_extensions',
-    'greentogo',
+
+    'beta_signup',
 ]
 
 MIDDLEWARE = [
@@ -122,12 +124,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-public_root = root.path('public/')
 
 STATIC_URL = '/static/'
 STATIC_ROOT = str(root.path("staticfiles/"))
-STATICFILES_DIRS = [root.path('../bower_components/'),
-                    root.path('static/'), ]
+STATICFILES_DIRS = [str(root.path('bower_components/')),
+                    str(root.path('greentogo/static/')), ]
 
 
 STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
