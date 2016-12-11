@@ -32,16 +32,12 @@
                 <label for="plan">Subscription</label>
                 <select id="plan" name="plan">
                     {% for plan in plans %}
-                        <option>{{ plan.name }} : {{plan.display_price}}</option>
+                        <option data-amount="{{ plan.amount }}" value="{{ plan.id }}">{{ plan.name }}: {{plan.display_price}}</option>
                     {% endfor %}
                 </select>
-                    <input id="name" type="text" name="name" placeholder="Your Name">
-                    <button type="submit" class="button">Subscribe</button>
+                <input id="name" type="text" name="name" placeholder="Your Name">
+                <button type="submit" class="button">Subscribe</button>
             </form>
-        <script src="https://checkout.stripe.com/checkout.js"></script>
-        <script src="https://checkout.stripe.com/checkout.js"></script>
-
-        <button id="customButton">Purchase</button>
 
         <script>
         var handler = StripeCheckout.configure({

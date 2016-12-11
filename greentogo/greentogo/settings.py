@@ -13,10 +13,10 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 
 import environ
-root = environ.Path(__file__) - 3  # three folder back (/a/b/c/ - 3 = /)
-env = environ.Env(DEBUG=(bool, False),)  # set default values and casting
+__root__ = environ.Path(__file__) - 3  # three folder back (/a/b/c/ - 3 = /)
+__env__ = environ.Env(DEBUG=(bool, False),)  # set default values and casting
 
-SITE_ROOT = root()
+SITE_ROOT = __root__()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,7 +29,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '1+rc*=eii(d_im=1%x(q4di-_)14=ksa6u70nzs_h61m(+1zda'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = __env__('DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'greentogo.wsgi.application'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 DATABASES = {
-    'default': env.db()
+    'default': __env__.db()
 }
 
 # Password validation
@@ -126,10 +126,10 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-STATIC_ROOT = str(root.path("staticfiles/"))
-STATICFILES_DIRS = [str(root.path('bower_components/')),
-                    str(root.path('greentogo/static/')), ]
+STATIC_ROOT = str(__root__.path("staticfiles/"))
+STATICFILES_DIRS = [str(__root__.path('bower_components/')),
+                    str(__root__.path('greentogo/static/')), ]
 
 
-STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
-STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY')
+STRIPE_SECRET_KEY = __env__('STRIPE_SECRET_KEY')
+STRIPE_PUBLISHABLE_KEY = __env__('STRIPE_PUBLISHABLE_KEY')
