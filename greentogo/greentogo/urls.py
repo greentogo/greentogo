@@ -15,10 +15,17 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.views.generic import TemplateView
 
 from beta_signup import views
 
 urlpatterns = [
     url(r'^$', views.SubscriptionView.as_view(), name='payment'),
+    url(r'^beta-subscribe/$', views.SubscriptionView.as_view(),
+        name="beta-subscribe"),
+    url(r'^thanks/', TemplateView.as_view(template_name="thanks.html"),
+        name="beta-thanks"),
+    url(r'^error/', TemplateView.as_view(template_name="error.html"),
+        name="beta-error"),
     url(r'^admin/', admin.site.urls),
 ]

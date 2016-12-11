@@ -1,0 +1,6 @@
+A new customer has signed up for GreenToGo!
+
+Customer Name: {{ subscription.customer.name }}
+Customer Email: {{ subscription.customer.email }}
+Plan Name: {{ plan.name }}
+Plan Price: {{ plan.display_price }}

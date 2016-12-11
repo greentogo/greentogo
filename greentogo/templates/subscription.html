@@ -1,21 +1,6 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Document</title>
-    <link rel="stylesheet" href="{% static "foundation-sites/dist/foundation.css" %}">
-    <link rel="stylesheet" href="{% static "signup.css" %}">
-    <script src="{% static "foundation.js" %}"></script>
-    <link rel='stylesheet' id='resonar-fonts-css' href='https://fonts.googleapis.com/css?family=Libre+Baskerville%3A400%2C700%2C400italic%7CLato%3A400%2C700%2C900%2C400italic%2C700italic%2C900italic%7CPlayfair+Display%3A400%2C700%2C400italic%2C700italic%7CInconsolata%3A400&#038;subset=latin%2Clatin-ext'
-        type='text/css' media='all' />
-</head>
-
-<body>
-    <div class="banner">
-        <img src="{% static "testimonial.jpg" %}" alt="GreenToGo being used on a wooden table with a beer">
-    </div>
+{% block content %}
     <div class="row">
         <div class="large-offset-2 large-8 small-12 columns">
             <h2>Buy a GreenToGo membership</h2>
@@ -24,11 +9,16 @@
                 will not be rebilled until 1 year after the program launches.
             </p>
 
-            <p>Your membership includes the GreenToGo mobile app for your phone and GreenToGo check-out/check-in privileges at participating restaurants in Durham!</p>
+            <p>Your membership includes the GreenToGo mobile app for your phone and GreenToGo check-out/check-in privileges
+                at participating restaurants in Durham!</p>
 
-            <p>Membership fees support the cost of buying the GreenToGo boxes, building a drop-off bin for each restaurant, and operating and managing the GreenToGo service in our community. We also want to employ people at a living wage, buy carbon-neutral transportation (like cargo bicycles or solar-powered Elf vehicles with trailers) to carry the reusable containers to/from the wash facility and restaurants. And finally, we’ll need to pay rent for some office space for our team.</p>
+            <p>Membership fees support the cost of buying the GreenToGo boxes, building a drop-off bin for each restaurant,
+                and operating and managing the GreenToGo service in our community. We also want to employ people at a living
+                wage, buy carbon-neutral transportation (like cargo bicycles or solar-powered Elf vehicles with trailers)
+                to carry the reusable containers to/from the wash facility and restaurants. And finally, we’ll need to pay
+                rent for some office space for our team.</p>
 
-            <form>
+            <div>
                 <label for="plan">Subscription</label>
                 <select id="plan" name="plan">
                     {% for plan in plans %}
@@ -36,38 +26,96 @@
                     {% endfor %}
                 </select>
                 <input id="name" type="text" name="name" placeholder="Your Name">
-                <button type="submit" class="button">Subscribe</button>
-            </form>
+                <p class="help-text" id="name-help-text" style="display: none;">You must enter a name.</p>
+                <button id="subscribe-button" class="button">Subscribe</button>
+            </div>
 
-        <script>
-        var handler = StripeCheckout.configure({
-          key: 'pk_test_6pRNASCoBOKtIshFeQd4XMUh',
-          image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
-          locale: 'auto',
-          token: function(token) {
-            // You can access the token ID with `token.id`.
-            // Get the token ID to your server-side code for use.
-          }
-        });
+            <script>
+                function csrfSafeMethod(method) {
+                    // these HTTP methods do not require CSRF protection
+                    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+                }
 
-        document.getElementById('customButton').addEventListener('click', function(e) {
-          // Open Checkout with further options:
-          handler.open({
-            name: 'Jane Subscriber',
-            description: 'some plan',
-            zipCode: true,
-            amount: 2000
-          });
-          e.preventDefault();
-        });
+                $.ajaxSetup({
+                    beforeSend: function(xhr, settings) {
+                        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                            var csrftoken = Cookies.get('csrftoken');
+                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                        }
+                    }
+                });
 
-        // Close Checkout on page navigation:
-        window.addEventListener('popstate', function() {
-          handler.close();
-        });
-        </script>
+                var plans = {
+                    {% for plan in plans %}
+                        '{{ plan.id }}': {amount: {{ plan.amount }}, name: '{{ plan.name }}'}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                };
+
+                var customerName = $("#name").val();
+                var planId = $("#plan").val();
+
+                $("#name").on('change', function () {
+                    $("#name").removeClass("error");
+                    customerName = $("#name").val();
+                });
+
+                $("#plan").on('change', function () {
+                    $("#plan").val();
+                });
+
+                var handler = StripeCheckout.configure({
+                    key: '{{ stripe_key }}',
+                    image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
+                    locale: 'auto',
+                    token: function (token) {
+                        $.ajax({
+                            type: "POST",
+                            url: '{% url "beta-subscribe" %}',
+                            data: {
+                                token: token.id,
+                                email: token.email,
+                                name: customerName,
+                                plan: planId
+                            },
+                            dataType: "json",
+                            success: function (data) {
+                                if (data.status === "success") {
+                                    window.location = "{% url 'beta-thanks' %}";
+                                } else {
+                                    window.location = "{% url 'beta-error' %}";
+                                }
+                            }
+                        });
+                    }
+                });
+
+                $("#subscribe-button").on('click', function (event) {
+                    $("#subscribe-button").prop("disabled", true);
+
+                    // Validate a name was given.
+                    if (!customerName) {
+                        $("#name").addClass("error");
+                        $("#name-help-text").css({display: "block"}).addClass("error");
+                        return false;
+                    }
+
+                    var plan = plans[planId];
+
+                    handler.open({
+                        name: "Durham GreenToGo",
+                        description: plan.name,
+                        zipCode: true,
+                        amount: plan.amount,
+                        panelLabel: "Subscribe"
+                    });
+                    event.preventDefault();
+                })
+
+                // Close Checkout on page navigation:
+                window.addEventListener('popstate', function() {
+                    handler.close();
+                });
+            </script>
         </div>
     </div>
-</body>
-
-</html>
+{% endblock %}

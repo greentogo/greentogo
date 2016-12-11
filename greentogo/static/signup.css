@@ -32,3 +32,12 @@ h6 {
 .site-title {
     font-family: Lato, sans-serif;
 }
+
+input.error {
+	border: 1px solid red;
+	background-color: #FDD;
+}
+
+p.error {
+	color: red;
+}

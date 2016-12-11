@@ -14,7 +14,8 @@ import os
 
 import environ
 __root__ = environ.Path(__file__) - 3  # three folder back (/a/b/c/ - 3 = /)
-__env__ = environ.Env(DEBUG=(bool, False),)  # set default values and casting
+# set default values and casting
+__env__ = environ.Env(DEBUG=(bool, False), EMAIL_SECURE=(bool, True))
 
 SITE_ROOT = __root__()
 
@@ -133,3 +134,23 @@ STATICFILES_DIRS = [str(__root__.path('bower_components/')),
 
 STRIPE_SECRET_KEY = __env__('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = __env__('STRIPE_PUBLISHABLE_KEY')
+
+# Email
+EMAIL_HOST_USER = __env__('EMAIL_ADDRESS')
+EMAIL_HOST_PASSWORD = __env__('EMAIL_PASSWORD')
+EMAIL_HOST = __env__('EMAIL_SMTP_SERVER')
+EMAIL_PORT = __env__('EMAIL_SMTP_PORT')
+EMAIL_USE_TLS = __env__('EMAIL_SECURE')
+EMAIL_USE_SSL = __env__('EMAIL_SECURE')
+EMAIL_REPLY_TO = __env__('EMAIL_REPLY_TO')
+EMAIL_ADMINS = __env__('EMAIL_ADMINS')
+if isinstance(EMAIL_ADMINS, str):
+    EMAIL_ADMINS = EMAIL_ADMINS.split(",")
+else:
+    EMAIL_ADMINS = [EMAIL_REPLY_TO]
+
+if len(EMAIL_ADMINS) == 1 and not EMAIL_ADMINS[0]:
+    EMAIL_ADMINS = [EMAIL_REPLY_TO]
+
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

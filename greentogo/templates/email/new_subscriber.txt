@@ -1,0 +1,15 @@
+Dear {{ subscription.customer.name }},
+
+Thank you so much for signing up for Durham GreenToGo! We cannot thank you
+enough for supporting us while we are getting GreenToGo off the ground.
+
+When the program begins, you will be emailed with information about the web and
+mobile applications and how to get started.
+
+If you have any problems or questions, please email help@durhamgreentogo.com.
+
+Your plan details:
+
+Name: {{ plan.name }}
+Price: {{ plan.display_price }}
+Email used: {{ subscription.customer.email }}
