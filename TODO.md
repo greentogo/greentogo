@@ -1,0 +1,2 @@
+- Compress assets
+- Add donate button
