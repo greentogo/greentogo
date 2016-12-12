@@ -3,6 +3,8 @@ from django.conf import settings
 from django.shortcuts import render
 from django import forms
 from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 import stripe
 
 from .models import Customer, Subscription, get_plan_price, add_plan_price
@@ -47,6 +49,7 @@ class SubscriptionView(View):
             'stripe_key': stripe_key
         })
 
+    @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
         form = SubscriptionForm(request.POST)
         if form.is_valid():

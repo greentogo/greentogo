@@ -30,6 +30,12 @@
       app_path={{ django.root }}
       settings={{ django.settings }}
       virtualenv={{ project.virtualenv }}
+  - name: Collect static files
+    django_manage: >
+      command=collectstatic
+      app_path={{ django.root }}
+      settings={{ django.settings }}
+      virtualenv={{ project.virtualenv }}
 - name: Create uwsgi config
   template: src=uwsgi.ini dest={{ project.root }}/uwsgi.ini
 - name: Create uwsgi systemd service
