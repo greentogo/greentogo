@@ -41,6 +41,10 @@ class SubscriptionForm(forms.Form):
 
 class SubscriptionView(View):
 
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         plans = get_plans()
         stripe_key = settings.STRIPE_PUBLISHABLE_KEY
@@ -49,7 +53,6 @@ class SubscriptionView(View):
             'stripe_key': stripe_key
         })
 
-    @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
         form = SubscriptionForm(request.POST)
         if form.is_valid():
