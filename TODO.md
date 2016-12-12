@@ -1,2 +1,4 @@
+- Fix banner to center when at 100%
 - Compress assets
 - Add donate button
+- Re-enable button
