@@ -18,7 +18,7 @@ project:
   domain: purchase.durhamgreentogo.com
 
 django:
-  root: "{{ project.srcroot }}/greentogo/"
+  root: "{{ project.srcroot }}greentogo/"
   settings: greentogo.settings
 
 repo:

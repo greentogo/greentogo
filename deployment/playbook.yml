@@ -10,6 +10,15 @@
     DJANGO_SETTINGS_MODULE: "{{ django.settings }}"
     DATABASE_URL: postgresql://{{ secret.db_user }}:{{ secret.db_password }}@{{ secret.db_host }}:{{ secret.db_port }}/{{ secret.db_name }}
     SECRET_KEY: "{{ secret.secret_key }}"
+    STRIPE_SECRET_KEY: "{{ stripe.secret_key }}"
+    STRIPE_PUBLISHABLE_KEY: "{{ stripe.publishable_key }}"
+    EMAIL_ADDRESS: "{{ email.address }}"
+    EMAIL_PASSWORD: "{{ email.password }}"
+    EMAIL_SMTP_SERVER: "{{ email.smtp_server }}"
+    EMAIL_SMTP_PORT: "{{ email.smtp_port }}"
+    EMAIL_SECURE: "{{ email.secure }}"
+    EMAIL_REPLY_TO: "{{ email.reply_to }}"
+    EMAIL_ADMINS: "{{ email.admins }}"
   roles:
     - { role: user, tags: user }
     - { role: apt, tags: apt }

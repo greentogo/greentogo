@@ -3,8 +3,8 @@
   block:
   - name: Check out code
     local_action: git repo="{{ repo.url }}" dest="{{ git_tmp_dir }}" version={{ repo.branch }}
-  # - name: Get ready for production
-  #   local_action: shell make prod chdir="{{ git_tmp_dir }}" executable=/bin/bash
+  - name: Get ready for production
+    local_action: shell make prod chdir="{{ git_tmp_dir }}" executable=/bin/bash
 - name: Push files to production
   synchronize:
     src="{{ git_tmp_dir }}"
@@ -19,14 +19,11 @@
   pip: name=uwsgi executable=pip3
 - become_user: "{{ project.user }}"
   block:
-  - name: Manually create the initial virtualenv
-    command: >
-      pyvenv {{ project.virtualenv }}
-      creates="{{ project.virtualenv }}"
   - name: Install requirements with pip
     pip: >
       requirements="{{ project.srcroot }}requirements.txt"
       virtualenv="{{ project.virtualenv }}"
+      virtualenv_python=python3
   - name: Migrate Django database
     django_manage: >
       command=migrate
