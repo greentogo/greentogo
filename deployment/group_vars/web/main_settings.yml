@@ -15,7 +15,7 @@ project:
   srcroot: /opt/{{ project_name }}/src/
   maintainer_email: clinton@dreisbach.us
   virtualenv: /opt/{{ project_name }}/env/
-  domain: buy.durhamgreentogo.com
+  domain: purchase.durhamgreentogo.com
 
 django:
   root: "{{ project.srcroot }}/greentogo/"

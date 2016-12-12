@@ -3,11 +3,11 @@
   block:
   - name: Check out code
     local_action: git repo="{{ repo.url }}" dest="{{ git_tmp_dir }}" version={{ repo.branch }}
-  - name: Generate bundles
-    local_action: shell make prod chdir="{{ git_tmp_dir }}" executable=/bin/bash
+  # - name: Get ready for production
+  #   local_action: shell make prod chdir="{{ git_tmp_dir }}" executable=/bin/bash
 - name: Push files to production
   synchronize:
-    src="{{ git_tmp_dir }}backend/"
+    src="{{ git_tmp_dir }}"
     dest="{{ project.srcroot }}"
     recursive=yes
   notify:
@@ -25,7 +25,7 @@
       creates="{{ project.virtualenv }}"
   - name: Install requirements with pip
     pip: >
-      requirements="{{ project.root }}src/requirements.txt"
+      requirements="{{ project.srcroot }}requirements.txt"
       virtualenv="{{ project.virtualenv }}"
   - name: Migrate Django database
     django_manage: >
