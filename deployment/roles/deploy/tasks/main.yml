@@ -1,0 +1,41 @@
+---
+- become: no
+  block:
+  - name: Check out code
+    local_action: git repo="{{ repo.url }}" dest="{{ git_tmp_dir }}" version={{ repo.branch }}
+  - name: Generate bundles
+    local_action: shell make prod chdir="{{ git_tmp_dir }}" executable=/bin/bash
+- name: Push files to production
+  synchronize:
+    src="{{ git_tmp_dir }}backend/"
+    dest="{{ project.srcroot }}"
+    recursive=yes
+  notify:
+    - Reload systemd
+    - Restart uWSGI
+- name: Ensure project user owns code
+  file: path={{ project.srcroot }} state=directory owner={{ project.user }} recurse=yes
+- name: Install uwsgi
+  pip: name=uwsgi executable=pip3
+- become_user: "{{ project.user }}"
+  block:
+  - name: Manually create the initial virtualenv
+    command: >
+      pyvenv {{ project.virtualenv }}
+      creates="{{ project.virtualenv }}"
+  - name: Install requirements with pip
+    pip: >
+      requirements="{{ project.root }}src/requirements.txt"
+      virtualenv="{{ project.virtualenv }}"
+  - name: Migrate Django database
+    django_manage: >
+      command=migrate
+      app_path={{ django.root }}
+      settings={{ django.settings }}
+      virtualenv={{ project.virtualenv }}
+- name: Create uwsgi config
+  template: src=uwsgi.ini dest={{ project.root }}/uwsgi.ini
+- name: Create uwsgi systemd service
+  template: src=uwsgi.service dest=/etc/systemd/system/uwsgi.service
+- name: Make sure uwsgi is running
+  service: name=uwsgi enabled=yes state=restarted

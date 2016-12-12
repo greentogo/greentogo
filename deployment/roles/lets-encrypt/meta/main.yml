@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  author: Jason Robinson
+  description: A role to automate LetsEncrypt certificates.
+  license: MIT
+  min_ansible_version: 2.0
+  platforms:
+  - name: Ubuntu
+    versions:
+    - trusty
+  - name: Debian
+    versions:
+    - jessie
+  categories:
+  - cloud
+  - web
+  galaxy_tags:
+    - letsencrypt
+dependencies: []

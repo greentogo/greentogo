@@ -1,0 +1,20 @@
+- name: Install Postgres
+  apt: name={{ item }} state=present
+  with_items:
+    - postgresql-9.5
+    - postgresql-server-dev-9.5
+    - python-psycopg2
+- become_user: postgres
+  block:
+    - name: Create user
+      postgresql_user: >
+        name={{ secret.db_user }}
+        password={{ secret.db_password }}
+        role_attr_flags=CREATEDB,NOSUPERUSER
+    - name: Create database
+      postgresql_db: >
+        owner={{ secret.db_user }}
+        name={{ secret.db_name }}
+        encoding="UTF-8"
+- name: Make sure Postgres is running
+  service: name=postgresql enabled=yes state=restarted

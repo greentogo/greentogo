@@ -1,0 +1,26 @@
+---
+project_name: greentogo
+apt_upgrade: no
+git_tmp_dir: /tmp/greentogo/
+
+lets_encrypt:
+  email: clinton@dreisbach.us
+
+project:
+  name: "{{ project_name }}"
+  user: greentogo
+  group: www-data
+  mode: live
+  root: /opt/{{ project_name }}/
+  srcroot: /opt/{{ project_name }}/src/
+  maintainer_email: clinton@dreisbach.us
+  virtualenv: /opt/{{ project_name }}/env/
+  domain: buy.durhamgreentogo.com
+
+django:
+  root: "{{ project.srcroot }}/greentogo/"
+  settings: greentogo.settings
+
+repo:
+  branch: master
+  url: "git@gitlab.com:dontwastedurham/greentogo.git"

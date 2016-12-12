@@ -1,0 +1,6 @@
+---
+- name: Install aptitude
+  apt: name=aptitude state=present
+- name: Upgrade packages
+  apt: update_cache=yes upgrade=yes
+  when: apt_upgrade == True

@@ -1,0 +1,14 @@
+---
+- name: Create user and home directory
+  user:
+    home: "{{ project.root }}"
+    name: "{{ project.user }}"
+    groups: "{{ project.group }}"
+    state: present
+
+- name: Change user home directory permissions
+  file:
+    state: directory
+    owner: "{{ project.user }}"
+    group: "{{ project.group }}"
+    path: "{{ project.root }}"

@@ -1,0 +1,29 @@
+[Unit]
+Description=uWSGI Emperor
+After=syslog.target
+
+[Service]
+Environment=PYTHONPATH={{ django.root }}
+Environment=DJANGO_SETTINGS_MODULE={{ django.settings }}
+Environment=DATABASE_URL=postgresql://{{ secret.db_user }}:{{ secret.db_password }}@{{ secret.db_host }}:{{ secret.db_port }}/{{ secret.db_name }}
+Environment=SECRET_KEY={{ secret.secret_key }}
+Environment=STRIPE_SECRET_KEY={{ stripe.secret_key }}
+Environment=STRIPE_PUBLISHABLE_KEY={{ stripe.publishable_key }}
+Environment=EMAIL_ADDRESS={{ email.address }}
+Environment=EMAIL_PASSWORD={{ email.password }}
+Environment=EMAIL_SMTP_SERVER={{ email.smtp_server }}
+Environment=EMAIL_SMTP_PORT={{ email.smtp_port }}
+Environment=EMAIL_SECURE={{ email.secure }}
+Environment=EMAIL_REPLY_TO={{ email.reply_to }}
+Environment=EMAIL_ADMINS={{ email.admins }}
+
+ExecStart=/usr/local/bin/uwsgi --uid {{ project.user }} --ini {{ project.root }}uwsgi.ini
+RuntimeDirectory=uwsgi
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
