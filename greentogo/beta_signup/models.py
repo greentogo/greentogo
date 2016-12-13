@@ -41,6 +41,8 @@ class Subscription(models.Model):
         default=uuid.uuid4, editable=False, unique=True)
     customer = models.ForeignKey(Customer)
     plan = models.CharField(max_length=255)
+    gifted_to_name = models.CharField(max_length=255, blank=True)
+    gifted_to_email = models.CharField(max_length=255, blank=True)
     started_on = models.DateField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

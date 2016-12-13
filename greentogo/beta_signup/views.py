@@ -1,10 +1,11 @@
 from django.views.generic import View
 from django.conf import settings
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django import forms
-from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
+
 import stripe
 
 from .models import Customer, Subscription, get_plan_price, add_plan_price
@@ -17,26 +18,13 @@ def get_plans():
     return [add_plan_price(plan) for plan in plans]
 
 
-def json_success(data):
-    return JsonResponse({
-        "status": "success",
-        "data": data
-    })
-
-
-def json_error(message, data):
-    return JsonResponse({
-        "status": "error",
-        "message": message,
-        "data": data
-    })
-
-
 class SubscriptionForm(forms.Form):
     token = forms.CharField(max_length=100)
     name = forms.CharField(max_length=255)
     email = forms.CharField(max_length=255)
     plan = forms.CharField(max_length=100)
+    gifted_to_name = forms.CharField(max_length=255, required=False)
+    gifted_to_email = forms.CharField(max_length=255, required=False)
 
 
 class SubscriptionView(View):
@@ -75,38 +63,18 @@ class SubscriptionView(View):
                                 email=email)
             customer.save()
             if not customer.pk:
-                return json_error(
-                    "Could not create customer.",
-                    {
-                        "stripe_id": stripe_customer.id,
-                        "name": customer.name,
-                        "email": customer.email
-                    }
-                )
+                return redirect(reverse('beta-error'))
 
             subscription = Subscription(stripe_id=stripe_subscription.id,
                                         customer=customer,
-                                        plan=plan)
+                                        plan=plan,
+                                        gifted_to_name=form.cleaned_data[
+                                            'gifted_to_name'],
+                                        gifted_to_email=form.cleaned_data['gifted_to_email'])
             subscription.save()
             if not subscription.pk:
-                return json_error(
-                    "Could not create subscription.",
-                    {
-                        "stripe_id": subscription.stripe_id,
-                        "plan": subscription.plan,
-                    }
-                )
+                return redirect(reverse('beta-error'))
 
-            return json_success({
-                "customer": {
-                    "name": customer.name,
-                    "email": customer.email,
-                    "stripe_id": customer.stripe_id
-                },
-                "subscription": {
-                    "plan": subscription.plan,
-                    "stripe_id": subscription.stripe_id
-                }
-            })
+            return redirect(reverse('beta-thanks'))
         else:
-            return json_error("Your form data was invalid.", form.cleaned_data)
+            return redirect(reverse('beta-error'))

@@ -19,15 +19,33 @@
                 rent for some office space for our team.</p>
 
             <div>
-                <label for="plan">Subscription</label>
-                <select id="plan" name="plan">
-                    {% for plan in plans %}
-                        <option data-amount="{{ plan.amount }}" value="{{ plan.id }}">{{ plan.name }}: {{plan.display_price}}</option>
-                    {% endfor %}
-                </select>
-                <input id="name" type="text" name="name" placeholder="Your Name">
-                <p class="help-text" id="name-help-text" style="display: none;">You must enter a name.</p>
-                <button id="subscribe-button" class="button">Subscribe</button>
+                <form id="subscription-form" action="{% url 'beta-subscribe' %}" method="POST">
+                    <input type="hidden" name="token" id="token" value="">
+                    <input type="hidden" name="email" id="email" value="">
+                    <label for="plan">Subscription Plan</label>
+                    <select id="plan" name="plan">
+                        {% for plan in plans %}
+                            <option data-amount="{{ plan.amount }}" value="{{ plan.id }}">{{ plan.name }}: {{plan.display_price}}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="name">Your Name</label>
+                    <input id="name" type="text" name="name" placeholder="Your Name">
+                    <p class="help-text" id="name-help-text" style="display: none;">You must enter a name.</p>
+
+                    <fieldset>
+                        <legend>Gift Subscription</legend>
+                        <p class="help-text">
+                            GreenToGo subscriptions make great gifts. If you'd like to buy one as a gift, enter
+                            your recipient's name and email here. We will send the email with your subscription
+                            information to you so as not to spoil the surprise.
+                        </p>
+                        <label for="gifted_to_name">Recipient's Name</label>
+                        <input id="gifted_to_name" type="text" name="gifted_to_name" placeholder="">
+                        <label for="gifted_to_email">Recipient's Email</label>
+                        <input id="gifted_to_email" type="text" name="gifted_to_email" placeholder="">
+                    </fieldset>
+                    <button id="subscribe-button" class="button">Subscribe</button>
+                </form>
             </div>
 
             <script>
@@ -37,16 +55,8 @@
                     {% endfor %}
                 };
 
-                var customerName = $("#name").val();
-                var planId = $("#plan").val();
-
                 $("#name").on('change', function () {
                     $("#name").removeClass("error");
-                    customerName = $("#name").val();
-                });
-
-                $("#plan").on('change', function () {
-                    $("#plan").val();
                 });
 
                 var handler = StripeCheckout.configure({
@@ -54,29 +64,14 @@
                     image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
                     locale: 'auto',
                     token: function (token) {
-                        $.ajax({
-                            type: "POST",
-                            url: '{% url "beta-subscribe" %}',
-                            data: {
-                                token: token.id,
-                                email: token.email,
-                                name: customerName,
-                                plan: planId
-                            },
-                            dataType: "json",
-                            success: function (data) {
-                                if (data.status === "success") {
-                                    window.location = "{% url 'beta-thanks' %}";
-                                } else {
-                                    window.location = "{% url 'beta-error' %}";
-                                }
-                            }
-                        });
+                        $("#token").val(token.id);
+                        $("#email").val(token.email);
+                        $("#subscription-form").submit();
                     }
                 });
 
                 $("#subscribe-button").on('click', function (event) {
-                    $("#subscribe-button").prop("disabled", true);
+                    var customerName = $("#name").val();
 
                     // Validate a name was given.
                     if (!customerName) {
@@ -85,6 +80,9 @@
                         return false;
                     }
 
+                    $("#subscribe-button").prop("disabled", true);
+
+                    var planId = $("#plan").val();
                     var plan = plans[planId];
 
                     handler.open({

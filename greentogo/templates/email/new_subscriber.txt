@@ -13,3 +13,7 @@ Your plan details:
 Name: {{ plan.name }}
 Price: {{ plan.display_price }}
 Email used: {{ subscription.customer.email }}
+{% if subscription.gifted_to_name or subscription.gifted_to_email %}
+Name of gift recipient: {{ subscription.gifted_to_name }}
+Email of gift recipient: {{ subscription.gifted_to_email }}
+{% endif %}
