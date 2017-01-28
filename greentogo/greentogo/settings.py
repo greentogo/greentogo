@@ -59,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
 ]
 
 ROOT_URLCONF = 'greentogo.urls'
@@ -131,7 +132,6 @@ STATIC_ROOT = str(__root__.path("staticfiles/"))
 STATICFILES_DIRS = [str(__root__.path('bower_components/')),
                     str(__root__.path('greentogo/static/')), ]
 
-
 STRIPE_SECRET_KEY = __env__('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = __env__('STRIPE_PUBLISHABLE_KEY')
 
@@ -195,3 +195,10 @@ if not DEBUG:
             },
         },
     }
+
+ROLLBAR = {
+    'access_token': __env__('ROLLBAR_KEY'),
+    'environment': 'development' if DEBUG else 'production',
+    'branch': 'master',
+    'root': '/opt/greentogo/src',
+}

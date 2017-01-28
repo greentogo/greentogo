@@ -5,3 +5,4 @@ django_extensions
 werkzeug
 django-environ
 stripe
+rollbar

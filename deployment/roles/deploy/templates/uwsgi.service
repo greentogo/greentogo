@@ -9,6 +9,7 @@ Environment=DATABASE_URL=postgresql://{{ secret.db_user }}:{{ secret.db_password
 Environment=SECRET_KEY={{ secret.secret_key }}
 Environment=STRIPE_SECRET_KEY={{ stripe.secret_key }}
 Environment=STRIPE_PUBLISHABLE_KEY={{ stripe.publishable_key }}
+Environment=ROLLBAR_KEY={{ rollbar.key }}
 Environment=EMAIL_ADDRESS={{ email.address }}
 Environment=EMAIL_PASSWORD={{ email.password }}
 Environment=EMAIL_SMTP_SERVER={{ email.smtp_server }}
