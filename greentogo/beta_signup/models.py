@@ -47,6 +47,9 @@ class Subscription(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return "{}: {}".format(self.customer, self.plan)
+
     def save(self, *args, **kwargs):
         is_new = self.pk is None
         result = super().save(*args, **kwargs)
