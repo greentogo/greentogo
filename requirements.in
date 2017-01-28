@@ -1,0 +1,7 @@
+Django
+psycopg2
+django_compressor
+django_extensions
+werkzeug
+django-environ
+stripe
