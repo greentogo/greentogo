@@ -72,6 +72,9 @@ class Subscription(models.Model):
                     output_field=models.IntegerField())))['checked_out']
         return self.plan.number_of_boxes - (boxes_checked_out or 0)
 
+    def can_checkout(self):
+        return self.available_boxes() > 0
+
     def tag_location(self, location):
         self.locationtag_set.create(location=location)
 
