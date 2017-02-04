@@ -22,7 +22,6 @@ SITE_ROOT = __root__()
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
@@ -34,7 +33,6 @@ DEBUG = __env__('DEBUG')
 
 ALLOWED_HOSTS = ['purchase.durhamgreentogo.com', 'localhost', '127.0.0.1']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -44,11 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'compressor',
     'django_extensions',
-
     'beta_signup',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -64,50 +61,48 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'greentogo.urls'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
+TEMPLATES = [{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [os.path.join(BASE_DIR, 'templates')],
+    'APP_DIRS': True,
+    'OPTIONS': {
+        'context_processors': [
+            'django.template.context_processors.debug',
+            'django.template.context_processors.request',
+            'django.contrib.auth.context_processors.auth',
+            'django.contrib.messages.context_processors.messages',
+        ],
     },
-]
+}, ]
 
 WSGI_APPLICATION = 'greentogo.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-DATABASES = {
-    'default': __env__.db()
-}
+DATABASES = {'default': __env__.db()}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
@@ -122,15 +117,15 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-
 STATIC_URL = '/static/'
 STATIC_ROOT = str(__root__.path("staticfiles/"))
-STATICFILES_DIRS = [str(__root__.path('bower_components/')),
-                    str(__root__.path('greentogo/static/')), ]
+STATICFILES_DIRS = [
+    str(__root__.path('bower_components/')),
+    str(__root__.path('greentogo/static/')),
+]
 
 STRIPE_SECRET_KEY = __env__('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = __env__('STRIPE_PUBLISHABLE_KEY')
@@ -187,10 +182,11 @@ if not DEBUG:
                 'level': 'ERROR',
                 'propagate': False,
             },
-            # Your own app - this assumes all your logger names start with "myapp."
+            # Your own app - this assumes all your logger names start with
+            # "myapp."
             'greentogo': {
                 'handlers': ['logfile'],
-                'level': 'WARNING', # Or maybe INFO or DEBUG
+                'level': 'WARNING',  # Or maybe INFO or DEBUG
                 'propagate': False
             },
         },

@@ -1,8 +1,16 @@
-Django
+Django~=1.10.4
 psycopg2
-django_compressor
-django_extensions
+django_compressor==2.1
+django_extensions==1.7.5
 werkzeug
 django-environ
 stripe
 rollbar
+
+# Development
+pytest
+pytest-django
+ipython
+yapf
+faker
+pre-commit
