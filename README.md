@@ -9,11 +9,6 @@ Development Setup
 1. pip install -r requirements.txt
 2. createdb -E UTF-8 greentogo
 
-## Assumptions to question
-
-- One subscription has one email address
-- One email address has one subscription
-
 ## Things that can happen
 
 - Customers can buy a subscription
@@ -53,3 +48,13 @@ Development Setup
 * stripe_id
 * parent_subscription? -- this is to handle corporate subscriptions
     * maybe corporate subscriptions work differently, with a separate table for them and each of the sub-subscriptions are in this table
+
+## Notes
+
+* Models are done. There's some confusion understanding owned subscriptions vs linked subscriptions and I think they need to be looked at again.
+* Admin has begun. May need to make something easier in the long run.
+* Authentication works with Customer objects!
+* Next steps: API
+  * Authenticate and get token
+  * Check out box
+  * Check in box

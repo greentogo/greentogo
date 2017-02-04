@@ -40,10 +40,16 @@ class Customer(models.Model):
             encoded=self._encrypted_password,
             setter=self.set_password)
 
+    def __str__(self):
+        return self.name
+
 
 class EmailAddress(models.Model):
     customer = models.ForeignKey(Customer)
     address = models.EmailField()
+
+    def __str__(self):
+        return self.address
 
 
 class Subscription(models.Model):
@@ -53,12 +59,15 @@ class Subscription(models.Model):
     One or more subscriptions can belong to the same customer.
     This should be a many-to-many relationship.
     """
-    admin = models.ForeignKey(Customer)
+    admin = models.ForeignKey(Customer, related_name="owned_subscriptions")
     plan = models.ForeignKey('SubscriptionPlan')
-    started_on = models.DateTimeField()
-    expires_on = models.DateTimeField(blank=True, null=True)
+    started_on = models.DateField()
+    expires_on = models.DateField(blank=True, null=True)
     stripe_id = models.CharField(
         max_length=100, unique=True, blank=True, null=True)
+
+    def __str__(self):
+        return "{}: {}".format(self.admin, self.plan)
 
     def available_boxes(self):
         boxes_checked_out = LocationTag.objects.filter(
@@ -84,9 +93,12 @@ class SubscriptionPlan(models.Model):
         max_length=25,
         unique=True,
         help_text="Code must be capital letters and numbers with no spaces.",
-        validators=[RegexValidator(r"^[A-Z0-9]$"), ])
+        validators=[RegexValidator(r"^[A-Z0-9]+$"), ])
     description = models.CharField(max_length=255)
     number_of_boxes = models.PositiveIntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return self.description
 
 
 class Location(models.Model):
