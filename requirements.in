@@ -1,7 +1,7 @@
 Django~=1.10.4
 psycopg2
-django_compressor==2.1
-django_extensions==1.7.5
+django-compressor==2.1
+django-extensions==1.7.5
 werkzeug
 django-environ
 stripe
