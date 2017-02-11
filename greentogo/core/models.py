@@ -4,62 +4,49 @@ from django.db.models import Sum, Case, When
 from django.contrib.auth import hashers
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.conf import settings
 
 
-class Customer(models.Model):
-    """GreenToGo customer model.
+class User(AbstractUser):
+    pass
 
-    A customer can have one or more subscriptions.
-    A customer can have one or more emails.
+
+class Subscriber(models.Model):
+    """GreenToGo subscriber model.
+
+    A subscriber can have one or more subscriptions.
+    A subscriber belongs to a user.
     """
-    name = models.CharField(max_length=255)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     subscriptions = models.ManyToManyField('Subscription')
-    _encrypted_password = models.CharField(max_length=100)
 
     @property
-    def password(self):
-        if not hasattr(self, '_password'):
-            self._password = None
-        return self._password
-
-    @password.setter
-    def password(self, password):
-        self.set_password(password)
-
-    @password.deleter
-    def password(self):
-        self._password = None
-
-    def set_password(self, password):
-        self._password = password
-        self._encrypted_password = hashers.make_password(password)
-
-    def check_password(self, possible_password):
-        return hashers.check_password(
-            password=possible_password,
-            encoded=self._encrypted_password,
-            setter=self.set_password)
-
-    def __str__(self):
-        return self.name
+    def username(self):
+        return self.user.username
 
 
-class EmailAddress(models.Model):
-    customer = models.ForeignKey(Customer)
-    address = models.EmailField()
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_subscriber(sender, instance, created, **kwargs):
+    if created:
+        Subscriber.objects.create(user=instance)
 
-    def __str__(self):
-        return self.address
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def save_subscriber(sender, instance, **kwargs):
+    instance.subscriber.save()
 
 
 class Subscription(models.Model):
     """GreenToGo subscription model.
 
-    A subscription can belong to more than one customer.
-    One or more subscriptions can belong to the same customer.
+    A subscription can belong to more than one subscriber.
+    One or more subscriptions can belong to the same subscriber.
     This should be a many-to-many relationship.
     """
-    admin = models.ForeignKey(Customer, related_name="owned_subscriptions")
+    admin = models.ForeignKey(Subscriber, related_name="owned_subscriptions")
     plan = models.ForeignKey('SubscriptionPlan')
     started_on = models.DateField()
     expires_on = models.DateField(blank=True, null=True)

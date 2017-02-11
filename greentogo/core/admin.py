@@ -1,9 +1,5 @@
 from django.contrib import admin
-from .models import EmailAddress, Customer, Subscription, SubscriptionPlan, Location
-
-
-class EmailAddressInline(admin.TabularInline):
-    model = EmailAddress
+from .models import User, Subscriber, Subscription, SubscriptionPlan, Location
 
 
 class OwnedSubscriptionInline(admin.TabularInline):
@@ -19,17 +15,16 @@ class OwnedSubscriptionInline(admin.TabularInline):
 
 
 class LinkedSubscriptionInline(admin.StackedInline):
-    model = Customer.subscriptions.through
+    model = Subscriber.subscriptions.through
 
 
-class CustomerAdmin(admin.ModelAdmin):
-    inlines = [
-        EmailAddressInline, LinkedSubscriptionInline, OwnedSubscriptionInline
-    ]
-    fields = ('name', )
-    list_display = ('name', )
+class SubscriberAdmin(admin.ModelAdmin):
+    inlines = [LinkedSubscriptionInline, OwnedSubscriptionInline]
+    fields = ('user', )
+    list_display = ('username', )
 
 
+admin.site.register(User)
 admin.site.register(Location)
 admin.site.register(SubscriptionPlan)
-admin.site.register(Customer, CustomerAdmin)
+admin.site.register(Subscriber, SubscriberAdmin)
