@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .permissions import HasSubscription
+from .serializers import LocationTagSerializer
 from core.models import Location, LocationTag
 
 
@@ -31,24 +32,14 @@ class CheckinCheckoutView(APIView):
 
     def checkin(self, subscription, location):
         if subscription.can_checkin():
-            subscription.tag_location(location)
-            return Response({
-                "service": location.service,
-                "subscription": subscription.pk,
-                "location": location.uuid,
-                "available_boxes": subscription.available_boxes()
-            })
+            tag = subscription.tag_location(location)
+            return Response(LocationTagSerializer(tag).data)
         else:
             return Response({"detail": "Subscription has no boxes out."})
 
     def checkout(self, subscription, location):
         if subscription.can_checkout():
-            subscription.tag_location(location)
-            return Response({
-                "service": location.service,
-                "subscription": subscription.pk,
-                "location": location.uuid,
-                "available_boxes": subscription.available_boxes()
-            })
+            tag = subscription.tag_location(location)
+            return Response(LocationTagSerializer(tag).data)
         else:
             return Response({"detail": "Subscription has no available boxes."})

@@ -75,7 +75,7 @@ class Subscription(models.Model):
         return self.available_boxes() < self.plan.number_of_boxes
 
     def tag_location(self, location):
-        self.locationtag_set.create(location=location)
+        return self.locationtag_set.create(location=location)
 
 
 class SubscriptionPlan(models.Model):

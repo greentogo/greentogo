@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'djoser',
     'beta_signup',
     'core',
+    'apiv1',
 ]
 
 MIDDLEWARE = [
