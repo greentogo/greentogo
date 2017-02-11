@@ -71,6 +71,9 @@ class Subscription(models.Model):
     def can_checkout(self):
         return self.available_boxes() > 0
 
+    def can_checkin(self):
+        return self.available_boxes() < self.plan.number_of_boxes
+
     def tag_location(self, location):
         self.locationtag_set.create(location=location)
 

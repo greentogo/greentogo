@@ -13,6 +13,8 @@ django-compressor==2.1
 django-environ==0.4.1
 django-extensions==1.7.5
 django==1.10.5
+djangorestframework==3.5.4
+djoser==0.5.4
 faker==0.7.7
 ipython-genutils==0.1.0   # via traitlets
 ipython==5.2.2

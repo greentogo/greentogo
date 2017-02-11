@@ -24,7 +24,13 @@ class SubscriberAdmin(admin.ModelAdmin):
     list_display = ('username', )
 
 
+class LocationAdmin(admin.ModelAdmin):
+    list_display = (
+        'uuid',
+        'service', )
+
+
 admin.site.register(User)
-admin.site.register(Location)
+admin.site.register(Location, LocationAdmin)
 admin.site.register(SubscriptionPlan)
 admin.site.register(Subscriber, SubscriberAdmin)

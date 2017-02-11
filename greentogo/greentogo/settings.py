@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'compressor',
     'django_extensions',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
     'beta_signup',
     'core',
 ]
@@ -107,6 +110,16 @@ AUTH_PASSWORD_VALIDATORS = [
 # Authentication
 
 AUTH_USER_MODEL = 'core.User'
+
+# API
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES':
+    ('rest_framework.authentication.TokenAuthentication', ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        #        'rest_framework.permissions.IsAuthenticated',
+        'apiv1.permissions.IsSubscriber', ),
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/

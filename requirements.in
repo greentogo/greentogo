@@ -6,6 +6,8 @@ werkzeug
 django-environ
 stripe
 rollbar
+djoser
+djangorestframework
 
 # Development
 pytest
