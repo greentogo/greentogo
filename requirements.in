@@ -4,6 +4,7 @@ django-compressor==2.1
 django-extensions==1.7.5
 werkzeug
 django-environ
+pinax-stripe
 stripe
 rollbar
 djoser
@@ -16,3 +17,4 @@ ipython
 yapf
 faker
 pre-commit
+vcrpy

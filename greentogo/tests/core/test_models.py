@@ -1,9 +1,10 @@
+import pytest
+
+pytest.mark.usefixtures('betamax_session')
+
+
 def test_location_has_uuid(checkin_location):
     assert checkin_location.uuid is not None
-
-
-def test_subscription_has_admin(subscription1):
-    assert subscription1.admin is not None
 
 
 def test_available_boxes_for_subscription(subscription2):

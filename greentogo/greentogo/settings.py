@@ -36,21 +36,30 @@ ALLOWED_HOSTS = ['purchase.durhamgreentogo.com', 'localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    # core
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
+    # third-party
     'compressor',
     'django_extensions',
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
+    "pinax.stripe",
+
+    # ours
     'beta_signup',
     'core',
     'apiv1',
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -147,6 +156,9 @@ STATICFILES_DIRS = [
 
 STRIPE_SECRET_KEY = __env__('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = __env__('STRIPE_PUBLISHABLE_KEY')
+
+PINAX_STRIPE_PUBLIC_KEY = __env__('STRIPE_PUBLISHABLE_KEY')
+PINAX_STRIPE_SECRET_KEY = __env__('STRIPE_SECRET_KEY')
 
 # Email
 EMAIL_HOST_USER = __env__('EMAIL_ADDRESS')

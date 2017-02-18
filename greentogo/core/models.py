@@ -9,9 +9,54 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 
+import pinax.stripe.models as pinax_models
+
 
 class User(AbstractUser):
     pass
+
+
+class Subscription(pinax_models.Subscription):
+    """GreenToGo subscription model.
+
+    A subscription can belong to more than one subscriber.
+    One or more subscriptions can belong to the same subscriber.
+    This should be a many-to-many relationship.
+    """
+
+    class Meta:
+        proxy = True
+
+    @property
+    def number_of_boxes(self):
+        try:
+            number_of_boxes = int(
+                self.plan.metadata.get("number_of_boxes", "1"))
+        except ValueError:
+            number_of_boxes = 1
+
+        return number_of_boxes
+
+    def available_boxes(self):
+        boxes_checked_out = LocationTag.objects.filter(
+            subscription=self).aggregate(checked_out=Sum(
+                Case(
+                    When(
+                        location__service=Location.CHECKOUT, then=1),
+                    When(
+                        location__service=Location.CHECKIN, then=-1),
+                    default=1,
+                    output_field=models.IntegerField())))['checked_out']
+        return self.number_of_boxes - (boxes_checked_out or 0)
+
+    def can_checkout(self):
+        return self.available_boxes() > 0
+
+    def can_checkin(self):
+        return self.available_boxes() < self.number_of_boxes
+
+    def tag_location(self, location):
+        return self.locationtag_set.create(location=location)
 
 
 class Subscriber(models.Model):
@@ -21,7 +66,8 @@ class Subscriber(models.Model):
     A subscriber belongs to a user.
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    subscriptions = models.ManyToManyField('Subscription')
+    subscriptions = models.ManyToManyField(
+        Subscription, related_name="subscribers")
 
     @property
     def username(self):
@@ -35,60 +81,15 @@ def create_subscriber(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_stripe_customer(sender, instance, created, **kwargs):
+    if created:
+        from pinax.stripe.actions import customers
+        customers.create(user=instance)
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def save_subscriber(sender, instance, **kwargs):
     instance.subscriber.save()
-
-
-class Subscription(models.Model):
-    """GreenToGo subscription model.
-
-    A subscription can belong to more than one subscriber.
-    One or more subscriptions can belong to the same subscriber.
-    This should be a many-to-many relationship.
-    """
-    admin = models.ForeignKey(Subscriber, related_name="owned_subscriptions")
-    plan = models.ForeignKey('SubscriptionPlan')
-    started_on = models.DateField()
-    expires_on = models.DateField(blank=True, null=True)
-    stripe_id = models.CharField(
-        max_length=100, unique=True, blank=True, null=True)
-
-    def __str__(self):
-        return "{}: {}".format(self.admin, self.plan)
-
-    def available_boxes(self):
-        boxes_checked_out = LocationTag.objects.filter(
-            subscription=self).aggregate(checked_out=Sum(
-                Case(
-                    When(
-                        location__service=Location.CHECKOUT, then=1),
-                    When(
-                        location__service=Location.CHECKIN, then=-1),
-                    default=1,
-                    output_field=models.IntegerField())))['checked_out']
-        return self.plan.number_of_boxes - (boxes_checked_out or 0)
-
-    def can_checkout(self):
-        return self.available_boxes() > 0
-
-    def can_checkin(self):
-        return self.available_boxes() < self.plan.number_of_boxes
-
-    def tag_location(self, location):
-        return self.locationtag_set.create(location=location)
-
-
-class SubscriptionPlan(models.Model):
-    code = models.CharField(
-        max_length=25,
-        unique=True,
-        help_text="Code must be capital letters and numbers with no spaces.",
-        validators=[RegexValidator(r"^[A-Z0-9]+$"), ])
-    description = models.CharField(max_length=255)
-    number_of_boxes = models.PositiveIntegerField(null=True, blank=True)
-
-    def __str__(self):
-        return self.description
 
 
 class Location(models.Model):
