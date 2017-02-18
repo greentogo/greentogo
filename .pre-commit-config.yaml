@@ -1,10 +1,10 @@
 -   repo: git://github.com/pre-commit/pre-commit-hooks
-    sha: 96fb7fa10f2f4c11ed33482a9ad7474251e5e97f
+    sha: e626cd57090d8df0be21e4df0f4e55cc3511d6ab
     hooks:
     -   id: trailing-whitespace
     -   id: check-merge-conflict
     -   id: end-of-file-fixer
 -   repo: git://github.com/pre-commit/mirrors-yapf
-    sha: 23d995302ef6716c27f10441b9fd3ccb43c1c489
+    sha: v0.15.0.post1
     hooks:
     -   id: yapf
