@@ -1,4 +1,4 @@
-Dear {{ subscription.customer.name }},
+Dear {{ subscription.customer.user.name }},
 
 Thank you so much for signing up for Durham GreenToGo! We cannot thank you
 enough for supporting us while we are getting GreenToGo off the ground.
@@ -12,8 +12,8 @@ Your plan details:
 
 Name: {{ plan.name }}
 Price: {{ plan.display_price }}
-Email used: {{ subscription.customer.email }}
-{% if subscription.gifted_to_name or subscription.gifted_to_email %}
-Name of gift recipient: {{ subscription.gifted_to_name }}
-Email of gift recipient: {{ subscription.gifted_to_email }}
+Email used: {{ subscription.customer.user.email }}
+{% if subscription.giftsubscription %}
+Name of gift recipient: {{ subscription.giftsubscription.gifted_to_name }}
+Email of gift recipient: {{ subscription.giftsubscription.gifted_to_email }}
 {% endif %}

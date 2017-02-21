@@ -1,0 +1,9 @@
+* TODO Fix email sent when charged -- this is in pinax.stripe
+* TODO Update web application
+** TODO Migrate data over into new schema
+
+* TODO Add actions for each webhook message
+* DONE Convert beta signup to use pinax.stripe
+* TODO Create report for Crystal
+** TODO Add report to admin
+* TODO Consider making a standard web application first

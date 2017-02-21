@@ -1,10 +1,10 @@
 A new customer has signed up for GreenToGo!
 
-Customer Name: {{ subscription.customer.name }}
-Customer Email: {{ subscription.customer.email }}
+Customer Name: {{ subscription.customer.user.name }}
+Customer Email: {{ subscription.customer.user.email }}
 Plan Name: {{ plan.name }}
 Plan Price: {{ plan.display_price }}
-{% if subscription.gifted_to_name or subscription.gifted_to_email %}
-Name of gift recipient: {{ subscription.gifted_to_name }}
-Email of gift recipient: {{ subscription.gifted_to_email }}
+{% if subscription.giftsubscription %}
+Name of gift recipient: {{ subscription.giftsubscription.gifted_to_name }}
+Email of gift recipient: {{ subscription.giftsubscription.gifted_to_email }}
 {% endif %}

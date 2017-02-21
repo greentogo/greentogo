@@ -31,7 +31,10 @@ SECRET_KEY = '1+rc*=eii(d_im=1%x(q4di-_)14=ksa6u70nzs_h61m(+1zda'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = __env__('DEBUG')
 
-ALLOWED_HOSTS = ['purchase.durhamgreentogo.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    'purchase.durhamgreentogo.com', 'greentogo.ngrok.io', 'localhost',
+    '127.0.0.1'
+]
 
 # Application definition
 

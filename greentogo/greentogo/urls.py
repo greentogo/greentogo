@@ -17,11 +17,13 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from django.views.generic import TemplateView
 
+from pinax.stripe.views import Webhook as StripeWebhook
 from beta_signup import views
 
 urlpatterns = [
     url(r'^$', views.SubscriptionView.as_view(), name='payment'),
     url(r'^auth/', include('djoser.urls.authtoken')),
+    url(r'^webhook/', StripeWebhook.as_view(), name="pinax_stripe_webhook"),
     url(r'^beta-subscribe/$',
         views.SubscriptionView.as_view(),
         name="beta-subscribe"),

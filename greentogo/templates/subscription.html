@@ -25,7 +25,7 @@
                     <label for="plan">Subscription Plan</label>
                     <select id="plan" name="plan">
                         {% for plan in plans %}
-                            <option data-amount="{{ plan.amount }}" value="{{ plan.id }}">{{ plan.name }}: {{plan.display_price}}</option>
+                            <option data-amount="{{ plan.amount }}" value="{{ plan.stripe_id }}">{{ plan.name }}: {{plan.display_price}}</option>
                         {% endfor %}
                     </select>
                     <label for="name">Your Name</label>
@@ -51,7 +51,7 @@
             <script>
                 var plans = {
                     {% for plan in plans %}
-                        '{{ plan.id }}': {amount: {{ plan.amount }}, name: '{{ plan.name }}'}{% if not forloop.last %},{% endif %}
+                        '{{ plan.stripe_id }}': {amount: {{ plan.amount }}, name: '{{ plan.name }}'}{% if not forloop.last %},{% endif %}
                     {% endfor %}
                 };
 

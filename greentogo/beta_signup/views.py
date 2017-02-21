@@ -6,16 +6,17 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 
-import stripe
+from django.contrib.auth import get_user_model
 
-from .models import Customer, Subscription, get_plan_price, add_plan_price
+import stripe
+from pinax.stripe.models import Plan
+from pinax.stripe.actions import invoices, customers, subscriptions
+
+from .models import get_plans, send_subscriber_email, send_admin_email, GiftSubscription
+
+User = get_user_model()
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
-
-
-def get_plans():
-    plans = sorted(stripe.Plan.list()['data'], key=lambda p: p['amount'])
-    return [add_plan_price(plan) for plan in plans]
 
 
 class SubscriptionForm(forms.Form):
@@ -28,7 +29,6 @@ class SubscriptionForm(forms.Form):
 
 
 class SubscriptionView(View):
-
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -36,10 +36,9 @@ class SubscriptionView(View):
     def get(self, request, *args, **kwargs):
         plans = get_plans()
         stripe_key = settings.STRIPE_PUBLISHABLE_KEY
-        return render(request, 'subscription.html', {
-            'plans': plans,
-            'stripe_key': stripe_key
-        })
+        return render(request, 'subscription.html',
+                      {'plans': plans,
+                       'stripe_key': stripe_key})
 
     def post(self, request, *args, **kwargs):
         form = SubscriptionForm(request.POST)
@@ -47,33 +46,32 @@ class SubscriptionView(View):
             email = form.cleaned_data['email']
             name = form.cleaned_data['name']
             plan = form.cleaned_data['plan']
+            token = form.cleaned_data['token']
 
-            stripe_customer = stripe.Customer.create(
-                email=email,
-                source=form.cleaned_data['token'],
-            )
+            try:
+                user = User.objects.get(email=email)
+                user.name = name
+                user.save()
+            except User.DoesNotExist:
+                user = User.objects.create_user(
+                    username=email, email=email, name=name)
 
-            stripe_subscription = stripe.Subscription.create(
-                customer=stripe_customer.id,
-                plan=plan,
-            )
+            customer = customers.get_customer_for_user(user)
+            if customer is None:
+                customer = customers.create(user)
 
-            customer = Customer(stripe_id=stripe_customer.id,
-                                name=name,
-                                email=email)
-            customer.save()
-            if not customer.pk:
-                return redirect(reverse('beta-error'))
+            subscription = subscriptions.create(
+                customer, plan=plan, token=token)
 
-            subscription = Subscription(stripe_id=stripe_subscription.id,
-                                        customer=customer,
-                                        plan=plan,
-                                        gifted_to_name=form.cleaned_data[
-                                            'gifted_to_name'],
-                                        gifted_to_email=form.cleaned_data['gifted_to_email'])
-            subscription.save()
-            if not subscription.pk:
-                return redirect(reverse('beta-error'))
+            if form.cleaned_data['gifted_to_name']:
+                gift = GiftSubscription(
+                    stripe_subscription=subscription,
+                    gifted_to_name=form.cleaned_data['gifted_to_name'],
+                    gifted_to_email=form.cleaned_data['gifted_to_email'], )
+                gift.save()
+
+            send_subscriber_email(subscription)
+            send_admin_email(subscription)
 
             return redirect(reverse('beta-thanks'))
         else:

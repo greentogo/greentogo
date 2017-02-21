@@ -13,7 +13,7 @@ import pinax.stripe.models as pinax_models
 
 
 class User(AbstractUser):
-    pass
+    name = models.CharField(max_length=255, blank=True, null=True)
 
 
 class Subscription(pinax_models.Subscription):
