@@ -1,0 +1,26 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="medium-12 columns">
+        <h2>Your Account</h2>
+
+        <h3>Subscriptions</h3>
+        {% if subscriptions %}
+        <ul>
+            {% for subscription in subscriptions %}
+            <li>
+                <a href="{% url 'subscription' sub_id=subscription.id %}">
+                    {{ subscription.name }}
+                </a>
+                (Ends: {{ subscription.ends }})
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>You do not have any subscriptions currently.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

@@ -23,6 +23,10 @@ from beta_signup import views as beta_views
 
 urlpatterns = [
     url(r'^$', core_views.index, name='index'),
+    url(r'^subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/$',
+        core_views.subscription,
+        name='subscription'),
+    url(r'^accounts/profile/$', core_views.account, name='account'),
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^auth/', include('djoser.urls.authtoken')),
     url(r'^webhook/', StripeWebhook.as_view(), name="pinax_stripe_webhook"),

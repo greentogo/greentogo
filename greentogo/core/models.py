@@ -27,6 +27,10 @@ class Subscription(pinax_models.Subscription):
     class Meta:
         proxy = True
 
+    @classmethod
+    def from_pinax(cls, sub):
+        return cls.objects.get(pk=sub.pk)
+
     @property
     def number_of_boxes(self):
         try:
@@ -41,10 +45,8 @@ class Subscription(pinax_models.Subscription):
         boxes_checked_out = LocationTag.objects.filter(
             subscription=self).aggregate(checked_out=Sum(
                 Case(
-                    When(
-                        location__service=Location.CHECKOUT, then=1),
-                    When(
-                        location__service=Location.CHECKIN, then=-1),
+                    When(location__service=Location.CHECKOUT, then=1),
+                    When(location__service=Location.CHECKIN, then=-1),
                     default=1,
                     output_field=models.IntegerField())))['checked_out']
         return self.number_of_boxes - (boxes_checked_out or 0)
@@ -95,9 +97,7 @@ def save_subscriber(sender, instance, **kwargs):
 class Location(models.Model):
     CHECKIN = 'IN'
     CHECKOUT = 'OUT'
-    SERVICE_CHOICES = (
-        (CHECKIN, 'Check in'),
-        (CHECKOUT, 'Check out'), )
+    SERVICE_CHOICES = ((CHECKIN, 'Check in'), (CHECKOUT, 'Check out'), )
 
     uuid = models.UUIDField(primary_key=True)
     service = models.CharField(max_length=25, choices=SERVICE_CHOICES)
