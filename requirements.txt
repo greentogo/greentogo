@@ -4,7 +4,7 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-appdirs==1.4.0            # via setuptools
+appdirs==1.4.2            # via setuptools
 aspy.yaml==0.2.2          # via pre-commit
 cached-property==1.3.0    # via pre-commit
 decorator==4.0.11         # via ipython, traitlets
@@ -13,12 +13,12 @@ django-compressor==2.1
 django-environ==0.4.1
 django-extensions==1.7.5
 django-registration-redux==1.4
-django==1.10.5
+Django==1.10.5            # via django-environ, jsonfield, pinax-stripe
 djangorestframework==3.5.4
 djoser==0.5.4
-faker==0.7.7
+faker==0.7.8
 ipython-genutils==0.1.0   # via traitlets
-ipython==5.2.2
+ipython==5.3.0
 jsonfield==1.0.3          # via pinax-stripe
 jsonschema==2.6.0         # via pre-commit
 multidict==2.1.4          # via yarl
@@ -27,7 +27,7 @@ packaging==16.8           # via setuptools
 pexpect==4.2.1            # via ipython
 pickleshare==0.7.4        # via ipython
 pinax-stripe==3.3.0
-pre-commit==0.12.2
+pre-commit==0.13.3
 prompt-toolkit==1.0.13    # via ipython
 psycopg2==2.6.2
 ptyprocess==0.5.1         # via pexpect
@@ -45,8 +45,8 @@ rjsmin==1.0.12            # via django-compressor
 rollbar==0.13.11
 simplegeneric==0.8.1      # via ipython
 six==1.10.0               # via django-environ, django-extensions, faker, packaging, pinax-stripe, prompt-toolkit, python-dateutil, rollbar, setuptools, traitlets, vcrpy
-stripe==1.46.0
-traitlets==4.3.1          # via ipython
+stripe==1.48.1
+traitlets==4.3.2          # via ipython
 vcrpy==1.10.5
 virtualenv==15.1.0        # via pre-commit
 wcwidth==0.1.7            # via prompt-toolkit

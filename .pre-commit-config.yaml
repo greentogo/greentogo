@@ -5,6 +5,6 @@
     -   id: check-merge-conflict
     -   id: end-of-file-fixer
 -   repo: git://github.com/pre-commit/mirrors-yapf
-    sha: v0.15.0.post1
+    sha: v0.16.0
     hooks:
     -   id: yapf
