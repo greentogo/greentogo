@@ -41,12 +41,13 @@ ALLOWED_HOSTS = [
 INSTALLED_APPS = [
     # core
     'django.contrib.admin',
-    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    "registration",  # third-party, needs to be above django.contrib.auth
+    'django.contrib.auth',
 
     # third-party
     'compressor',
@@ -72,8 +73,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
 ]
+
+if not DEBUG:
+    MIDDLEWARE += [
+        'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
+    ]
 
 ROOT_URLCONF = 'greentogo.urls'
 
@@ -231,3 +236,8 @@ ROLLBAR = {
     'branch': 'master',
     'root': '/opt/greentogo/src',
 }
+
+## Registration
+
+ACCOUNT_ACTIVATION_DAYS = 7
+REGISTRATION_AUTO_LOGIN = True

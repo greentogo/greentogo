@@ -18,14 +18,16 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 
 from pinax.stripe.views import Webhook as StripeWebhook
-from beta_signup import views
+from core import views as core_views
+from beta_signup import views as beta_views
 
 urlpatterns = [
-    url(r'^$', views.SubscriptionView.as_view(), name='payment'),
+    url(r'^$', core_views.index, name='index'),
+    url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^auth/', include('djoser.urls.authtoken')),
     url(r'^webhook/', StripeWebhook.as_view(), name="pinax_stripe_webhook"),
     url(r'^beta-subscribe/$',
-        views.SubscriptionView.as_view(),
+        beta_views.SubscriptionView.as_view(),
         name="beta-subscribe"),
     url(r'^thanks/',
         TemplateView.as_view(template_name="thanks.html"),

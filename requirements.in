@@ -9,6 +9,7 @@ stripe
 rollbar
 djoser
 djangorestframework
+django-registration-redux
 
 # Development
 pytest
