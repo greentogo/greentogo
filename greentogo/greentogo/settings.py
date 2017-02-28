@@ -82,19 +82,21 @@ if not DEBUG:
 
 ROOT_URLCONF = 'greentogo.urls'
 
-TEMPLATES = [{
-    'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'DIRS': [os.path.join(BASE_DIR, 'templates')],
-    'APP_DIRS': True,
-    'OPTIONS': {
-        'context_processors': [
-            'django.template.context_processors.debug',
-            'django.template.context_processors.request',
-            'django.contrib.auth.context_processors.auth',
-            'django.contrib.messages.context_processors.messages',
-        ],
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
     },
-}, ]
+]
 
 WSGI_APPLICATION = 'greentogo.wsgi.application'
 
@@ -161,6 +163,19 @@ STATICFILES_DIRS = [
     str(__root__.path('bower_components/')),
     str(__root__.path('greentogo/static/')),
 ]
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    # other finders..
+    'compressor.finders.CompressorFinder', )
+
+# Django compressor
+
+COMPRESS_PRECOMPILERS = (('text/scss', 'node-sass ' + " ".join(
+    ["--include-path {}".format(d) for d in STATICFILES_DIRS]) + ' {infile}'),
+                         )
+
+# Secret settings
 
 STRIPE_SECRET_KEY = __env__('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = __env__('STRIPE_PUBLISHABLE_KEY')

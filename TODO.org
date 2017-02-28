@@ -10,4 +10,5 @@
 * DONE Create login page
 * TODO Create account page
 * TODO Create new subscription page
+* TODO Style application
 

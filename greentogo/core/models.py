@@ -16,6 +16,7 @@ class User(AbstractUser):
     name = models.CharField(max_length=255, blank=True, null=True)
 
 
+# TODO Change from inheritance to composition
 class Subscription(pinax_models.Subscription):
     """GreenToGo subscription model.
 
