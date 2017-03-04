@@ -9,6 +9,12 @@
 * TODO Create home page
 * DONE Create login page
 * TODO Create account page
+** TODO Change email address
+** TODO Change password
+** TODO Show current subscription status
+** TODO Upgrade subscription
+** DONE Cancel subscription
+** TODO Add confirmation to subscription cancellatiosn
 * TODO Create new subscription page
 * TODO Style application
 
