@@ -12,6 +12,24 @@ from django.conf import settings
 import pinax.stripe.models as pinax_models
 
 
+def get_plan_price(plan):
+    return "${:.02f}".format(plan.amount)
+
+
+def plan_to_dict(plan):
+    return {
+        'stripe_id': plan.stripe_id,
+        'name': plan.name,
+        'amount': int(plan.amount * 100),
+        'display_price': get_plan_price(plan)
+    }
+
+
+def get_plans():
+    plans = pinax_models.Plan.objects.order_by('amount')
+    return [plan_to_dict(plan) for plan in plans]
+
+
 class User(AbstractUser):
     name = models.CharField(max_length=255, blank=True, null=True)
 
@@ -39,23 +57,29 @@ class Subscription(pinax_models.Subscription):
         return cls.objects.get(pk=sub.pk)
 
     @property
+    def canceled(self):
+        return self.canceled_at is not None
+
+    @property
     def number_of_boxes(self):
         try:
-            number_of_boxes = int(
-                self.plan.metadata.get("number_of_boxes", "1"))
+            number_of_boxes = int(self.plan.metadata.get("number_of_boxes", "1"))
         except ValueError:
             number_of_boxes = 1
 
         return number_of_boxes
 
     def available_boxes(self):
-        boxes_checked_out = LocationTag.objects.filter(
-            subscription=self).aggregate(checked_out=Sum(
+        boxes_checked_out = LocationTag.objects.filter(subscription=self).aggregate(
+            checked_out=Sum(
                 Case(
                     When(location__service=Location.CHECKOUT, then=1),
                     When(location__service=Location.CHECKIN, then=-1),
                     default=1,
-                    output_field=models.IntegerField())))['checked_out']
+                    output_field=models.IntegerField()
+                )
+            )
+        )['checked_out']
         return self.number_of_boxes - (boxes_checked_out or 0)
 
     def can_checkout(self):
@@ -75,8 +99,7 @@ class Subscriber(models.Model):
     A subscriber belongs to a user.
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    subscriptions = models.ManyToManyField(
-        Subscription, related_name="subscribers")
+    subscriptions = models.ManyToManyField(Subscription, related_name="subscribers")
 
     @property
     def username(self):

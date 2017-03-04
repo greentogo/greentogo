@@ -5,24 +5,35 @@
     <div class="medium-12 columns">
         <h2>Your Account</h2>
 
-        <h3>Subscriptions</h3>
+        <h3>Your Subscriptions</h3>
         {% if subscriptions %}
-        <ul>
-            {% for subscription in subscriptions %}
-            <li>
-                <a href="{% url 'subscription' sub_id=subscription.id %}">
-                    {{ subscription.name }}
-                </a>
-                (Ends: {{ subscription.ends }})
+        {% for sub in subscriptions %}
+        <div class="row">
+            <div class="medium-6 columns">
+                <p class="lead">
+                    <a href="{% url 'subscription' sub_id=sub.id %}">
+                        {{ sub.name }} @ ${{ sub.price }}
+                    </a>
+                </p>
+                <p>
+                    {% if sub.auto_renew %}
+                    Renews automatically on {{ sub.ends }}
+                    {% else %}
+                    Ends on {{ sub.ends }}
+                    {% endif %}
+                </p>
+            </div>
 
-                <form class="inline-form" action="{% url 'cancel_subscription' sub_id=subscription.id %}" method="POST">
-                    {% csrf_token %}
-                    <button class="alert tiny button" type="submit">Cancel</button>
-                </form>
-
-            </li>
-            {% endfor %}
-        </ul>
+            <div class="medium-6 columns text-right">
+                <div class="button-group">
+                    <a href="{% url 'subscription_plan' sub_id=sub.id %}"
+                       class="small button">Change plan</a>
+                    <a href="#" class="small button">Change payment method</a>
+                    <a href="#" class="small alert button">Cancel</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
         {% else %}
         <p>You do not have any subscriptions currently.</p>
         {% endif %}

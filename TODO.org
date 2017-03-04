@@ -11,10 +11,12 @@
 * TODO Create account page
 ** TODO Change email address
 ** TODO Change password
-** TODO Show current subscription status
-** TODO Upgrade subscription
+** DONE Show current subscription status
+** DONE Upgrade subscription
 ** DONE Cancel subscription
 ** TODO Add confirmation to subscription cancellatiosn
 * TODO Create new subscription page
 * TODO Style application
-
+* Questions
+** When we upgrade a plan, when are we charged?
+** Do we need to regularly run a cron job to invoice people?

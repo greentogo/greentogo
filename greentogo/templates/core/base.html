@@ -37,6 +37,15 @@
                 </ul>
             </div>
         </div>
+        {% if messages %}
+        <div class="messages row">
+            {% for message in messages %}
+            <div class="callout small-12 columns {{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
         {% block content %}
         {% endblock %}
         {% compress js %}

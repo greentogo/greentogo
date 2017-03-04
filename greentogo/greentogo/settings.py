@@ -31,10 +31,7 @@ SECRET_KEY = '1+rc*=eii(d_im=1%x(q4di-_)14=ksa6u70nzs_h61m(+1zda'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = __env__('DEBUG')
 
-ALLOWED_HOSTS = [
-    'purchase.durhamgreentogo.com', 'greentogo.ngrok.io', 'localhost',
-    '127.0.0.1'
-]
+ALLOWED_HOSTS = ['purchase.durhamgreentogo.com', 'greentogo.ngrok.io', 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -110,20 +107,16 @@ DATABASES = {'default': __env__.db()}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME':
-        'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME':
-        'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME':
-        'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME':
-        'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
 
@@ -134,11 +127,11 @@ AUTH_USER_MODEL = 'core.User'
 # API
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES':
-    ('rest_framework.authentication.TokenAuthentication', ),
+    'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework.authentication.TokenAuthentication', ),
     'DEFAULT_PERMISSION_CLASSES': (
         #        'rest_framework.permissions.IsAuthenticated',
-        'apiv1.permissions.IsSubscriber', ),
+        'apiv1.permissions.IsSubscriber',
+    ),
 }
 
 # Internationalization
@@ -167,13 +160,17 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     # other finders..
-    'compressor.finders.CompressorFinder', )
+    'compressor.finders.CompressorFinder',
+)
 
 # Django compressor
 
-COMPRESS_PRECOMPILERS = (('text/scss', 'node-sass ' + " ".join(
-    ["--include-path {}".format(d) for d in STATICFILES_DIRS]) + ' {infile}'),
-                         )
+COMPRESS_PRECOMPILERS = (
+    (
+        'text/scss', 'node-sass ' +
+        " ".join(["--include-path {}".format(d) for d in STATICFILES_DIRS]) + ' {infile}'
+    ),
+)
 
 # Secret settings
 
@@ -256,3 +253,12 @@ ROLLBAR = {
 
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_AUTO_LOGIN = True
+
+## Message tags
+
+from django.contrib.messages import constants as messages
+MESSAGE_TAGS = {
+    messages.DEBUG: 'secondary',
+    messages.INFO: 'primary',
+    messages.ERROR: 'alert',
+}

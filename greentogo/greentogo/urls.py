@@ -23,25 +23,28 @@ from beta_signup import views as beta_views
 
 urlpatterns = [
     url(r'^$', core_views.index, name='index'),
-    url(r'^subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/$',
+    url(
+        r'^subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/$',
         core_views.subscription,
-        name='subscription'),
-    url(r'^subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/cancel/$',
+        name='subscription'
+    ),
+    url(
+        r'^subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/plan/$',
+        core_views.subscription_plan,
+        name='subscription_plan'
+    ),
+    url(
+        r'^subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/cancel/$',
         core_views.cancel_subscription,
-        name='cancel_subscription'),
+        name='cancel_subscription'
+    ),
     url(r'^account/$', core_views.account, name='account'),
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^auth/', include('djoser.urls.authtoken')),
     url(r'^webhook/', StripeWebhook.as_view(), name="pinax_stripe_webhook"),
-    url(r'^beta-subscribe/$',
-        beta_views.SubscriptionView.as_view(),
-        name="beta-subscribe"),
-    url(r'^thanks/',
-        TemplateView.as_view(template_name="thanks.html"),
-        name="beta-thanks"),
-    url(r'^error/',
-        TemplateView.as_view(template_name="error.html"),
-        name="beta-error"),
+    url(r'^beta-subscribe/$', beta_views.SubscriptionView.as_view(), name="beta-subscribe"),
+    url(r'^thanks/', TemplateView.as_view(template_name="thanks.html"), name="beta-thanks"),
+    url(r'^error/', TemplateView.as_view(template_name="error.html"), name="beta-error"),
     url(r'^admin/', admin.site.urls),
     url(r'^api/v1/', include('apiv1.urls')),
 ]
