@@ -30,7 +30,7 @@ urlpatterns = [
     ),
     url(
         r'^subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/plan/$',
-        core_views.subscription_plan,
+        core_views.change_subscription_plan,
         name='subscription_plan'
     ),
     url(

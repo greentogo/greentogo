@@ -28,8 +28,8 @@
                 <div class="button-group">
                     <a href="{% url 'subscription_plan' sub_id=sub.id %}"
                        class="small button">Change plan</a>
-                    <a href="#" class="small button">Change payment method</a>
-                    <a href="#" class="small alert button">Cancel</a>
+                    <a href="#TODO" class="small button">Change payment method</a>
+                    <a href="{% url 'cancel_subscription' sub_id=sub.id %}" class="small alert button">Cancel</a>
                 </div>
             </div>
         </div>

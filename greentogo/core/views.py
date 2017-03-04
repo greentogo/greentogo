@@ -43,7 +43,7 @@ def subscription(request, sub_id):
 
 
 @login_required
-def subscription_plan(request, sub_id):
+def change_subscription_plan(request, sub_id):
     subscription = Subscription.lookup_by_customer_and_sub_id(request.user.customer, sub_id)
     if request.method == "POST":
         form = SubscriptionPlanForm(request.POST)
@@ -64,9 +64,12 @@ def subscription_plan(request, sub_id):
 
 
 @login_required
-@require_POST
 def cancel_subscription(request, sub_id):
     # TODO add messaging
     subscription = Subscription.lookup_by_customer_and_sub_id(request.user.customer, sub_id)
-    subscriptions.cancel(subscription, at_period_end=False)
-    return redirect(reverse('account'))
+    if request.method == "POST":
+        subscriptions.cancel(subscription, at_period_end=False)
+        messages.success(request, "Your subscription has been cancelled.")
+        return redirect(reverse('account'))
+
+    return render(request, "core/cancel_subscription.html", {"subscription": subscription})
