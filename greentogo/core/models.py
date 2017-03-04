@@ -29,6 +29,12 @@ class Subscription(pinax_models.Subscription):
         proxy = True
 
     @classmethod
+    def lookup_by_customer_and_sub_id(cls, customer, sub_id):
+        # TODO handle exceptions
+        subscription = customer.subscription_set.get(stripe_id=sub_id)
+        return cls.from_pinax(subscription)
+
+    @classmethod
     def from_pinax(cls, sub):
         return cls.objects.get(pk=sub.pk)
 
