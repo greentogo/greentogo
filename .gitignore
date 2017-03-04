@@ -97,3 +97,4 @@ db.sqlite3
 bower_components/
 .vscode/
 .password
+staticfiles/
