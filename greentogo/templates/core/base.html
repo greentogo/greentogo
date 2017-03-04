@@ -14,17 +14,17 @@
     </head>
 
     <body>
-        <div class="row">
-            <div class="medium-6 columns">
-                Logo
+        <div class="row page-header">
+            <div class="medium-6 columns align-bottom">
+                <h1 class="logo">GreenToGo</h1>
             </div>
-            <div class="medium-6 columns">
+            <div class="medium-6 columns align-bottom">
                 <ul class="dropdown menu align-right" data-dropdown-menu>
                     {% if user.is_authenticated %}
                     <li class="is-dropdown-submenu-parent">
                         <a href="#">{{ user }}</a>
                         <ul class="menu">
-                            <li><a href="#">My account</a></li>
+                            <li><a href="{% url 'account' %}">My account</a></li>
                             <li><a href="{% url 'auth_logout' %}">Logout</a></li>
                         </ul>
                     </li>
