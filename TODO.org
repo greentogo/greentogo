@@ -1,21 +1,21 @@
-* TODO Fix email sent when charged -- this is in pinax.stripe
-* TODO Update web application
-** TODO Migrate data over into new schema
-* TODO Add actions for each webhook message
-* DONE Convert beta signup to use pinax.stripe
-* TODO Create report for Crystal
-** TODO Add report to admin
 * DONE Consider making a standard web application first
-* TODO Create home page
+* DONE Convert beta signup to use pinax.stripe
 * DONE Create login page
+* TODO Create new subscription page
 * TODO Create account page
 ** TODO Change email address
 ** TODO Change password
 ** DONE Show current subscription status
 ** DONE Upgrade subscription
 ** DONE Cancel subscription
-** TODO Add confirmation to subscription cancellatiosn
-* TODO Create new subscription page
+** DONE Add confirmation to subscription cancellatiosn
+* TODO Fix email sent when charged -- this is in pinax.stripe
+* TODO Update web application
+** TODO Migrate data over into new schema
+* TODO Add actions for each webhook message
+* TODO Create report for Crystal
+** TODO Add report to admin
+* TODO Create home page
 * TODO Style application
 * Questions
 ** When we upgrade a plan, when are we charged?

@@ -10,12 +10,3 @@ rollbar
 djoser
 djangorestframework
 django-registration-redux
-
-# Development
-pytest
-pytest-django
-ipython
-yapf
-faker
-pre-commit
-vcrpy

@@ -7,12 +7,15 @@ REVISION := $(shell git log -n 1 --pretty=format:"%H")
 server: requirements
 	tmux new-session './greentogo/manage.py runserver_plus' \; split-window -h 'ngrok http -subdomain=greentogo 8000'
 
-requirements: requirements.txt bower.json
-	pip-sync requirements.txt
+requirements: requirements.txt dev-requirements.txt bower.json
+	pip-sync requirements.txt dev-requirements.txt
 	bower install
 
 requirements.txt: requirements.in
 	pip-compile requirements.in
+
+dev-requirements.txt: dev-requirements.in
+	pip-compile dev-requirements.in
 
 deploy:
 	ansible-playbook -i deployment/hosts  --vault-password-file=.password  deployment/playbook.yml
