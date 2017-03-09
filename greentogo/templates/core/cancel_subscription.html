@@ -1,0 +1,22 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="medium-12 columns">
+        <h2>Cancel Subscription Plan</h2>
+
+        <p>
+            <strong>Your current plan</strong>: {{ subscription.plan_display }} @ ${{ subscription.total_amount }}
+        </p>
+
+        <form action="." method="POST">
+            {% csrf_token %}
+            <div>
+                <button type="submit" class="button">Cancel this subscription</button>
+                <a href="{% url 'account' %}" class="alert button">Go back to account</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
