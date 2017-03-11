@@ -7,6 +7,7 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
 import pinax.stripe.models as pinax_models
+import stripe
 from pinax.stripe.actions import customers, invoices, subscriptions
 
 from .forms import NewSubscriptionForm, SubscriptionPlanForm, UserForm
@@ -77,13 +78,19 @@ def add_subscription(request):
         form = NewSubscriptionForm(request.POST)
         if form.is_valid():
             plan = pinax_models.Plan.objects.get(stripe_id=form.cleaned_data['plan'])
-            subscriptions.create(
-                customer=request.user.customer, plan=plan, token=form.cleaned_data['token']
-            )
-            messages.success(
-                request, "You have added a subscription to the plan {}.".format(plan.name)
-            )
-            return redirect(reverse('account'))
+            try:
+                subscriptions.create(
+                    customer=request.user.customer, plan=plan, token=form.cleaned_data['token']
+                )
+                messages.success(
+                    request, "You have added a subscription to the plan {}.".format(plan.name)
+                )
+                return redirect(reverse('account'))
+            except stripe.error.CardError as ex:
+                error = ex.json_body.get('error')
+                messages.error(
+                    request, "We had a problem processing your card. {}".format(error['message'])
+                )
     else:
         form = NewSubscriptionForm()
 
