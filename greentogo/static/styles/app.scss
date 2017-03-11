@@ -71,3 +71,17 @@
 .inline-form {
     display: inline-block;
 }
+
+form {
+    .error {
+        label {
+            color: map-get($foundation-palette, "alert");
+        }
+        input, textarea, select {
+            border-color: map-get($foundation-palette, "alert");
+        }
+        .error-text {
+            color: map-get($foundation-palette, "alert");
+        }
+    }
+}

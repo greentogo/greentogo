@@ -32,6 +32,11 @@ def get_plans():
 
 class User(AbstractUser):
     name = models.CharField(max_length=255, blank=True, null=True)
+    email = models.EmailField(
+        verbose_name='Email address',
+        max_length=255,
+        unique=True,
+    )
 
 
 # TODO Change from inheritance to composition

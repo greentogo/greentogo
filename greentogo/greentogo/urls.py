@@ -23,6 +23,7 @@ from beta_signup import views as beta_views
 
 urlpatterns = [
     url(r'^$', core_views.index, name='index'),
+    url(r'^subscription/new/$', core_views.add_subscription, name='add_subscription'),
     url(
         r'^subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/$',
         core_views.subscription,

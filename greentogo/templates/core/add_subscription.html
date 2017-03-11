@@ -1,0 +1,65 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="medium-12 columns">
+        <h2>Add a New Subscription</h2>
+
+        <form action="." method="POST" id="new-subscription-form">
+            {% csrf_token %}
+            {{ form.token }}
+            <label for="{{ form.plan.id_for_label }}">Choose a subscription plan</label>
+            {{ form.plan }}
+            <div>
+                <button type="submit" id="subscribe-button" class="button">Add subscription</button>
+                <a href="{% url 'account' %}" class="alert button">Go back to account</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+ var plans = {
+     {% for plan in plans %}
+     '{{ plan.stripe_id }}': {amount: {{ plan.amount }}, name: '{{ plan.name }}'}{% if not forloop.last %},{% endif %}
+     {% endfor %}
+ };
+
+ var handler = StripeCheckout.configure({
+     key: '{{ stripe_key }}',
+     email: '{{ email }}',
+     image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
+     locale: 'auto',
+     zipCode: true,
+     token: function (token) {
+         $("#{{ form.token.id_for_label }}").val(token.id);
+         $("#new-subscription-form").submit();
+     },
+     closed: function () {
+         $("#subscribe-button").prop("disabled", false);
+     }
+ });
+
+ $("#subscribe-button").on('click', function (event) {
+     $("#subscribe-button").prop("disabled", true);
+
+     var planId = $("#{{ form.plan.id_for_label }}").val();
+     var plan = plans[planId];
+
+     handler.open({
+         name: "Durham GreenToGo",
+         description: plan.name,
+         amount: plan.amount,
+         panelLabel: "Subscribe"
+     });
+     event.preventDefault();
+ })
+
+ // Close Checkout on page navigation:
+ window.addEventListener('popstate', function() {
+     handler.close();
+ });
+</script>
+{% endblock %}

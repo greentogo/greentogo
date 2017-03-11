@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -6,7 +7,7 @@ from django.contrib import messages
 from pinax.stripe.actions import invoices, customers, subscriptions
 import pinax.stripe.models as pinax_models
 from .models import Subscription, get_plans
-from .forms import SubscriptionPlanForm
+from .forms import SubscriptionPlanForm, NewSubscriptionForm, UserForm
 
 
 def index(request):
@@ -15,6 +16,15 @@ def index(request):
 
 @login_required
 def account(request):
+    if request.method == "POST":
+        form = UserForm(request.POST, instance=request.user)
+        if form.is_valid():
+            messages.success(request, "You have updated your user information.")
+            form.save()
+            return redirect(reverse("account"))
+    else:
+        form = UserForm(instance=request.user)
+
     customer = request.user.customer
     subscriptions = [
         {
@@ -29,8 +39,10 @@ def account(request):
     ]
 
     return render(
-        request, 'core/account.html', {"customer": customer,
-                                       "subscriptions": subscriptions}
+        request, 'core/account.html',
+        {"form": form,
+         "customer": customer,
+         "subscriptions": subscriptions}
     )
 
 
@@ -40,6 +52,32 @@ def subscription(request, sub_id):
     return render(request, "core/subscription.html", {
         "subscription": subscription,
     })
+
+
+@login_required
+def add_subscription(request):
+    if request.method == "POST":
+        form = NewSubscriptionForm(request.POST)
+        if form.is_valid():
+            plan = pinax_models.Plan.objects.get(stripe_id=form.cleaned_data['plan'])
+            subscriptions.create(
+                customer=request.user.customer, plan=plan, token=form.cleaned_data['token']
+            )
+            messages.success(
+                request, "You have added a subscription to the plan {}.".format(plan.name)
+            )
+            return redirect(reverse('account'))
+    else:
+        form = NewSubscriptionForm()
+
+    return render(
+        request, "core/add_subscription.html", {
+            "form": form,
+            "plans": get_plans(),
+            "email": request.user.email,
+            "stripe_key": settings.STRIPE_PUBLISHABLE_KEY
+        }
+    )
 
 
 @login_required
@@ -65,7 +103,6 @@ def change_subscription_plan(request, sub_id):
 
 @login_required
 def cancel_subscription(request, sub_id):
-    # TODO add messaging
     subscription = Subscription.lookup_by_customer_and_sub_id(request.user.customer, sub_id)
     if request.method == "POST":
         subscriptions.cancel(subscription, at_period_end=False)

@@ -1,9 +1,29 @@
 {% extends "core/base.html" %}
 
+{% load foundation_extras %}
+
 {% block content %}
 <div class="row">
     <div class="medium-12 columns">
-        <h2>Your Account</h2>
+        <h2>Manage Your Account</h2>
+        <h3>Your Login</h3>
+        <form action="." method="POST">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="row">
+                <div class="medium-6 columns">
+                    {% form_field field=form.name %}
+                </div>
+                <div class="medium-6 columns">
+                    {% form_field field=form.email %}
+                </div>
+            </div>
+
+            <button type="submit" class="button">Update your information</button>
+        </form>
+        <ul>
+            <li><a href="#TODO">Change your password</a></li>
+        </ul>
 
         <h3>Your Subscriptions</h3>
         {% if subscriptions %}
@@ -35,8 +55,13 @@
         </div>
         {% endfor %}
         {% else %}
-        <p>You do not have any subscriptions currently.</p>
+        <div>
+            <p class="lead">You do not have any subscriptions currently.</p>
+        </div>
         {% endif %}
+        <div>
+            <a href="{% url 'add_subscription' %}" class="button large">Add a new subscription</a>
+        </div>
     </div>
 </div>
 
