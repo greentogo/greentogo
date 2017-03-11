@@ -99,7 +99,8 @@ def add_subscription(request):
 
 @login_required
 def change_subscription_plan(request, sub_id):
-    subscription = Subscription.lookup_by_customer_and_sub_id(request.user.customer, sub_id)
+    customer = request.user.customer
+    subscription = Subscription.lookup_by_customer_and_sub_id(customer, sub_id)
     if request.method == "POST":
         form = SubscriptionPlanForm(request.POST)
         if form.is_valid():
@@ -107,6 +108,7 @@ def change_subscription_plan(request, sub_id):
             subscriptions.update(
                 subscription=subscription, plan=plan, prorate=True, charge_immediately=True
             )
+            invoices.create(customer=customer)
             messages.success(request, "Your plan has been updated to {}.".format(plan.name))
             return redirect(reverse('account'))
     else:

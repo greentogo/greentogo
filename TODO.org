@@ -2,15 +2,16 @@
 * DONE Convert beta signup to use pinax.stripe
 * DONE Create login page
 * DONE Create new subscription page
-* TODO Create account page
+* DONE Create account page
 ** DONE Change name
 ** DONE Change email address
-** TODO Change password
+** DONE Change password
 ** DONE Show current subscription status
 ** DONE Upgrade subscription
 ** DONE Cancel subscription
 ** DONE Add confirmation to subscription cancellatiosn
 * TODO Figure out payment when sub changes -- how does the user get charged
+** TODO We have to create an invoice
 * TODO Fix email sent when charged -- this is in pinax.stripe
 * TODO Update web application
 ** TODO Migrate data over into new schema
@@ -20,6 +21,7 @@
 * TODO Create home page
 * TODO Style application
 * TODO Go back and make changing email much more robust
+* TODO Add JS validation to change password
 * Questions
 ** When we upgrade a plan, when are we charged?
 ** Do we need to regularly run a cron job to invoice people?
