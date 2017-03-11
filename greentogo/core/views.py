@@ -1,13 +1,16 @@
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
 from django.contrib import messages
-from pinax.stripe.actions import invoices, customers, subscriptions
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import SetPasswordForm
+from django.core.urlresolvers import reverse
+from django.shortcuts import redirect, render
+from django.views.decorators.http import require_POST
+
 import pinax.stripe.models as pinax_models
+from pinax.stripe.actions import customers, invoices, subscriptions
+
+from .forms import NewSubscriptionForm, SubscriptionPlanForm, UserForm
 from .models import Subscription, get_plans
-from .forms import SubscriptionPlanForm, NewSubscriptionForm, UserForm
 
 
 def index(request):
@@ -44,6 +47,20 @@ def account(request):
          "customer": customer,
          "subscriptions": subscriptions}
     )
+
+
+@login_required
+def change_password(request):
+    if request.method == "POST":
+        form = SetPasswordForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your password has been changed.")
+            return redirect(reverse('account'))
+    else:
+        form = SetPasswordForm(request.user)
+
+    return render(request, "core/change_password.html", {"form": form})
 
 
 @login_required

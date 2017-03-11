@@ -1,12 +1,13 @@
 {% if field.errors %}
-    <div class="error">
-    <label for="{{ field.id_for_label }}">Your name</label>
+<div class="error">
+    {{ field.label_tag }}
     {{ field }}
     {% for error in field.errors %}
     <p class="error-text">{{ error }}</p>
     {% endfor %}
-    </div>
+</div>
 {% else %}
-    <label for="{{ field.id_for_label }}">Your name</label>
+    {{ field.label_tag }}
+    <label for="{{ field.id_for_label }}">{{ label_text }}</label>
     {{ field }}
 {% endif %}

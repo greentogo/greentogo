@@ -39,6 +39,7 @@ urlpatterns = [
         core_views.cancel_subscription,
         name='cancel_subscription'
     ),
+    url(r'^change_password/$', core_views.change_password, name='change_password'),
     url(r'^account/$', core_views.account, name='account'),
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^auth/', include('djoser.urls.authtoken')),

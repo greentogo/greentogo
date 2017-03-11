@@ -98,3 +98,4 @@ bower_components/
 .vscode/
 .password
 staticfiles/
+/.isort.cfg
