@@ -13,33 +13,37 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
 
-from pinax.stripe.views import Webhook as StripeWebhook
-from core import views as core_views
 from beta_signup import views as beta_views
+from core import views as core_views
+from pinax.stripe.views import Webhook as StripeWebhook
 
 urlpatterns = [
-    url(r'^$', core_views.index, name='index'),
-    url(r'^subscription/new/$', core_views.add_subscription, name='add_subscription'),
+    url(r'^account/subscription/new/$', core_views.add_subscription, name='add_subscription'),
     url(
-        r'^subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/$',
+        r'^account/subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/$',
         core_views.subscription,
         name='subscription'
     ),
     url(
-        r'^subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/plan/$',
+        r'^account/subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/plan/$',
         core_views.change_subscription_plan,
         name='subscription_plan'
     ),
     url(
-        r'^subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/cancel/$',
+        r'^account/subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/cancel/$',
         core_views.cancel_subscription,
         name='cancel_subscription'
     ),
-    url(r'^change_password/$', core_views.change_password, name='change_password'),
+    url(r'^account/change_password/$', core_views.change_password, name='change_password'),
+    url(
+        r'^account/change_payment_method/$',
+        core_views.change_payment_method,
+        name='change_payment_method'
+    ),
     url(r'^account/$', core_views.account, name='account'),
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^auth/', include('djoser.urls.authtoken')),
@@ -49,4 +53,5 @@ urlpatterns = [
     url(r'^error/', TemplateView.as_view(template_name="error.html"), name="beta-error"),
     url(r'^admin/', admin.site.urls),
     url(r'^api/v1/', include('apiv1.urls')),
+    url(r'^$', core_views.index, name='index'),
 ]

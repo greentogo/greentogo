@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST
 
 import pinax.stripe.models as pinax_models
 import stripe
-from pinax.stripe.actions import customers, invoices, subscriptions
+from pinax.stripe.actions import customers, invoices, subscriptions, sources
 
 from .forms import NewSubscriptionForm, SubscriptionPlanForm, UserForm
 from .models import Subscription, get_plans
@@ -62,6 +62,31 @@ def change_password(request):
         form = SetPasswordForm(request.user)
 
     return render(request, "core/change_password.html", {"form": form})
+
+
+@login_required
+def change_payment_method(request):
+    customer = request.user.customer
+    card = pinax_models.Card.objects.get(stripe_id=customer.default_source)
+    if request.method == "POST":
+        token = request.POST.get('token')
+        if token:
+            try:
+                source = sources.create_card(customer=customer, token=token)
+                customers.set_default_source(customer=customer, source=source)
+                messages.success(request, "You have updated your default payment source.")
+                return redirect(reverse('account'))
+            except stripe.error.CardError as ex:
+                error = ex.json_body.get('error')
+                messages.error(
+                    request, "We had a problem processing your card. {}".format(error['message'])
+                )
+
+    return render(
+        request, "core/change_payment_source.html",
+        {"card": card,
+         "stripe_key": settings.STRIPE_PUBLISHABLE_KEY}
+    )
 
 
 @login_required

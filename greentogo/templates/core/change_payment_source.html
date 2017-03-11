@@ -1,0 +1,56 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="medium-12 columns">
+        <h2>Update Payment Source</h2>
+
+        <p>
+            Your current payment source is the <strong>{{ card.brand }}</strong> card ending in <strong>{{ card.last4 }}</strong> and expiring on <strong>{{ card.exp_month }}/{{ card.exp_year }}</strong>.
+        </p>
+        <form action="." method="POST" id="change-payment-form">
+            {% csrf_token %}
+            <input id="token" name="token" type="hidden" value="" />
+            <div>
+                <button type="submit" id="change-payment-button" class="button">Change payment source</button>
+                <a href="{% url 'account' %}" class="alert button">Go back to account</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+ var handler = StripeCheckout.configure({
+     key: '{{ stripe_key }}',
+     email: '{{ email }}',
+     image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
+     locale: 'auto',
+     zipCode: true,
+     token: function (token) {
+         $("#token").val(token.id);
+         $("#change-payment-form").submit();
+     },
+     closed: function () {
+         $("#change-payment-button").prop("disabled", false);
+     }
+ });
+
+ $("#change-payment-button").on('click', function (event) {
+     $("#change-payment-button").prop("disabled", true);
+
+     handler.open({
+         name: "Durham GreenToGo",
+         panelLabel: "Change Payment Method",
+         label: "Change Payment Method"
+     });
+     event.preventDefault();
+ })
+
+ // Close Checkout on page navigation:
+ window.addEventListener('popstate', function() {
+     handler.close();
+ });
+</script>
+{% endblock %}

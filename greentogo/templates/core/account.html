@@ -23,6 +23,7 @@
         </form>
         <ul>
             <li><a href="{% url 'change_password' %}">Change your password</a></li>
+            <li><a href="{% url 'change_payment_method' %}">Change your default payment method</a></li>
         </ul>
 
         <h3>Your Subscriptions</h3>
@@ -48,7 +49,6 @@
                 <div class="button-group">
                     <a href="{% url 'subscription_plan' sub_id=sub.id %}"
                        class="small button">Change plan</a>
-                    <a href="#TODO" class="small button">Change payment method</a>
                     <a href="{% url 'cancel_subscription' sub_id=sub.id %}" class="small alert button">Cancel</a>
                 </div>
             </div>
