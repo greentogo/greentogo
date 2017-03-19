@@ -59,7 +59,12 @@
     margin-bottom: 1rem;
 
     .logo {
+        height: 180px;
+        background-image: url("../logo.png");
+        background-position: 0 -50px;
+        background-repeat: no-repeat;
         margin: 0;
+        text-indent: -1000px;
     }
 
     .align-bottom {
