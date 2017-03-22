@@ -1,5 +1,5 @@
 -   repo: git://github.com/pre-commit/pre-commit-hooks
-    sha: e626cd57090d8df0be21e4df0f4e55cc3511d6ab
+    sha: 5bf6c09bfa1297d3692cadd621ef95f1284e33c0
     hooks:
     -   id: trailing-whitespace
     -   id: check-merge-conflict
@@ -12,7 +12,7 @@
 -   repo: local
     hooks:
     -   id: isort
-        name: "Sort imports"
+        name: Sort imports
         entry: isort
         language: system
         files: \.py$
