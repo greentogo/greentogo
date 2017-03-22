@@ -10,3 +10,4 @@ rollbar
 djoser
 djangorestframework
 django-registration-redux
+wagtail

@@ -4,22 +4,39 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
+appdirs==1.4.3            # via setuptools
+beautifulsoup4==4.5.3     # via wagtail
 django-appconf==1.0.2     # via django-compressor, pinax-stripe
 django-compressor==2.1
 django-environ==0.4.1
 django-extensions==1.7.5
+django-modelcluster==3.0.1  # via wagtail
 django-registration-redux==1.4
+django-taggit==0.22.0     # via wagtail
+django-treebeard==4.1.0   # via wagtail
 django==1.10.6
 djangorestframework==3.5.4
 djoser==0.5.4
+html5lib==0.999999999     # via wagtail
 jsonfield==2.0.1          # via pinax-stripe
+olefile==0.44             # via pillow
+packaging==16.8           # via setuptools
+Pillow==4.0.0             # via wagtail
 pinax-stripe==3.3.0
 psycopg2==2.7
-pytz==2016.10             # via pinax-stripe
+pyparsing==2.2.0          # via packaging
+pytz==2016.10             # via django-modelcluster, pinax-stripe
 rcssmin==1.0.6            # via django-compressor
-requests==2.13.0          # via rollbar, stripe
+requests==2.13.0          # via rollbar, stripe, wagtail
 rjsmin==1.0.12            # via django-compressor
 rollbar==0.13.11
-six==1.10.0               # via django-environ, django-extensions, pinax-stripe, rollbar
+six==1.10.0               # via django-environ, django-extensions, html5lib, packaging, pinax-stripe, rollbar, setuptools
 stripe==1.48.1
+Unidecode==0.4.20         # via wagtail
+wagtail==1.9
+webencodings==0.5         # via html5lib
 werkzeug==0.11.15
+Willow==0.4               # via wagtail
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools                # via html5lib

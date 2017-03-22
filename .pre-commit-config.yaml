@@ -4,7 +4,15 @@
     -   id: trailing-whitespace
     -   id: check-merge-conflict
     -   id: end-of-file-fixer
+    -   id: debug-statements
 -   repo: git://github.com/pre-commit/mirrors-yapf
     sha: v0.16.0
     hooks:
     -   id: yapf
+-   repo: local
+    hooks:
+    -   id: isort
+        name: "Sort imports"
+        entry: isort
+        language: system
+        files: \.py$

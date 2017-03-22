@@ -12,7 +12,10 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 
+from django.contrib.messages import constants as messages
+
 import environ
+
 __root__ = environ.Path(__file__) - 3  # three folder back (/a/b/c/ - 3 = /)
 # set default values and casting
 __env__ = environ.Env(DEBUG=(bool, False), EMAIL_SECURE=(bool, True))
@@ -54,6 +57,21 @@ INSTALLED_APPS = [
     'djoser',
     "pinax.stripe",
 
+    # wagtail
+    'wagtail.wagtailforms',
+    'wagtail.wagtailredirects',
+    'wagtail.wagtailembeds',
+    'wagtail.wagtailsites',
+    'wagtail.wagtailusers',
+    'wagtail.wagtailsnippets',
+    'wagtail.wagtaildocs',
+    'wagtail.wagtailimages',
+    'wagtail.wagtailsearch',
+    'wagtail.wagtailadmin',
+    'wagtail.wagtailcore',
+    'modelcluster',
+    'taggit',
+
     # ours
     'beta_signup',
     'core',
@@ -70,6 +88,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'wagtail.wagtailcore.middleware.SiteMiddleware',
+    'wagtail.wagtailredirects.middleware.RedirectMiddleware',
 ]
 
 if not DEBUG:
@@ -162,6 +182,9 @@ STATICFILES_FINDERS = (
     # other finders..
     'compressor.finders.CompressorFinder',
 )
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = str(__root__.path("media/"))
 
 # Django compressor
 
@@ -256,9 +279,10 @@ REGISTRATION_AUTO_LOGIN = True
 
 ## Message tags
 
-from django.contrib.messages import constants as messages
 MESSAGE_TAGS = {
     messages.DEBUG: 'secondary',
     messages.INFO: 'primary',
     messages.ERROR: 'alert',
 }
+
+WAGTAIL_SITE_NAME = 'GreenToGo'
