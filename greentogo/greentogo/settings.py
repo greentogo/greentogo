@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     'beta_signup',
     'core',
     'apiv1',
+    'cms',
 ]
 
 SITE_ID = 1

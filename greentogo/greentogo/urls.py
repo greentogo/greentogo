@@ -61,8 +61,7 @@ urlpatterns = [
     url(r'^api/v1/', include('apiv1.urls')),
     url(r'^cms/', include(wagtailadmin_urls)),
     url(r'^documents/', include(wagtaildocs_urls)),
-    url(r'^pages/', include(wagtail_urls)),
-    url(r'^$', core_views.index, name='index'),
+    url(r'', include(wagtail_urls)),
 ] + static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
 )
