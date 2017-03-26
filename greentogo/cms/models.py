@@ -3,6 +3,7 @@ from django.db import models
 from wagtail.wagtailadmin.edit_handlers import FieldPanel
 from wagtail.wagtailcore.fields import RichTextField
 from wagtail.wagtailcore.models import Page
+from wagtailmenus.models import MenuPage
 
 
 class HomePage(Page):
@@ -13,11 +14,9 @@ class HomePage(Page):
     ]
 
 
-class StandardPage(Page):
+class StandardPage(MenuPage):
     body = RichTextField(blank=True)
-    menu_text = models.CharField(max_length=50)
 
     content_panels = Page.content_panels + [
-        FieldPanel('menu_text'),
         FieldPanel('body', classname="full"),
     ]

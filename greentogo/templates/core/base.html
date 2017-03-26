@@ -1,5 +1,7 @@
+{# -*- engine:django -*- #}
 {% load static %}
 {% load compress %}
+{% load menu_tags %}
 <!DOCTYPE html>
 <html>
     <head>
@@ -17,36 +19,23 @@
         <div class="row page-header">
             <div class="medium-6 columns align-bottom">
                 <div class="logo">
-                    <img alt="GreenToGo logo" src="{% static 'logo.png' %}"/>
+                    <a href="/">
+                        <img alt="GreenToGo logo" src="{% static 'logo.png' %}"/>
+                    </a>
                 </div>
             </div>
             <div class="medium-6 columns align-bottom">
-                <ul class="dropdown menu align-right" data-dropdown-menu>
-                    {% if user.is_authenticated %}
-                    <li class="is-dropdown-submenu-parent">
-                        <a href="#">{{ user }}</a>
-                        <ul class="menu">
-                            <li><a href="{% url 'account' %}">My account</a></li>
-                            <li><a href="{% url 'auth_logout' %}">Logout</a></li>
-                        </ul>
-                    </li>
-                    {% else %}
-                    <li><a href="{% url 'auth_login' %}">Login</a></li>
-                    <li><a href="{% url 'registration_register' %}">Create account</a></li>
-                    {% endif %}
-                    {% block menu %}
-                    {% endblock %}
-                </ul>
+                {% main_menu %}
             </div>
         </div>
         {% if messages %}
-        <div class="messages row">
-            {% for message in messages %}
-            <div class="callout small-12 columns {{ message.tags }}">
-                {{ message }}
+            <div class="messages row">
+                {% for message in messages %}
+                    <div class="callout small-12 columns {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
         {% endif %}
         {% block content %}
         {% endblock %}
@@ -57,7 +46,7 @@
         {% endcompress %}
         <script src="https://checkout.stripe.com/checkout.js"></script>
         <script>
-          $(document).foundation();
+         $(document).foundation();
         </script>
         {% block javascript %}
         {% endblock %}

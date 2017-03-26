@@ -4,6 +4,11 @@ This project contains both the GreenToGo subscription site and API for use by th
 
 The files are laid out in accordance with recommendations from Two Scoops of Django.
 
+## Docs
+
+* [Wagtail Menus](https://github.com/rkhleics/wagtailmenus)
+
+
 Development Setup
 
 1. pip install -r requirements.txt

@@ -1,0 +1,26 @@
+{# -*- engine:django -*- #}
+{% load menu_tags %}
+
+<ul class="dropdown menu align-right" data-dropdown-menu>
+    {% if user.is_authenticated %}
+        <li class="is-dropdown-submenu-parent">
+            <a href="#">{{ user }}</a>
+            <ul class="menu">
+                <li><a href="{% url 'account' %}">My account</a></li>
+                <li><a href="{% url 'auth_logout' %}">Logout</a></li>
+            </ul>
+        </li>
+    {% else %}
+        <li><a href="{% url 'auth_login' %}">Login</a></li>
+        <li><a href="{% url 'registration_register' %}">Create account</a></li>
+    {% endif %}
+
+    {% for item in menu_items reversed %}
+        <li class="{{ item.active_class }}{% if item.has_children_in_menu %} is-dropdown-submenu-parent{% endif %}">
+            <a href="{{ item.href }}">{{ item.text }}</a>
+            {% if item.has_children_in_menu %}
+                {% sub_menu item template="menus/sub_menu_dropdown.html" %}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

@@ -1,15 +1,17 @@
 import uuid
-from django.db import models
-from django.db.models import Sum, Case, When
+
+from django.conf import settings
 from django.contrib.auth import hashers
+from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-from django.contrib.auth.models import AbstractUser
+from django.db import models
+from django.db.models import Case, Sum, When
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.conf import settings
 
 import pinax.stripe.models as pinax_models
+from django_geocoder.wrapper import get_cached as geocode
 
 
 def get_plan_price(plan):
@@ -147,3 +149,21 @@ class LocationTag(models.Model):
     subscription = models.ForeignKey(Subscription)
     location = models.ForeignKey(Location)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Restaurant(models.Model):
+    name = models.CharField(max_length=255)
+    address = models.CharField(max_length=1023)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.address and self.latitude is None or self.longitude is None:
+            result = geocode(self.address, provider='google')
+            lat, lng = result.latlng
+            self.latitude = lat
+            self.longitude = lng
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
