@@ -71,7 +71,19 @@ class LoginScreen extends React.Component {
             title: 'Login',
         }
     }
-    
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            username: null,
+            password: null
+        }
+    }
+
+    attemptLogin() {
+        console.log(this.state)
+    }
+
     render() {
         return (
             <Container>
@@ -86,14 +98,17 @@ class LoginScreen extends React.Component {
                             <Input placeholder="Username"
                                    autoCapitalize="none"
                                    autoCorrect={false}
+                                   onChangeText={(text) => this.setState({username: text})}
                             />
                         </Item>
                         <Item last>
                             <Input placeholder="Password"
-                                   secureTextEntry={true} />
+                                   secureTextEntry={true}
+                                   onChangeText={(text) => this.setState({password: text})}
+                            />
                         </Item>
                         <View style={stylesheet.buttonContainer}>
-                            <Button light style={styles.fullWidthButton}>
+                            <Button light style={styles.fullWidthButton} onPress={() => this.attemptLogin()}>
                                 <Text style={stylesheet.boldText}>Login</Text>
                             </Button>
                         </View>
@@ -131,6 +146,6 @@ const styles = {
     }
 }
 
-const stylesheet = StyleSheet.create(styles);
+const stylesheet = StyleSheet.create(styles)
 
-Expo.registerRootComponent(App);
+Expo.registerRootComponent(App)
