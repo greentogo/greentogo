@@ -6,18 +6,10 @@ import {
     View,
 } from 'react-native';
 
-import {
-    Container,
-    Header,
-    Body,
-    Title,
-    Content,
-    Form,
-    Item,
-    Input,
-    Button,
-    Row,
-} from 'native-base';
+import { createStore, applyMiddleware, combineReducers } from 'redux';
+import { Provider } from 'react-redux';
+import promiseMiddleware from 'redux-promise';
+import { createLogger } from 'redux-logger';
 
 import Expo from 'expo';
 
@@ -27,125 +19,32 @@ import {
     StackNavigation,
 } from '@expo/ex-navigation';
 
-const Router = createRouter(() => ({
-    home: () => HomeScreen,
-}));
+import reducer from './reducer';
+import stylesheet from './styles';
 
-class App extends React.Component {
-    render() {
-        if (true) {
-            return <LoginScreen />;
-        } else {
-            return (
-                <NavigationProvider router={Router}>
-                    <StackNavigation initialRoute={Router.getRoute('home')} />
-                </NavigationProvider>
-            );
-        }
+import App from "./components/App";
+import LoginScreen from "./components/LoginScreen";
+
+const logger = createLogger({
+    colors: {
+        title: false,
+        prevState: false,
+        action: false,
+        nextState: false,
+        error: false,
     }
-}
+})
 
-class HomeScreen extends React.Component {
-    static route = {
-        navigationBar: {
-            title: 'Home',
-        }
-    }
+const store = createStore(reducer, applyMiddleware(promiseMiddleware, logger));
 
-    render() {
-        if (true) {
-            return <LoginScreen />;
-        } else {
-            return (
-                <View style={styles.container}>
-                    <Text>Open up main.js to start working on your app!</Text>
-                </View>
-            )
-        }
-    }
-}
-
-class LoginScreen extends React.Component {
-    static route = {
-        navigationBar: {
-            title: 'Login',
-        }
-    }
-
-    constructor(props) {
-        super(props)
-        this.state = {
-            username: null,
-            password: null
-        }
-    }
-
-    attemptLogin() {
-        console.log(this.state)
-    }
-
+class ReduxApp extends React.Component {
     render() {
         return (
-            <Container>
-                <Header>
-                    <Body>
-                        <Title>Login</Title>
-                    </Body>
-                </Header>
-                <Content>
-                    <Form>
-                        <Item>
-                            <Input placeholder="Username"
-                                   autoCapitalize="none"
-                                   autoCorrect={false}
-                                   onChangeText={(text) => this.setState({username: text})}
-                            />
-                        </Item>
-                        <Item last>
-                            <Input placeholder="Password"
-                                   secureTextEntry={true}
-                                   onChangeText={(text) => this.setState({password: text})}
-                            />
-                        </Item>
-                        <View style={stylesheet.buttonContainer}>
-                            <Button light style={styles.fullWidthButton} onPress={() => this.attemptLogin()}>
-                                <Text style={stylesheet.boldText}>Login</Text>
-                            </Button>
-                        </View>
-                    </Form>
-                </Content>
-            </Container>
+            <Provider store={store}>
+                <App />
+            </Provider>
         )
     }
 }
 
-const styles = {
-    buttonContainer: {
-        padding: 10,
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    fullWidthButton: {
-        width: '100%',
-        justifyContent: 'center',
-        flex: 1,
-    },
-    boldText: {
-        fontWeight: 'bold'
-    },
-    bigText: {
-        fontSize: 30
-    }
-}
-
-const stylesheet = StyleSheet.create(styles)
-
-Expo.registerRootComponent(App)
+Expo.registerRootComponent(ReduxApp)
