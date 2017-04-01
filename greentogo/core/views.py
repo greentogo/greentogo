@@ -1,12 +1,19 @@
-import pinax.stripe.models as pinax_models
-import stripe
+import json
+from collections import OrderedDict
+from itertools import groupby
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import SetPasswordForm
+from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, render
+from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
+
+import pinax.stripe.models as pinax_models
+import stripe
 from pinax.stripe.actions import customers, invoices, sources, subscriptions
 
 from .forms import NewSubscriptionForm, SubscriptionPlanForm, UserForm
@@ -163,9 +170,21 @@ def cancel_subscription(request, sub_id):
 
 
 def restaurants(request):
-    restaurants = Restaurant.objects.all()
+    restaurants = Restaurant.objects.order_by('phase', 'name').all()
+    restaurants_by_phase = OrderedDict()
+    phases = []
+    for phase, rlist in groupby((r for r in restaurants), key=lambda r: r.phase):
+        phases.append(phase)
+        restaurants_by_phase[phase] = [r for r in rlist]
+    phase_colors = {1: 'red', 2: 'blue', 3: 'purple', 4: 'yellow', 5: 'green'}
+
     return render(
-        request, "core/restaurants.djhtml",
-        {"api_key": settings.GOOGLE_API_KEY,
-         "restaurants": restaurants}
+        request, "core/restaurants.djhtml", {
+            "api_key": settings.GOOGLE_API_KEY,
+            "phases": phases,
+            "phase_colors": phase_colors,
+            "phase_colors_json": mark_safe(json.dumps(phase_colors)),
+            "restaurants_by_phase": restaurants_by_phase,
+            "restaurants_json": mark_safe(serializers.serialize("json", restaurants))
+        }
     )

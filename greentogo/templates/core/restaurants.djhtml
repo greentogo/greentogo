@@ -1,10 +1,25 @@
 {% extends "core/base.html" %}
 
+{% load foundation_extras %}
 {% load serialization_extras %}
 
 {% block content %}
     <div class="row">
-        <div class="medium-12 columns">
+        <div class="medium-3 xlarge-2 columns">
+            {% for phase, restaurants in restaurants_by_phase.items %}
+                <div class="lead"
+                     style="border-width: 0 0 0 10px; border-color: {{ phase_colors|getitem:phase}}; padding-left: 5px; border-style: solid;">
+                    <strong>Phase {{ phase }}</strong>
+                </div>
+                {% for restaurant in restaurants %}
+                    <p>
+                        <span><strong>{{ restaurant.name }}</strong></span>
+                        <span>{{ restaurant.address }}</span>
+                    </p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        <div class="medium-9 xlarge-10 columns">
             <h2>Participating Restaurants</h2>
             <div id="restaurant-map">
             </div>
@@ -14,41 +29,47 @@
 
 {% block javascript %}
     <script type="text/javascript">
-        var phaseColors = {
-          1: 'red', 2: 'blue', 3: 'purple', 4: 'yellow', 5: 'green'
-        };
+     var phaseColors = {{ phase_colors_json }};
 
-        function phaseImage(phase) {
-          return 'http://maps.google.com/mapfiles/ms/icons/' + phaseColors[phase] + '-dot.png';
-        }
-        
-        var restaurants = {{ restaurants|jsonify }};
+     function phaseImage(phase) {
+         return 'http://maps.google.com/mapfiles/ms/icons/' + phaseColors[phase] + '-dot.png';
+     }
 
-        function markerContent(restaurant) {
-            return ("<div id='bodyContent'><b>" + restaurant.fields.name + "</b><br />" + restaurant.fields.address + "</div>");
-        }
-        
-        function initMap() {
-            var durhamCenter = { lat: 35.97, lng: -78.8986 };
-            var map = new google.maps.Map(document.getElementById('restaurant-map'), {
-                zoom: 12,
-                center: durhamCenter
-            });
+     var restaurants = {{ restaurants_json }};
+     var infos = [];
 
-            restaurants.forEach(function (restaurant) {
-                var info = new google.maps.InfoWindow({
-                    content: markerContent(restaurant)
-                });
-        
-                var marker = new google.maps.Marker({
-                  icon: phaseImage(restaurant.fields.phase),
-                  map: map,
-                  title: restaurant.fields.name,
-                  position: { lat: restaurant.fields.latitude, lng: restaurant.fields.longitude },
-                });
-                marker.addListener('click', function () { info.open(map, marker) })
-            });
-       }
+     function markerContent(restaurant) {
+         return ("<div id='bodyContent'><b>" + restaurant.fields.name + "</b><br />" + restaurant.fields.address + "</div>");
+     }
+
+     function initMap() {
+         var bounds = new google.maps.LatLngBounds();
+         var durhamCenter = { lat: 35.97, lng: -78.8986 };
+         var map = new google.maps.Map(document.getElementById('restaurant-map'), {
+             zoom: 12,
+             center: durhamCenter
+         });
+
+         var info = new google.maps.InfoWindow();
+
+         restaurants.forEach(function (restaurant) {
+             var marker = new google.maps.Marker({
+                 icon: phaseImage(restaurant.fields.phase),
+                 map: map,
+                 title: restaurant.fields.name,
+                 position: { lat: restaurant.fields.latitude, lng: restaurant.fields.longitude },
+             });
+
+             bounds.extend(marker.position);
+
+             marker.addListener('click', function () {
+                 info.setContent(markerContent(restaurant));
+                 info.open(map, marker);
+             });
+         });
+
+         map.fitBounds(bounds);
+     }
     </script>
 
     <script async defer
