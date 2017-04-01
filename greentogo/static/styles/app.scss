@@ -50,6 +50,11 @@
 // @include motion-ui-transitions;
 // @include motion-ui-animations;
 
+#restaurant-map {
+    height: 600px;
+    width: "100%";
+}
+
 .page-header {
     vertical-align: bottom;
     display: flex;
@@ -66,6 +71,12 @@
         display: inline-block;
         align-self: flex-end;
     }
+}
+
+.page-footer {
+    border-top: 1px solid gray;
+    margin-top: 1rem;
+    padding-top: 0.5rem;
 }
 
 .inline-form {

@@ -39,6 +39,12 @@
         {% endif %}
         {% block content %}
         {% endblock %}
+        <footer class="page-footer row">
+            <div class="medium-12 columns">
+                {% flat_menu 'social_media' %}
+            </div>
+        </footer>
+
         {% compress js %}
         <script src="{% static 'jquery/dist/jquery.js' %}"></script>
         <script src="{% static 'js-cookie/src/js.cookie.js' %}"></script>

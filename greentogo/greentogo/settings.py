@@ -12,9 +12,8 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 
-from django.contrib.messages import constants as messages
-
 import environ
+from django.contrib.messages import constants as messages
 
 __root__ = environ.Path(__file__) - 3  # three folder back (/a/b/c/ - 3 = /)
 # set default values and casting
@@ -201,6 +200,8 @@ COMPRESS_PRECOMPILERS = (
 )
 
 # Secret settings
+
+GOOGLE_API_KEY = __env__('GOOGLE_API_KEY')
 
 STRIPE_SECRET_KEY = __env__('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = __env__('STRIPE_PUBLISHABLE_KEY')

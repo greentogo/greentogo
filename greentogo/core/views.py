@@ -1,3 +1,5 @@
+import pinax.stripe.models as pinax_models
+import stripe
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -5,13 +7,10 @@ from django.contrib.auth.forms import SetPasswordForm
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
-
-import pinax.stripe.models as pinax_models
-import stripe
-from pinax.stripe.actions import customers, invoices, subscriptions, sources
+from pinax.stripe.actions import customers, invoices, sources, subscriptions
 
 from .forms import NewSubscriptionForm, SubscriptionPlanForm, UserForm
-from .models import Subscription, get_plans
+from .models import Restaurant, Subscription, get_plans
 
 
 def index(request):
@@ -161,3 +160,12 @@ def cancel_subscription(request, sub_id):
         return redirect(reverse('account'))
 
     return render(request, "core/cancel_subscription.html", {"subscription": subscription})
+
+
+def restaurants(request):
+    restaurants = Restaurant.objects.all()
+    return render(
+        request, "core/restaurants.djhtml",
+        {"api_key": settings.GOOGLE_API_KEY,
+         "restaurants": restaurants}
+    )

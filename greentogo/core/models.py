@@ -1,5 +1,6 @@
 import uuid
 
+import pinax.stripe.models as pinax_models
 from django.conf import settings
 from django.contrib.auth import hashers
 from django.contrib.auth.models import AbstractUser
@@ -9,8 +10,6 @@ from django.db import models
 from django.db.models import Case, Sum, When
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-import pinax.stripe.models as pinax_models
 from django_geocoder.wrapper import get_cached as geocode
 
 
@@ -39,6 +38,9 @@ class User(AbstractUser):
         max_length=255,
         unique=True,
     )
+
+    def __str__(self):
+        return self.name or self.username
 
 
 # TODO Change from inheritance to composition
@@ -156,6 +158,7 @@ class Restaurant(models.Model):
     address = models.CharField(max_length=1023)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
+    phase = models.PositiveIntegerField(default=1)
 
     def save(self, *args, **kwargs):
         if self.address and self.latitude is None or self.longitude is None:
