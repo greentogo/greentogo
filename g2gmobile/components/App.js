@@ -20,7 +20,7 @@ const Router = createRouter(() => ({
 class App extends React.Component {
     render() {
         if (true) {
-            return <LoginScreen />;
+            return <LoginScreen store={this.props.store} />;
         } else {
             return (
                 <NavigationProvider router={Router}>

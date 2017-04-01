@@ -12,9 +12,6 @@ import {
     Button,
 } from "native-base";
 
-import { connect } from 'react-redux';
-
-import { saveAuthToken } from "../actions";
 import stylesheet from "../styles";
 
 class LoginScreen extends React.Component {
@@ -33,20 +30,8 @@ class LoginScreen extends React.Component {
     }
 
     attemptLogin() {
-        this.props.login(
-            fetch('https://greentogo.ngrok.io/auth/login/', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    username: this.state.username,
-                    password: this.state.password,
-                })
-            })
-                .then((response) => response.json())
-        )
+        console.log(this);
+        this.props.store.attemptLogin(this.state.username, this.state.password);
     }
 
     render() {
@@ -88,18 +73,4 @@ class LoginScreen extends React.Component {
     }
 }
 
-const mapStateToProps = (state) => {
-    return {}
-}
-
-const mapDispatchToProps = (dispatch) => {
-    return {
-        login: (promise) => {
-            dispatch(saveAuthToken(promise))
-        }
-    }
-}
-
-const LoginContainer = connect(mapStateToProps, mapDispatchToProps)(LoginScreen);
-
-export default LoginContainer;
+export default LoginScreen;
