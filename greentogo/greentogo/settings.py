@@ -12,8 +12,9 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 
-import environ
 from django.contrib.messages import constants as messages
+
+import environ
 
 __root__ = environ.Path(__file__) - 3  # three folder back (/a/b/c/ - 3 = /)
 # set default values and casting
@@ -147,6 +148,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Authentication
 
 AUTH_USER_MODEL = 'core.User'
+LOGIN_REDIRECT_URL = '/account/'
 
 # API
 
