@@ -3,9 +3,11 @@
 {% load compress %}
 {% load menu_tags %}
 <!DOCTYPE html>
-<html>
+<html class="no-js" lang="en">
     <head>
         <meta charset="UTF-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{% block title %}Durham GreenToGo{% endblock %}</title>
         {% compress css %}
         <link rel="stylesheet" type="text/scss" href="{% static 'styles/app.scss' %}">
@@ -14,33 +16,28 @@
         <link rel='stylesheet' id='resonar-fonts-css' href='https://fonts.googleapis.com/css?family=Libre+Baskerville%3A400%2C700%2C400italic%7CLato%3A400%2C700%2C900%2C400italic%2C700italic%2C900italic%7CPlayfair+Display%3A400%2C700%2C400italic%2C700italic%7CInconsolata%3A400&#038;subset=latin%2Clatin-ext'
               type='text/css' media='all' />
     </head>
-
     <body>
-        <div class="row page-header">
-            <div class="medium-6 columns align-bottom">
-                <div class="logo">
-                    <a href="/">
-                        <img alt="GreenToGo logo" src="{% static 'logo.png' %}"/>
-                    </a>
-                </div>
-            </div>
-            <div class="medium-6 columns align-bottom">
-                {% main_menu %}
+        <div class="row">
+            <div class="column">
+                {% main_menu template="menus/top_menu.html" %}
             </div>
         </div>
+
         {% if messages %}
             <div class="messages row">
+                <div class="column">
                 {% for message in messages %}
-                    <div class="callout small-12 columns {{ message.tags }}">
+                    <div class="callout {{ message.tags }}">
                         {{ message }}
                     </div>
                 {% endfor %}
+                </div>
             </div>
         {% endif %}
         {% block content %}
         {% endblock %}
-        <footer class="page-footer row">
-            <div class="medium-12 columns">
+        <footer class="row">
+            <div class="medium-12 columns page-footer">
                 {% flat_menu 'social_media' %}
             </div>
         </footer>

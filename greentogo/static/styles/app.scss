@@ -55,22 +55,40 @@
     width: "100%";
 }
 
-.page-header {
-    vertical-align: bottom;
-    display: flex;
-    height: 100%;
-    border-bottom: 2px solid black;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
+.no-js .top-bar {
+  display: none;
+}
 
-    .logo {
-        margin-top: 10px;
+@media screen and (min-width: 40em) {
+  .no-js .top-bar {
+    display: block;
+  }
+
+  .no-js .title-bar {
+    display: none;
+  }
+}
+
+.top-bar {
+    background-color: #628e86;
+    color: #fefefe;
+
+    ul {
+        background-color: #628e86;
     }
 
-    .align-bottom {
-        display: inline-block;
-        align-self: flex-end;
+    .active > a {
+        background-color: darken(#628e86, 10%);
+        color: #fefefe;
     }
+
+    a {
+        color: #fefefe;
+    }
+}
+
+.messages {
+    margin-top: 1rem;
 }
 
 .page-footer {
