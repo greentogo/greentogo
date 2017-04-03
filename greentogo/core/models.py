@@ -1,6 +1,5 @@
 import uuid
 
-import pinax.stripe.models as pinax_models
 from django.conf import settings
 from django.contrib.auth import hashers
 from django.contrib.auth.models import AbstractUser
@@ -10,6 +9,8 @@ from django.db import models
 from django.db.models import Case, Sum, When
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+import pinax.stripe.models as pinax_models
 from django_geocoder.wrapper import get_cached as geocode
 
 
@@ -43,36 +44,36 @@ class User(AbstractUser):
         return self.name or self.username
 
 
-# TODO Change from inheritance to composition
-class Subscription(pinax_models.Subscription):
+class Subscription(models.Model):
     """GreenToGo subscription model.
 
     A subscription can belong to more than one subscriber.
     One or more subscriptions can belong to the same subscriber.
     This should be a many-to-many relationship.
     """
-
-    class Meta:
-        proxy = True
+    subscribers = models.ManyToManyField("Subscriber", related_name="subscriptions")
+    pinax_subscription = models.OneToOneField(
+        pinax_models.Subscription, related_name="g2g_subscription"
+    )
 
     @classmethod
     def lookup_by_customer_and_sub_id(cls, customer, sub_id):
         # TODO handle exceptions
         subscription = customer.subscription_set.get(stripe_id=sub_id)
-        return cls.from_pinax(subscription)
+        return subscription.g2g_subscription
 
-    @classmethod
-    def from_pinax(cls, sub):
-        return cls.objects.get(pk=sub.pk)
+    @property
+    def customer(self):
+        return self.pinax_subscription.customer
 
     @property
     def canceled(self):
-        return self.canceled_at is not None
+        return self.pinax_subscription.canceled_at is not None
 
     @property
     def number_of_boxes(self):
         try:
-            number_of_boxes = int(self.plan.metadata.get("number_of_boxes", "1"))
+            number_of_boxes = int(self.pinax_subscription.plan.metadata.get("number_of_boxes", "1"))
         except ValueError:
             number_of_boxes = 1
 
@@ -108,7 +109,6 @@ class Subscriber(models.Model):
     A subscriber belongs to a user.
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    subscriptions = models.ManyToManyField(Subscription, related_name="subscribers")
 
     @property
     def username(self):
@@ -131,6 +131,12 @@ def create_stripe_customer(sender, instance, created, **kwargs):
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def save_subscriber(sender, instance, **kwargs):
     instance.subscriber.save()
+
+
+@receiver(post_save, sender=pinax_models.Subscription)
+def create_g2g_subscription(sender, instance, created, **kwargs):
+    if created:
+        Subscription.objects.create(pinax_subscription=instance)
 
 
 class Location(models.Model):

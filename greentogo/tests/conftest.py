@@ -1,12 +1,14 @@
-import pytest
-from core.models import Location, Subscription, Subscriber
-from pinax.stripe.models import Plan
-from faker import Faker
+import os.path
 from datetime import datetime
+
 from django.contrib.auth import get_user_model
 
+import pytest
+from faker import Faker
+from pinax.stripe import models as pinax_models
 from vcr import VCR
-import os.path
+
+from core.models import Location, Subscriber, Subscription
 
 
 @pytest.fixture(scope="session")
@@ -16,8 +18,7 @@ def faker():
 
 @pytest.fixture(scope="session")
 def vcr():
-    return VCR(cassette_library_dir=os.path.join(
-        os.path.dirname(__file__), "cassettes"))
+    return VCR(cassette_library_dir=os.path.join(os.path.dirname(__file__), "cassettes"))
 
 
 my_vcr = vcr()
@@ -39,7 +40,7 @@ def checkout_location(db):
 
 @pytest.fixture
 def plan1(db):
-    plan, _ = Plan.objects.get_or_create(
+    plan, _ = pinax_models.Plan.objects.get_or_create(
         stripe_id="1BOX",
         defaults={
             "name": "1 Box",
@@ -50,13 +51,14 @@ def plan1(db):
             "metadata": {
                 "number_of_boxes": "1"
             }
-        })
+        }
+    )
     return plan
 
 
 @pytest.fixture
 def plan2(db):
-    plan, _ = Plan.objects.get_or_create(
+    plan, _ = pinax_models.Plan.objects.get_or_create(
         stripe_id="2BOX",
         defaults={
             "name": "2 Boxes",
@@ -67,7 +69,8 @@ def plan2(db):
             "metadata": {
                 "number_of_boxes": "2"
             }
-        })
+        }
+    )
     return plan
 
 
@@ -75,33 +78,36 @@ def plan2(db):
 @pytest.fixture
 def user(db, faker):
     User = get_user_model()
-    user = User.objects.create_user(
-        faker.user_name, password=faker.password(length=10))
+    user = User.objects.create_user(faker.user_name, password=faker.password(length=10))
     user.save()
     return user
 
 
 @pytest.fixture
 def subscription1(db, user, plan1):
-    subscription = Subscription(
+    pinax_sub = pinax_models.Subscription(
         plan=plan1,
         customer=user.customer,
         quantity=1,
         start=datetime.now(),
-        status='active', )
-    subscription.save()
+        status='active',
+    )
+    pinax_sub.save()
+    subscription = pinax_sub.g2g_subscription
     subscription.subscribers.add(user.subscriber)
     return subscription
 
 
 @pytest.fixture
 def subscription2(db, user, plan2):
-    subscription = Subscription(
+    pinax_sub = pinax_models.Subscription(
         plan=plan2,
         customer=user.customer,
         quantity=1,
         start=datetime.now(),
-        status='active', )
-    subscription.save()
+        status='active',
+    )
+    pinax_sub.save()
+    subscription = pinax_sub.g2g_subscription
     subscription.subscribers.add(user.subscriber)
     return subscription
