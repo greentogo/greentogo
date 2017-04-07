@@ -1,5 +1,5 @@
-import uuid
-
+import pinax.stripe.models as pinax_models
+import shortuuid
 from django.conf import settings
 from django.contrib.auth import hashers
 from django.contrib.auth.models import AbstractUser
@@ -9,8 +9,6 @@ from django.db import models
 from django.db.models import Case, Sum, When
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-import pinax.stripe.models as pinax_models
 from django_geocoder.wrapper import get_cached as geocode
 
 
@@ -152,13 +150,32 @@ class Location(models.Model):
     CHECKOUT = 'OUT'
     SERVICE_CHOICES = ((CHECKIN, 'Check in'), (CHECKOUT, 'Check out'), )
 
-    uuid = models.UUIDField(primary_key=True)
+    code = models.CharField(max_length=6, unique=True)
     service = models.CharField(max_length=25, choices=SERVICE_CHOICES)
+    name = models.CharField(max_length=255)
+    address = models.CharField(max_length=1023)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if self.uuid is None:
-            self.uuid = uuid.uuid4()
+        self._set_code()
+        self._geocode()
         super().save(*args, **kwargs)
+
+    def _set_code(self, force=False):
+        if force or not self.code:
+            shortuuid.set_alphabet("23456789ABCDEFGHJKLMNPQRSTUVWXYZ")
+            code = shortuuid.uuid()[:6]
+            while Location.objects.filter(code=code).count() > 0:
+                code = shortuuid.uuid()[:6]
+            self.code = code
+
+    def _geocode(self):
+        if self.address and self.latitude is None or self.longitude is None:
+            result = geocode(self.address, provider='google')
+            lat, lng = result.latlng
+            self.latitude = lat
+            self.longitude = lng
 
 
 class LocationTag(models.Model):

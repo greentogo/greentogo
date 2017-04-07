@@ -16,7 +16,9 @@ class SubscriberAdmin(admin.ModelAdmin):
 
 
 class LocationAdmin(admin.ModelAdmin):
-    list_display = ('uuid', 'service', )
+    fields = ('name', 'code', 'service', 'address', 'latitude', 'longitude', )
+    readonly_fields = ('code', 'latitude', 'longitude', )
+    list_display = ('name', 'code', 'service', )
 
 
 admin.site.register(User)

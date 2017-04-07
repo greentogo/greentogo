@@ -2,6 +2,8 @@ import json
 from collections import OrderedDict
 from itertools import groupby
 
+import pinax.stripe.models as pinax_models
+import stripe
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -11,9 +13,6 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
-
-import pinax.stripe.models as pinax_models
-import stripe
 from pinax.stripe.actions import customers, invoices, sources, subscriptions
 
 from .forms import NewSubscriptionForm, SubscriptionPlanForm, UserForm
@@ -191,11 +190,18 @@ def restaurants(request):
 
 
 @login_required
-def location(request, location_id):
+def location(request, location_code):
     user = request.user
-    location = get_object_or_404(Location, pk=location_id)
+    location = get_object_or_404(Location, code=location_code.upper())
 
     if request.method == "POST":
+        subscription_id = request.POST.get('subscription_id')
+        try:
+            subscription = Subscription.objects.get(pk=subscription_id)
+        except Subscription.DoesNotExist:
+            # TODO: handle this
+            pass
+
         # TODO: Remember to make this use a transaction.
         pass
 
@@ -205,7 +211,8 @@ def location(request, location_id):
             "name": subscription.plan_display(),
             "max_boxes": subscription.number_of_boxes,
             "available_boxes": subscription.available_boxes(),
-        } for subscription in user.subscriber.subscriptions.filter(g2g_subscription__ended_at=None)
+        }
+        for subscription in user.subscriber.subscriptions.filter(pinax_subscription__ended_at=None)
     ]
 
     return render(

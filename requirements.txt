@@ -36,6 +36,7 @@ rcssmin==1.0.6            # via django-compressor
 requests==2.13.0          # via geocoder, rollbar, stripe, wagtail
 rjsmin==1.0.12            # via django-compressor
 rollbar==0.13.11
+shortuuid==0.5.0
 six==1.10.0               # via django-environ, django-extensions, geocoder, html5lib, packaging, pinax-stripe, rollbar, setuptools
 stripe==1.51.0
 unidecode==0.4.20         # via wagtail

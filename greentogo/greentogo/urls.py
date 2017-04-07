@@ -27,6 +27,7 @@ from beta_signup import views as beta_views
 from core import views as core_views
 
 urlpatterns = [
+    url(r'^locations/(?P<location_code>[A-Za-z1-9]{6})/$', core_views.location, name='location'),
     url(r'^restaurants/$', core_views.restaurants, name='restaurants'),
     url(r'^account/subscription/new/$', core_views.add_subscription, name='add_subscription'),
     url(
