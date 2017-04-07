@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import SetPasswordForm
 from django.core import serializers
 from django.core.urlresolvers import reverse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
 
@@ -17,7 +17,7 @@ import stripe
 from pinax.stripe.actions import customers, invoices, sources, subscriptions
 
 from .forms import NewSubscriptionForm, SubscriptionPlanForm, UserForm
-from .models import Restaurant, Subscription, get_plans
+from .models import Location, Restaurant, Subscription, get_plans
 
 
 def index(request):
@@ -186,5 +186,31 @@ def restaurants(request):
             "phase_colors_json": mark_safe(json.dumps(phase_colors)),
             "restaurants_by_phase": restaurants_by_phase,
             "restaurants_json": mark_safe(serializers.serialize("json", restaurants))
+        }
+    )
+
+
+@login_required
+def location(request, location_id):
+    user = request.user
+    location = get_object_or_404(Location, pk=location_id)
+
+    if request.method == "POST":
+        # TODO: Remember to make this use a transaction.
+        pass
+
+    subscriptions = [
+        {
+            "id": subscription.stripe_id,
+            "name": subscription.plan_display(),
+            "max_boxes": subscription.number_of_boxes,
+            "available_boxes": subscription.available_boxes(),
+        } for subscription in user.subscriber.subscriptions.filter(g2g_subscription__ended_at=None)
+    ]
+
+    return render(
+        request, "core/location.djhtml", {
+            "location": location,
+            "subscriptions": subscriptions,
         }
     )

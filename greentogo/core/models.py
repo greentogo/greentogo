@@ -67,8 +67,15 @@ class Subscription(models.Model):
         return self.pinax_subscription.customer
 
     @property
+    def stripe_id(self):
+        return self.pinax_subscription.stripe_id
+
+    @property
     def canceled(self):
         return self.pinax_subscription.canceled_at is not None
+
+    def plan_display(self):
+        return self.pinax_subscription.plan_display()
 
     @property
     def number_of_boxes(self):
@@ -136,7 +143,8 @@ def save_subscriber(sender, instance, **kwargs):
 @receiver(post_save, sender=pinax_models.Subscription)
 def create_g2g_subscription(sender, instance, created, **kwargs):
     if created:
-        Subscription.objects.create(pinax_subscription=instance)
+        sub = Subscription.objects.create(pinax_subscription=instance)
+        sub.subscribers.add(instance.customer.user.subscriber)
 
 
 class Location(models.Model):
