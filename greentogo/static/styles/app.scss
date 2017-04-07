@@ -69,6 +69,13 @@
   }
 }
 
+@media (max-width: 40em) {
+    .page-header .column {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
 .top-bar {
     background-color: #628e86;
     color: #fefefe;
@@ -89,6 +96,10 @@
 
 .messages {
     margin-top: 1rem;
+}
+
+.page-header {
+    margin-bottom: 2rem;
 }
 
 .page-footer {
