@@ -36,24 +36,21 @@ def account(request):
     else:
         form = UserForm(instance=request.user)
 
-    customer = request.user.customer
-    subscriptions = [
+    owned_subscriptions = [
         {
             "id": subscription.stripe_id,
             "name": subscription.plan_display(),
             "price": subscription.total_amount,
             "ends": subscription.current_period_end,
-            "auto_renew": not subscription.cancel_at_period_end,
+            "auto_renew": subscription.auto_renew
         }
-        for subscription in customer.subscription_set.filter(ended_at=None)
-        .order_by("-current_period_end")
+        for subscription in Subscription.objects.active().owned_by(request.user)
+        .reverse_chrono_order()
     ]
 
     return render(
-        request, 'core/account.html',
-        {"form": form,
-         "customer": customer,
-         "subscriptions": subscriptions}
+        request, 'core/account.html', {"form": form,
+                                       "owned_subscriptions": owned_subscriptions}
     )
 
 

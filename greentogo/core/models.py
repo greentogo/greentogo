@@ -52,6 +52,12 @@ class SubscriptionQuerySet(models.QuerySet):
     def active(self):
         return self.filter(pinax_subscription__ended_at=None)
 
+    def owned_by(self, user):
+        return self.filter(pinax_subscription__customer=user.customer)
+
+    def reverse_chrono_order(self):
+        return self.order_by("-pinax_subscription__current_period_end")
+
 
 class SubscriptionManager(models.Manager):
     def get_queryset(self):
@@ -94,6 +100,9 @@ class Subscription(models.Model):
     def customer(self):
         return self.pinax_subscription.customer
 
+    def plan_display(self):
+        return self.pinax_subscription.plan_display()
+
     @property
     def stripe_id(self):
         return self.pinax_subscription.stripe_id
@@ -102,12 +111,17 @@ class Subscription(models.Model):
     def canceled(self):
         return self.pinax_subscription.canceled_at is not None
 
-    def plan_display(self):
-        return self.pinax_subscription.plan_display()
-
     @property
     def total_amount(self):
         return self.pinax_subscription.total_amount
+
+    @property
+    def current_period_end(self):
+        return self.pinax_subscription.current_period_end
+
+    @property
+    def auto_renew(self):
+        return not self.pinax_subscription.cancel_at_period_end
 
     @property
     def number_of_boxes(self):
