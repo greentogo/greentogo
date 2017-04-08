@@ -24,16 +24,26 @@ def vcr():
 my_vcr = vcr()
 
 
+@my_vcr.use_cassette()
 @pytest.fixture
 def checkin_location(db):
-    loc = Location(service=Location.CHECKIN)
+    loc = Location(
+        service=Location.CHECKIN,
+        name="Test Checkin Location",
+        address="119 Orange St, Durham, NC 27701"
+    )
     loc.save()
     return loc
 
 
+@my_vcr.use_cassette()
 @pytest.fixture
 def checkout_location(db):
-    loc = Location(service=Location.CHECKOUT)
+    loc = Location(
+        service=Location.CHECKOUT,
+        name="Test Checkout Location",
+        address="119 Orange St, Durham, NC 27701"
+    )
     loc.save()
     return loc
 

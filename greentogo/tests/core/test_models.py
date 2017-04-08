@@ -8,8 +8,8 @@ from core.models import Subscription
 pytest.mark.usefixtures('betamax_session')
 
 
-def test_location_has_uuid(checkin_location):
-    assert checkin_location.uuid is not None
+def test_location_has_code(checkin_location):
+    assert checkin_location.code is not None
 
 
 def test_available_boxes_for_subscription(subscription2):

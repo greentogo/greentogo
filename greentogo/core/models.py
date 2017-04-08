@@ -1,15 +1,17 @@
-import pinax.stripe.models as pinax_models
-import shortuuid
 from django.conf import settings
 from django.contrib.auth import hashers
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import Case, Sum, When
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+import pinax.stripe.models as pinax_models
+import shortuuid
 from django_geocoder.wrapper import get_cached as geocode
+from pinax.stripe.actions import subscriptions
 
 
 def get_plan_price(plan):
@@ -55,10 +57,19 @@ class Subscription(models.Model):
     )
 
     @classmethod
+    def create_from_pinax_subscription(cls, pinax_subscription):
+        sub = cls.objects.create(pinax_subscription=pinax_subscription)
+        sub.subscribers.add(pinax_subscription.customer.user.subscriber)
+        return sub
+
+    @classmethod
     def lookup_by_customer_and_sub_id(cls, customer, sub_id):
         # TODO handle exceptions
-        subscription = customer.subscription_set.get(stripe_id=sub_id)
-        return subscription.g2g_subscription
+        pinax_sub = customer.subscription_set.get(stripe_id=sub_id)
+        try:
+            return pinax_sub.g2g_subscription
+        except ObjectDoesNotExist:
+            return cls.create_from_pinax_subscription(pinax_sub)
 
     @property
     def customer(self):
@@ -74,6 +85,10 @@ class Subscription(models.Model):
 
     def plan_display(self):
         return self.pinax_subscription.plan_display()
+
+    @property
+    def total_amount(self):
+        return self.pinax_subscription.total_amount
 
     @property
     def number_of_boxes(self):
@@ -105,6 +120,9 @@ class Subscription(models.Model):
 
     def tag_location(self, location):
         return self.locationtag_set.create(location=location)
+
+    def cancel(self):
+        subscriptions.cancel(self.pinax_subscription, at_period_end=False)
 
 
 class Subscriber(models.Model):
@@ -141,8 +159,7 @@ def save_subscriber(sender, instance, **kwargs):
 @receiver(post_save, sender=pinax_models.Subscription)
 def create_g2g_subscription(sender, instance, created, **kwargs):
     if created:
-        sub = Subscription.objects.create(pinax_subscription=instance)
-        sub.subscribers.add(instance.customer.user.subscriber)
+        Subscription.create_from_pinax_subscription(instance)
 
 
 class Location(models.Model):
@@ -173,9 +190,10 @@ class Location(models.Model):
     def _geocode(self):
         if self.address and self.latitude is None or self.longitude is None:
             result = geocode(self.address, provider='google')
-            lat, lng = result.latlng
-            self.latitude = lat
-            self.longitude = lng
+            if result.latlng:
+                lat, lng = result.latlng
+                self.latitude = lat
+                self.longitude = lng
 
 
 class LocationTag(models.Model):
