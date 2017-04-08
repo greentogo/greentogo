@@ -12,6 +12,10 @@ def test_location_has_code(checkin_location):
     assert checkin_location.code is not None
 
 
+def test_number_of_boxes_for_subscription(subscription2):
+    assert subscription2.number_of_boxes == 2
+
+
 def test_available_boxes_for_subscription(subscription2):
     assert subscription2.available_boxes() == 2
 

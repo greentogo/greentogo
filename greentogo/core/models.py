@@ -43,6 +43,23 @@ class User(AbstractUser):
     def __str__(self):
         return self.name or self.username
 
+    @property
+    def subscriptions(self):
+        return self.subscriber.subscriptions
+
+
+class SubscriptionQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(pinax_subscription__ended_at=None)
+
+
+class SubscriptionManager(models.Manager):
+    def get_queryset(self):
+        return SubscriptionQuerySet(self.model, using=self._db)
+
+    def active(self):
+        return self.get_queryset().active()
+
 
 class Subscription(models.Model):
     """GreenToGo subscription model.
@@ -55,6 +72,8 @@ class Subscription(models.Model):
     pinax_subscription = models.OneToOneField(
         pinax_models.Subscription, related_name="g2g_subscription"
     )
+
+    objects = SubscriptionManager()
 
     @classmethod
     def create_from_pinax_subscription(cls, pinax_subscription):
@@ -118,7 +137,14 @@ class Subscription(models.Model):
     def can_checkin(self):
         return self.available_boxes() < self.number_of_boxes
 
+    def can_tag_location(self, location):
+        if location.service == Location.CHECKIN:
+            return self.can_checkin()
+        else:
+            return self.can_checkout()
+
     def tag_location(self, location):
+        # TODO raise exception if you illegally tag
         return self.locationtag_set.create(location=location)
 
     def cancel(self):

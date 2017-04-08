@@ -5,7 +5,36 @@
 {% block content %}
     <div class="row">
         <div class="medium-12 columns">
-            <h1>Location</h1>
+            <h2>
+                {% if location.service == location.CHECKIN %}
+                    Check in a box
+                {% else %}
+                    Check out a box
+                {% endif %}
+                at {{ location.name }}
+            </h2>
+            <form action="." method="POST">
+                {% csrf_token %}
+                <label for="subscription_id">Subscription</label>
+                <select name="subscription_id" id="subscription_id">                    
+                    {% for sub in subscriptions %}
+                        <option value="{{ sub.id }}"
+                                data-available="{{ sub.available_boxes }}"
+                                data-max="{{ sub.max_boxes }}">
+                            {{ sub.name }} -
+                            {{ sub.available_boxes }}/{{ sub.max_boxes }} available
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="button">
+                    {% if location.service == location.CHECKIN %}
+                        Check in
+                    {% else %}
+                        Check out
+                    {% endif %}                    
+                </button>
+            </form>
         </div>
     </div>
 {% endblock %}

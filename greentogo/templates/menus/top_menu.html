@@ -25,6 +25,7 @@
             {% endfor %}
 
             {% if user.is_authenticated %}
+                <li><a href="{% url 'locations' %}">Check in / check out</a></li>
                 <li><a href="{% url 'account' %}">My account</a></li>
                 <li><a href="{% url 'auth_logout' %}">Logout</a></li>
             {% else %}

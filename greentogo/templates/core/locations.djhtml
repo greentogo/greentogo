@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+
+{% load foundation_extras %}
+
+{% block content %}
+    <div class="row">
+        <div class="medium-12 columns">
+            <h2>Enter a location code</h2>
+            <form action="." method="POST">
+                {% csrf_token %}
+                <label for="location_code">Location code</label>
+                <input type="text" id="location_code" name="location_code" autofocus maxlength="6" miinlength="6" pattern="[A-Za-z1-9]{6}" />
+
+                <button type="submit" class="button">
+                    Check in / check out
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
