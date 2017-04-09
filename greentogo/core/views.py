@@ -44,7 +44,7 @@ def account(request):
             "ends": subscription.current_period_end,
             "auto_renew": subscription.auto_renew
         }
-        for subscription in Subscription.objects.active().owned_by(request.user)
+        for subscription in request.user.subscriptions.active().owned_by(request.user)
         .reverse_chrono_order()
     ]
 

@@ -52,8 +52,8 @@ def test_pinax_subscription_creates_g2g_subscription(user, plan1):
     )
     pinax_sub.save()
 
-    assert type(pinax_sub.g2g_subscription) is Subscription
+    assert type(pinax_sub.user_subscriptions.get(user=user)) is Subscription
 
 
 def test_subscription_customer_is_also_subscriber(subscription1):
-    assert subscription1.customer.user.subscriber in subscription1.subscribers.all()
+    assert subscription1.customer.user == subscription1.user

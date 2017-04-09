@@ -8,7 +8,7 @@ from faker import Faker
 from pinax.stripe import models as pinax_models
 from vcr import VCR
 
-from core.models import Location, Subscriber, Subscription
+from core.models import Location, Subscription
 
 
 @pytest.fixture(scope="session")
@@ -88,7 +88,7 @@ def plan2(db):
 @pytest.fixture
 def user(db, faker):
     User = get_user_model()
-    user = User.objects.create_user(faker.user_name, password=faker.password(length=10))
+    user = User.objects.create_user(faker.user_name(), password=faker.password(length=10))
     user.save()
     return user
 
@@ -103,9 +103,7 @@ def subscription1(db, user, plan1):
         status='active',
     )
     pinax_sub.save()
-    subscription = pinax_sub.g2g_subscription
-    subscription.subscribers.add(user.subscriber)
-    return subscription
+    return pinax_sub.user_subscriptions.get(user=user)
 
 
 @pytest.fixture
@@ -118,6 +116,4 @@ def subscription2(db, user, plan2):
         status='active',
     )
     pinax_sub.save()
-    subscription = pinax_sub.g2g_subscription
-    subscription.subscribers.add(user.subscriber)
-    return subscription
+    return pinax_sub.user_subscriptions.get(user=user)

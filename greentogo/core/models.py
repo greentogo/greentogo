@@ -32,6 +32,30 @@ def get_plans():
     return [plan_to_dict(plan) for plan in plans]
 
 
+def max_boxes_for_subscription(pinax_sub):
+    try:
+        number_of_boxes = int(pinax_sub.plan.metadata.get("number_of_boxes", "1"))
+    except ValueError:
+        number_of_boxes = 1
+    return number_of_boxes
+
+
+def available_boxes_for_subscription(pinax_sub):
+    boxes_checked_out = LocationTag.objects \
+        .filter(subscription=pinax_sub) \
+        .aggregate(
+            checked_out=Sum(
+                Case(
+                    When(location__service=Location.CHECKOUT, then=1),
+                    When(location__service=Location.CHECKIN, then=-1),
+                    default=1,
+                    output_field=models.IntegerField()
+                )
+            )
+        )['checked_out']
+    return max_boxes_for_subscription(pinax_sub) - (boxes_checked_out or 0)
+
+
 class User(AbstractUser):
     name = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(
@@ -42,10 +66,6 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.name or self.username
-
-    @property
-    def subscriptions(self):
-        return self.subscriber.subscriptions
 
 
 class SubscriptionQuerySet(models.QuerySet):
@@ -59,42 +79,35 @@ class SubscriptionQuerySet(models.QuerySet):
         return self.order_by("-pinax_subscription__current_period_end")
 
 
-class SubscriptionManager(models.Manager):
-    def get_queryset(self):
-        return SubscriptionQuerySet(self.model, using=self._db)
-
-    def active(self):
-        return self.get_queryset().active()
-
-
 class Subscription(models.Model):
     """GreenToGo subscription model.
 
-    A subscription can belong to more than one subscriber.
-    One or more subscriptions can belong to the same subscriber.
-    This should be a many-to-many relationship.
+    Connects users to subscription objects in Stripe.
     """
-    subscribers = models.ManyToManyField("Subscriber", related_name="subscriptions")
-    pinax_subscription = models.OneToOneField(
-        pinax_models.Subscription, related_name="g2g_subscription"
+    objects = SubscriptionQuerySet.as_manager()
+
+    user = models.ForeignKey(User, related_name="subscriptions")
+    pinax_subscription = models.ForeignKey(
+        pinax_models.Subscription, related_name="user_subscriptions"
     )
 
-    objects = SubscriptionManager()
+    class Meta:
+        unique_together = (('user', 'pinax_subscription', ), )
 
     @classmethod
-    def create_from_pinax_subscription(cls, pinax_subscription):
-        sub = cls.objects.create(pinax_subscription=pinax_subscription)
-        sub.subscribers.add(pinax_subscription.customer.user.subscriber)
-        return sub
+    def create_for_subscription_owner(cls, pinax_subscription):
+        return cls.objects.create(
+            pinax_subscription=pinax_subscription, user=pinax_subscription.customer.user
+        )
 
     @classmethod
     def lookup_by_customer_and_sub_id(cls, customer, sub_id):
         # TODO handle exceptions
         pinax_sub = customer.subscription_set.get(stripe_id=sub_id)
         try:
-            return pinax_sub.g2g_subscription
+            return pinax_sub.user_subscriptions.get(user=customer.user)
         except ObjectDoesNotExist:
-            return cls.create_from_pinax_subscription(pinax_sub)
+            return cls.create_for_subscription_owner(pinax_sub)
 
     @property
     def customer(self):
@@ -125,25 +138,10 @@ class Subscription(models.Model):
 
     @property
     def number_of_boxes(self):
-        try:
-            number_of_boxes = int(self.pinax_subscription.plan.metadata.get("number_of_boxes", "1"))
-        except ValueError:
-            number_of_boxes = 1
-
-        return number_of_boxes
+        return max_boxes_for_subscription(self.pinax_subscription)
 
     def available_boxes(self):
-        boxes_checked_out = LocationTag.objects.filter(subscription=self).aggregate(
-            checked_out=Sum(
-                Case(
-                    When(location__service=Location.CHECKOUT, then=1),
-                    When(location__service=Location.CHECKIN, then=-1),
-                    default=1,
-                    output_field=models.IntegerField()
-                )
-            )
-        )['checked_out']
-        return self.number_of_boxes - (boxes_checked_out or 0)
+        return available_boxes_for_subscription(self.pinax_subscription)
 
     def can_checkout(self):
         return self.available_boxes() > 0
@@ -158,30 +156,12 @@ class Subscription(models.Model):
             return self.can_checkout()
 
     def tag_location(self, location):
+        tag = LocationTag.objects.create(subscription=self.pinax_subscription, location=location)
         # TODO raise exception if you illegally tag
-        return self.locationtag_set.create(location=location)
+        return tag
 
     def cancel(self):
         subscriptions.cancel(self.pinax_subscription, at_period_end=False)
-
-
-class Subscriber(models.Model):
-    """GreenToGo subscriber model.
-
-    A subscriber can have one or more subscriptions.
-    A subscriber belongs to a user.
-    """
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-
-    @property
-    def username(self):
-        return self.user.username
-
-
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_subscriber(sender, instance, created, **kwargs):
-    if created:
-        Subscriber.objects.create(user=instance)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -191,15 +171,10 @@ def create_stripe_customer(sender, instance, created, **kwargs):
         customers.create(user=instance)
 
 
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def save_subscriber(sender, instance, **kwargs):
-    instance.subscriber.save()
-
-
 @receiver(post_save, sender=pinax_models.Subscription)
 def create_g2g_subscription(sender, instance, created, **kwargs):
     if created:
-        Subscription.create_from_pinax_subscription(instance)
+        Subscription.create_for_subscription_owner(instance)
 
 
 class Location(models.Model):
@@ -237,7 +212,7 @@ class Location(models.Model):
 
 
 class LocationTag(models.Model):
-    subscription = models.ForeignKey(Subscription)
+    subscription = models.ForeignKey(pinax_models.Subscription)
     location = models.ForeignKey(Location)
     created_at = models.DateTimeField(auto_now_add=True)
 

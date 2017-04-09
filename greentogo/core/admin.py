@@ -1,18 +1,6 @@
 from django.contrib import admin
 
-from .models import Location, Restaurant, Subscriber, Subscription, User
-
-
-class LinkedSubscriptionInline(admin.StackedInline):
-    model = Subscriber.subscriptions.through
-
-
-class SubscriberAdmin(admin.ModelAdmin):
-    inlines = [
-        LinkedSubscriptionInline,
-    ]
-    fields = ('user', )
-    list_display = ('username', )
+from .models import Location, Restaurant, Subscription, User
 
 
 class LocationAdmin(admin.ModelAdmin):
@@ -23,5 +11,5 @@ class LocationAdmin(admin.ModelAdmin):
 
 admin.site.register(User)
 admin.site.register(Location, LocationAdmin)
-admin.site.register(Subscriber, SubscriberAdmin)
 admin.site.register(Restaurant)
+admin.site.register(Subscription)
