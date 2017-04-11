@@ -86,6 +86,7 @@ class Subscription(models.Model):
     """
     objects = SubscriptionQuerySet.as_manager()
 
+    name = models.CharField(max_length=255, null=True, blank=True)
     user = models.ForeignKey(User, related_name="subscriptions")
     pinax_subscription = models.ForeignKey(
         pinax_models.Subscription, related_name="user_subscriptions"
@@ -112,6 +113,10 @@ class Subscription(models.Model):
     @property
     def customer(self):
         return self.pinax_subscription.customer
+
+    @property
+    def display_name(self):
+        return self.name or self.plan_display()
 
     def plan_display(self):
         return self.pinax_subscription.plan_display()

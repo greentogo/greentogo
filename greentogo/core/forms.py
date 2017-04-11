@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from .models import get_plans
+
+from .models import Subscription, get_plans
 
 
 class UserForm(forms.ModelForm):
@@ -34,3 +35,11 @@ class NewSubscriptionForm(forms.Form):
             (plan['stripe_id'], "{name}: {display_price}".format(**plan), ) for plan in get_plans()
         ]
     )
+
+
+class SubscriptionForm(forms.ModelForm):
+    class Meta:
+        model = Subscription
+        fields = [
+            'name',
+        ]
