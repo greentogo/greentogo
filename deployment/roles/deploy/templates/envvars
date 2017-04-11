@@ -1,0 +1,15 @@
+export PYTHONPATH={{ django.root }}
+export DJANGO_SETTINGS_MODULE={{ django.settings }}
+export DATABASE_URL=postgresql://{{ secret.db_user }}:{{ secret.db_password }}@{{ secret.db_host }}:{{ secret.db_port }}/{{ secret.db_name }}
+export SECRET_KEY={{ secret.secret_key }}
+export STRIPE_SECRET_KEY={{ stripe.secret_key }}
+export STRIPE_PUBLISHABLE_KEY={{ stripe.publishable_key }}
+export ROLLBAR_KEY={{ rollbar.key }}
+export EMAIL_ADDRESS={{ email.address }}
+export EMAIL_PASSWORD={{ email.password }}
+export EMAIL_SMTP_SERVER={{ email.smtp_server }}
+export EMAIL_SMTP_PORT={{ email.smtp_port }}
+export EMAIL_SECURE={{ email.secure }}
+export EMAIL_REPLY_TO={{ email.reply_to }}
+export EMAIL_ADMINS={{ email.admins }}
+export GOOGLE_API_KEY={{ google.api_key }}

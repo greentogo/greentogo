@@ -27,6 +27,8 @@
   template: src=uwsgi.service dest=/etc/systemd/system/uwsgi.service
 - become_user: "{{ project.user }}"
   block:
+  - name: Create envvars script
+    template: src=envvars dest={{ project.root }}/envvars
   - name: Install bower components
     shell: bower install chdir={{ project.srcroot }}
   - name: Install requirements with pip

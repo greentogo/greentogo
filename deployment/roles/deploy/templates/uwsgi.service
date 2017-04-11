@@ -17,6 +17,7 @@ Environment=EMAIL_SMTP_PORT={{ email.smtp_port }}
 Environment=EMAIL_SECURE={{ email.secure }}
 Environment=EMAIL_REPLY_TO={{ email.reply_to }}
 Environment=EMAIL_ADMINS={{ email.admins }}
+Environment=GOOGLE_API_KEY={{ google.api_key }}
 
 ExecStart=/usr/local/bin/uwsgi --uid {{ project.user }} --ini {{ project.root }}uwsgi.ini
 RuntimeDirectory=uwsgi
