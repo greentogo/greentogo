@@ -11,3 +11,4 @@
     - libxslt1.1
     - libxslt1-dev
     - sendmail
+    - virtualenv

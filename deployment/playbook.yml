@@ -1,4 +1,13 @@
 ---
+- hosts: all
+  gather_facts: False
+  remote_user: root
+  become: yes
+  become_user: root
+  become_method: sudo
+  tasks:
+  - name: install python 2
+    raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
 - name: Configure server
   hosts: all
   remote_user: root
@@ -20,6 +29,7 @@
     EMAIL_SECURE: "{{ email.secure }}"
     EMAIL_REPLY_TO: "{{ email.reply_to }}"
     EMAIL_ADMINS: "{{ email.admins }}"
+    GOOGLE_API_KEY: "{{ google.api_key }}"
   roles:
     - { role: user, tags: user }
     - { role: apt, tags: apt }

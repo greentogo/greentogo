@@ -3,8 +3,6 @@
   block:
   - name: Check out code
     local_action: git repo="{{ repo.url }}" dest="{{ git_tmp_dir }}" version={{ repo.branch }}
-  - name: Get ready for production
-    local_action: shell make prod chdir="{{ git_tmp_dir }}" executable=/bin/bash
 - name: Push files to production
   synchronize:
     src="{{ git_tmp_dir }}"
@@ -15,10 +13,22 @@
     - Restart uWSGI
 - name: Ensure project user owns code
   file: path={{ project.srcroot }} state=directory owner={{ project.user }} recurse=yes
+- name: Install npm
+  apt: name=npm state=present
+- name: Install node-legacy
+  apt: name=nodejs-legacy state=present
+- name: Install bower
+  npm: name=bower global=yes state=present
 - name: Install uwsgi
   pip: name=uwsgi executable=pip3
+- name: Create uwsgi config
+  template: src=uwsgi.ini dest={{ project.root }}/uwsgi.ini
+- name: Create uwsgi systemd service
+  template: src=uwsgi.service dest=/etc/systemd/system/uwsgi.service
 - become_user: "{{ project.user }}"
   block:
+  - name: Install bower components
+    shell: bower install chdir={{ project.srcroot }}
   - name: Install requirements with pip
     pip: >
       requirements="{{ project.srcroot }}requirements.txt"
@@ -26,7 +36,7 @@
       virtualenv_python=python3
   - name: Migrate Django database
     django_manage: >
-      command=migrate
+      command="migrate"
       app_path={{ django.root }}
       settings={{ django.settings }}
       virtualenv={{ project.virtualenv }}
@@ -36,9 +46,5 @@
       app_path={{ django.root }}
       settings={{ django.settings }}
       virtualenv={{ project.virtualenv }}
-- name: Create uwsgi config
-  template: src=uwsgi.ini dest={{ project.root }}/uwsgi.ini
-- name: Create uwsgi systemd service
-  template: src=uwsgi.service dest=/etc/systemd/system/uwsgi.service
 - name: Make sure uwsgi is running
   service: name=uwsgi enabled=yes state=restarted

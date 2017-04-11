@@ -12,3 +12,10 @@
     owner: "{{ project.user }}"
     group: "{{ project.group }}"
     path: "{{ project.root }}"
+
+- name: Ensure there is a logs directory
+  file:
+    state: directory
+    owner: "{{ project.user }}"
+    group: "{{ project.group }}"
+    path: "{{ project.root }}/logs"
