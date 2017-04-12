@@ -2,6 +2,8 @@ import json
 from collections import OrderedDict
 from itertools import groupby
 
+import pinax.stripe.models as pinax_models
+import stripe
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -12,12 +14,9 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
-
-import pinax.stripe.models as pinax_models
-import stripe
 from pinax.stripe.actions import customers, invoices, sources, subscriptions
 
-from .forms import NewSubscriptionForm, SubscriptionPlanForm, UserForm
+from .forms import (NewSubscriptionForm, SubscriptionForm, SubscriptionPlanForm, UserForm)
 from .models import Location, Restaurant, Subscription, get_plans
 
 
@@ -96,9 +95,13 @@ def change_payment_method(request):
 @login_required
 def subscription(request, sub_id):
     subscription = Subscription.lookup_by_customer_and_sub_id(request.user.customer, sub_id)
-    return render(request, "core/subscription.html", {
-        "subscription": subscription,
-    })
+    form = SubscriptionForm(instance=subscription)
+    return render(
+        request, "core/subscription.html", {
+            "form": form,
+            "subscription": subscription,
+        }
+    )
 
 
 @login_required

@@ -1,13 +1,18 @@
 {% extends "core/base.html" %}
 
+{% load foundation_extras %}
+
 {% block content %}
 <div class="row">
     <div class="medium-12 columns">
-        <h2>Subscription</h2>
-        <dl>
-            <dt>Number of boxes</dt>
-            <dd>{{ subscription.number_of_boxes }}</dd>
-        </dl>
+        <h2>Subscription: {{ subscription.display_name }}</h2>
+        <p><strong>Number of boxes:</strong> {{ subscription.number_of_boxes }}</p>
+        <form action="." method="POST">
+            {% csrf_token %}
+            {% form_field field=form.name label="Nickname" %}
+
+            <button type="submit" class="button">Update subscription</button>
+        </form>
     </div>
 </div>
 {% endblock %}
