@@ -47,10 +47,9 @@ def account(request):
         .reverse_chrono_order()
     ]
 
-    return render(
-        request, 'core/account.html', {"form": form,
-                                       "owned_subscriptions": owned_subscriptions}
-    )
+    subscriptions = request.user.subscriptions.active().reverse_chrono_order()
+
+    return render(request, 'core/account.html', {"form": form, "subscriptions": subscriptions})
 
 
 @login_required

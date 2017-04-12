@@ -1,3 +1,4 @@
+{# -*- engine:django -*- #}
 {% extends "core/base.html" %}
 
 {% load foundation_extras %}
@@ -27,30 +28,34 @@
         </ul>
 
         <h3>Your Subscriptions</h3>
-        {% if owned_subscriptions %}
-        {% for sub in owned_subscriptions %}
+        {% if subscriptions %}
+        {% for sub in subscriptions %}
         <div class="row">
             <div class="medium-6 columns">
                 <p class="lead">
-                    <a href="{% url 'subscription' sub_id=sub.id %}">
-                        {{ sub.name }} @ ${{ sub.price }}
+                    <a href="{% url 'subscription' sub_id=sub.stripe_id %}">
+                        {{ sub.name }}
                     </a>
                 </p>
                 <p>
+                    Plan: {{ sub.plan_display }}<br />
+                    Number of boxes: {{ sub.available_boxes }} / {{ sub.number_of_boxes }}<br />
                     {% if sub.auto_renew %}
-                    Renews automatically on {{ sub.ends }}
+                    Renews automatically on {{ sub.current_period_end }}
                     {% else %}
-                    Ends on {{ sub.ends }}
+                    Ends on {{ sub.current_period_end }}
                     {% endif %}
                 </p>
             </div>
 
             <div class="medium-6 columns text-right">
+                {% if sub.is_owner_subscription %}
                 <div class="button-group">
-                    <a href="{% url 'subscription_plan' sub_id=sub.id %}"
+                    <a href="{% url 'subscription_plan' sub_id=sub.stripe_id %}"
                        class="small button">Change plan</a>
-                    <a href="{% url 'cancel_subscription' sub_id=sub.id %}" class="small alert button">Cancel</a>
+                    <a href="{% url 'cancel_subscription' sub_id=sub.stripe_id %}" class="small alert button">Cancel</a>
                 </div>
+                {% endif %}
             </div>
         </div>
         {% endfor %}

@@ -7,21 +7,43 @@
 <div class="row">
     <div class="medium-12 columns">
         <h2>Subscription: {{ subscription.display_name }}</h2>
-        <p><strong>Number of boxes:</strong> {{ subscription.number_of_boxes }}</p>
-        <p>
-            <strong>Owned by:</strong>
-            {% if subscription.is_owner_subscription %}
-                You!
-            {% else %}
-                {{ subscription.owner }}
-            {% endif %}
-        </p>
+        <div class="row" style="margin-bottom: 1rem;">
+            <div class="medium-4 columns">
+                <strong>Number of boxes:</strong>
+                {{ subscription.number_of_boxes }}
+            </div>
+            <div class="medium-4 columns">
+                <strong>Plan:</strong>
+                {{ subscription.plan_display }}
+            </div>
+            <div class="medium-4 columns">
+                <strong>Owned by:</strong>
+                {% if subscription.is_owner_subscription %}
+                    You!
+                {% else %}
+                    {{ subscription.owner }}
+                {% endif %}
+            </div>
+        </div>
         <form action="." method="POST">
             {% csrf_token %}
-            {% form_field field=form.name label="Nickname" %}
 
-            <button type="submit" class="button">Update subscription</button>
+            <div class="row">
+                <div class="column">
+                    {% form_field field=form.name label="Nickname" %}
+                    <button type="submit" class="button">Update subscription nickname</button>
+                </div>
+            </div>
         </form>
+
+        {% if subscription.is_owner_subscription %}
+            <div class="button-group">
+                <a href="{% url 'subscription_plan' sub_id=subscription.stripe_id %}"
+                   class="small button">Change plan</a>
+                <a href="{% url 'cancel_subscription' sub_id=subscription.stripe_id %}" class="small alert button">Cancel</a>
+            </div>
+        {% endif %}
+
     </div>
 </div>
 {% endblock %}
