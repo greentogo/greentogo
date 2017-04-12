@@ -1,3 +1,4 @@
+{# -*- engine:django -*- #}
 {% extends "core/base.html" %}
 
 {% load foundation_extras %}
@@ -7,6 +8,14 @@
     <div class="medium-12 columns">
         <h2>Subscription: {{ subscription.display_name }}</h2>
         <p><strong>Number of boxes:</strong> {{ subscription.number_of_boxes }}</p>
+        <p>
+            <strong>Owned by:</strong>
+            {% if subscription.is_owner_subscription %}
+                You!
+            {% else %}
+                {{ subscription.owner }}
+            {% endif %}
+        </p>
         <form action="." method="POST">
             {% csrf_token %}
             {% form_field field=form.name label="Nickname" %}

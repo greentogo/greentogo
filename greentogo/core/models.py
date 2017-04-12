@@ -1,3 +1,5 @@
+import pinax.stripe.models as pinax_models
+import shortuuid
 from django.conf import settings
 from django.contrib.auth import hashers
 from django.contrib.auth.models import AbstractUser
@@ -7,9 +9,6 @@ from django.db import models
 from django.db.models import Case, Sum, When
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-import pinax.stripe.models as pinax_models
-import shortuuid
 from django_geocoder.wrapper import get_cached as geocode
 from pinax.stripe.actions import subscriptions
 
@@ -113,6 +112,13 @@ class Subscription(models.Model):
     @property
     def customer(self):
         return self.pinax_subscription.customer
+
+    @property
+    def owner(self):
+        return self.customer.user
+
+    def is_owner_subscription(self):
+        return self.user == self.owner
 
     @property
     def display_name(self):

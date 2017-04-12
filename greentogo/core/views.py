@@ -16,7 +16,7 @@ from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
 from pinax.stripe.actions import customers, invoices, sources, subscriptions
 
-from .forms import (NewSubscriptionForm, SubscriptionForm, SubscriptionPlanForm, UserForm)
+from .forms import NewSubscriptionForm, SubscriptionForm, SubscriptionPlanForm, UserForm
 from .models import Location, Restaurant, Subscription, get_plans
 
 
@@ -95,7 +95,15 @@ def change_payment_method(request):
 @login_required
 def subscription(request, sub_id):
     subscription = Subscription.lookup_by_customer_and_sub_id(request.user.customer, sub_id)
-    form = SubscriptionForm(instance=subscription)
+    if request.method == "POST":
+        form = SubscriptionForm(request.POST, instance=subscription)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "You have updated your subscription.")
+            return redirect(reverse('account'))
+    else:
+        form = SubscriptionForm(instance=subscription)
+
     return render(
         request, "core/subscription.html", {
             "form": form,
