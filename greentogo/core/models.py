@@ -67,6 +67,18 @@ class User(AbstractUser):
         return self.name or self.username
 
 
+class SubscriptionInvitation(models.Model):
+    code = models.CharField(max_length=40)
+    pinax_subscription = models.ForeignKey(pinax_models.Subscription, related_name="invitations")
+
+    def accept(self, user):
+        subscription, created = Subscription.objects.get_or_create(
+            user=user, pinax_subscription=self.pinax_subscription
+        )
+        self.delete()
+        return subscription
+
+
 class SubscriptionQuerySet(models.QuerySet):
     def active(self):
         return self.filter(pinax_subscription__ended_at=None)

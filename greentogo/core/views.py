@@ -260,3 +260,18 @@ def location(request, location_code):
             "subscriptions": subscriptions,
         }
     )
+
+
+@login_required
+def invitation(request, invitation_code):
+    user = request.user
+    invitation = get_object_or_404(SubscriptionInvitation, code=invitation_code)
+
+    subscription = invitation.accept()
+    messages.success(
+        request, "You have accepted an invitation to {}'s {} subscription.".format(
+            subscription.owner.name, subscription.plan_display()
+        )
+    )
+
+    return redirect(reverse('account'))
