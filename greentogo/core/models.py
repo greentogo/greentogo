@@ -71,6 +71,12 @@ class SubscriptionInvitation(models.Model):
     code = models.CharField(max_length=40)
     pinax_subscription = models.ForeignKey(pinax_models.Subscription, related_name="invitations")
 
+    def save(self, *args, **kwargs):
+        if not self.code:
+            shortuuid.set_alphabet("23456789ABCDEFGHJKLMNPQRSTUVWXYZ")
+            self.code = shortuuid.uuid()
+        return super().save(*args, **kwargs)
+
     def accept(self, user):
         subscription, created = Subscription.objects.get_or_create(
             user=user, pinax_subscription=self.pinax_subscription
