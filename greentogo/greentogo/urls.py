@@ -18,7 +18,6 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
-
 from pinax.stripe.views import Webhook as StripeWebhook
 from wagtail.wagtailadmin import urls as wagtailadmin_urls
 from wagtail.wagtailcore import urls as wagtail_urls
@@ -31,6 +30,7 @@ urlpatterns = [
     url(r'^locations/$', core_views.locations, name='locations'),
     url(r'^locations/(?P<location_code>[A-Za-z1-9]{6})/$', core_views.location, name='location'),
     url(r'^restaurants/$', core_views.restaurants, name='restaurants'),
+    url(r'^invitation/(?P<invitation_code>[A-Z1-9]+)/$', core_views.invitation, name='invitation'),
     url(r'^account/subscription/new/$', core_views.add_subscription, name='add_subscription'),
     url(
         r'^account/subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/$',

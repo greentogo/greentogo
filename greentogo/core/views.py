@@ -17,7 +17,7 @@ from django.views.decorators.http import require_POST
 from pinax.stripe.actions import customers, invoices, sources, subscriptions
 
 from .forms import NewSubscriptionForm, SubscriptionForm, SubscriptionPlanForm, UserForm
-from .models import Location, Restaurant, Subscription, get_plans
+from .models import Location, Restaurant, Subscription, SubscriptionInvitation, get_plans
 
 
 def index(request):
@@ -34,18 +34,6 @@ def account(request):
             return redirect(reverse("account"))
     else:
         form = UserForm(instance=request.user)
-
-    owned_subscriptions = [
-        {
-            "id": subscription.stripe_id,
-            "name": subscription.plan_display(),
-            "price": subscription.total_amount,
-            "ends": subscription.current_period_end,
-            "auto_renew": subscription.auto_renew
-        }
-        for subscription in request.user.subscriptions.active().owned_by(request.user)
-        .reverse_chrono_order()
-    ]
 
     subscriptions = request.user.subscriptions.active().reverse_chrono_order()
 
@@ -93,7 +81,7 @@ def change_payment_method(request):
 
 @login_required
 def subscription(request, sub_id):
-    subscription = Subscription.lookup_by_customer_and_sub_id(request.user.customer, sub_id)
+    subscription = request.user.subscriptions.get(pinax_subscription__stripe_id=sub_id)
     if request.method == "POST":
         form = SubscriptionForm(request.POST, instance=subscription)
         if form.is_valid():
@@ -267,7 +255,7 @@ def invitation(request, invitation_code):
     user = request.user
     invitation = get_object_or_404(SubscriptionInvitation, code=invitation_code)
 
-    subscription = invitation.accept()
+    subscription = invitation.accept(user)
     messages.success(
         request, "You have accepted an invitation to {}'s {} subscription.".format(
             subscription.owner.name, subscription.plan_display()
