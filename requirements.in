@@ -15,3 +15,5 @@ wagtailmenus
 django-geocoder
 autorepr
 shortuuid
+pyqrcode
+pypng

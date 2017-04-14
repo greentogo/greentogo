@@ -100,3 +100,4 @@ bower_components/
 staticfiles/
 /.isort.cfg
 *.sql
+*.png

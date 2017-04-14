@@ -13,6 +13,8 @@
                 {% endif %}
                 at {{ location.name }}
             </h2>
+
+            {% if subscriptions %}
             <form action="." method="POST">
                 {% csrf_token %}
                 <label for="subscription_id">Subscription</label>
@@ -35,6 +37,12 @@
                     {% endif %}                    
                 </button>
             </form>
+            {% else %}
+                <p>
+                You do not have any current subscriptions.
+                <a href="{% url 'add_subscription' %}">Go add one now.</a>
+                </p>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

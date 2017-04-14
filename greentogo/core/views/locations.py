@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from core.models import Location, Subscription
 
@@ -49,6 +50,12 @@ def location(request, location_code):
                     msg = "You have checked in all of your boxes for this subscription."
                 else:
                     msg = "You do not have enough boxes to check out with this subscription."
+                    if subscription.is_owner_subscription():
+                        msg += """ <a href="{}">Change your subscription plan.</a>""".format(
+                            reverse('subscription_plan', kwargs={"sub_id": subscription.stripe_id})
+                        )
+                        msg = mark_safe(msg)
+
                 messages.error(request, msg)
 
     subscriptions = [

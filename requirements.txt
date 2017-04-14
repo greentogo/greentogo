@@ -30,6 +30,8 @@ pillow==4.0.0             # via wagtail
 pinax-stripe==3.3.0
 psycopg2==2.7.1
 pyparsing==2.2.0          # via packaging
+pypng==0.0.18
+pyqrcode==1.2.1
 pytz==2016.10             # via django-modelcluster, pinax-stripe
 ratelim==0.1.6            # via geocoder
 rcssmin==1.0.6            # via django-compressor
