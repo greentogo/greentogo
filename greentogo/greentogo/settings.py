@@ -12,9 +12,8 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 
-from django.contrib.messages import constants as messages
-
 import environ
+from django.contrib.messages import constants as messages
 
 __root__ = environ.Path(__file__) - 3  # three folder back (/a/b/c/ - 3 = /)
 # set default values and casting
@@ -213,6 +212,8 @@ PINAX_STRIPE_SECRET_KEY = __env__('STRIPE_SECRET_KEY')
 PINAX_STRIPE_HOOKSET = 'core.hookset.StripeHookset'
 
 # Email
+REGISTRATION_DEFAULT_FROM_EMAIL = __env__('EMAIL_ADDRESS')
+DEFAULT_FROM_EMAIL = __env__('EMAIL_ADDRESS')
 EMAIL_HOST_USER = __env__('EMAIL_ADDRESS')
 EMAIL_HOST_PASSWORD = __env__('EMAIL_PASSWORD')
 EMAIL_HOST = __env__('EMAIL_SMTP_SERVER')
