@@ -33,7 +33,7 @@
         <div class="row">
             <div class="medium-6 columns">
                 <p class="lead">
-                    <a href="{% url 'subscription' sub_id=sub.stripe_id %}">
+                    <a href="{{ sub.get_absolute_url }}">
                         {{ sub.display_name }}
                     </a>
                 </p>

@@ -1,6 +1,5 @@
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
-
 from pinax.stripe.hooks import DefaultHookSet
 
 
@@ -16,7 +15,7 @@ class StripeHookset(DefaultHookSet):
             last4 = charge.stripe_charge.source.last4
 
             site = Site.objects.get_current()
-            protocol = getattr(settings, "DEFAULT_HTTP_PROTOCOL", "http")
+            protocol = getattr(settings, "DEFAULT_HTTP_PROTOCOL", "https")
             ctx = {
                 "last4": last4,
                 "subscription": subscription,

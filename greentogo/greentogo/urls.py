@@ -23,28 +23,47 @@ from wagtail.wagtailadmin import urls as wagtailadmin_urls
 from wagtail.wagtailcore import urls as wagtail_urls
 from wagtail.wagtaildocs import urls as wagtaildocs_urls
 
+import core.views.locations
+import core.views.subscriptions
 from beta_signup import views as beta_views
 from core import views as core_views
 
 urlpatterns = [
-    url(r'^locations/$', core_views.locations, name='locations'),
-    url(r'^locations/(?P<location_code>[A-Za-z1-9]{6})/$', core_views.location, name='location'),
+    url(r'^locations/$', core.views.locations.locations, name='locations'),
+    url(
+        r'^locations/(?P<location_code>[A-Za-z1-9]{6})/$',
+        core.views.locations.location,
+        name='location'
+    ),
     url(r'^restaurants/$', core_views.restaurants, name='restaurants'),
-    url(r'^invitation/(?P<invitation_code>[A-Z1-9]+)/$', core_views.invitation, name='invitation'),
-    url(r'^account/subscription/new/$', core_views.add_subscription, name='add_subscription'),
+    url(
+        r'^invitation/(?P<invitation_code>[A-Z1-9]+)/$',
+        core.views.subscriptions.invitation,
+        name='invitation'
+    ),
+    url(
+        r'^account/subscription(?P<sub_id>sub_[A-Za-z0-9]+)/invite/$',
+        core.views.subscriptions.create_invite,
+        name='create_invite'
+    ),
+    url(
+        r'^account/subscription/new/$',
+        core.views.subscriptions.add_subscription,
+        name='add_subscription'
+    ),
     url(
         r'^account/subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/$',
-        core_views.subscription,
+        core.views.subscriptions.subscription,
         name='subscription'
     ),
     url(
         r'^account/subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/plan/$',
-        core_views.change_subscription_plan,
+        core.views.subscriptions.change_subscription_plan,
         name='subscription_plan'
     ),
     url(
         r'^account/subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/cancel/$',
-        core_views.cancel_subscription,
+        core.views.subscriptions.cancel_subscription,
         name='cancel_subscription'
     ),
     url(r'^account/change_password/$', core_views.change_password, name='change_password'),

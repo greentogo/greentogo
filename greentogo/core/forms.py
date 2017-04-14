@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
-from .models import Subscription, get_plans
+from .models import Subscription, SubscriptionInvitation, get_plans
 
 
 class UserForm(forms.ModelForm):
@@ -42,4 +42,12 @@ class SubscriptionForm(forms.ModelForm):
         model = Subscription
         fields = [
             'name',
+        ]
+
+
+class SubscriptionInvitationForm(forms.ModelForm):
+    class Meta:
+        model = SubscriptionInvitation
+        fields = [
+            'email',
         ]

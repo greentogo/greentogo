@@ -4,46 +4,89 @@
 {% load foundation_extras %}
 
 {% block content %}
-<div class="row">
-    <div class="medium-12 columns">
-        <h2>Subscription: {{ subscription.display_name }}</h2>
-        <div class="row" style="margin-bottom: 1rem;">
-            <div class="medium-4 columns">
-                <strong>Number of boxes:</strong>
-                {{ subscription.number_of_boxes }}
-            </div>
-            <div class="medium-4 columns">
-                <strong>Plan:</strong>
-                {{ subscription.plan_display }}
-            </div>
-            <div class="medium-4 columns">
-                <strong>Owned by:</strong>
-                {% if subscription.is_owner_subscription %}
-                    You!
-                {% else %}
-                    {{ subscription.owner }}
-                {% endif %}
-            </div>
-        </div>
-        <form action="." method="POST">
-            {% csrf_token %}
-
-            <div class="row">
-                <div class="column">
-                    {% form_field field=form.name label="Nickname" %}
-                    <button type="submit" class="button">Update subscription nickname</button>
+    <div class="row">
+        <div class="medium-12 columns">
+            <h2>Subscription: {{ subscription.display_name }}</h2>
+            <div class="row" style="margin-bottom: 1rem;">
+                <div class="medium-4 columns">
+                    <strong>Plan:</strong>
+                    {{ subscription.plan_display }}
+                    <br/>
+                    <a href="{% url 'subscription_plan' sub_id=subscription.stripe_id %}"
+                       class="button small">Change plan</a>
+                </div>
+                <div class="medium-4 columns">
+                    <strong>Number of boxes:</strong>
+                    {{ subscription.available_boxes }} / {{ subscription.number_of_boxes }}
+                </div>
+                <div class="medium-4 columns">
+                    <strong>Owned by:</strong>
+                    {% if subscription.is_owner_subscription %}
+                        You!
+                    {% else %}
+                        {{ subscription.owner }}
+                    {% endif %}
                 </div>
             </div>
-        </form>
+            <form action="." method="POST">
+                {% csrf_token %}
 
-        {% if subscription.is_owner_subscription %}
-            <div class="button-group">
-                <a href="{% url 'subscription_plan' sub_id=subscription.stripe_id %}"
-                   class="small button">Change plan</a>
-                <a href="{% url 'cancel_subscription' sub_id=subscription.stripe_id %}" class="small alert button">Cancel</a>
-            </div>
-        {% endif %}
+                <div class="row">
+                    <div class="column">
+                        {% form_field field=form.name label="Nickname" %}
+                        <button type="submit" class="button">Update subscription nickname</button>
+                    </div>
+                </div>
+            </form>
 
+            {% if subscription.is_owner_subscription %}
+                {% if subscription.other_subscriptions %}
+                    <div class="row">
+                        <div class="column">
+                            <h3>Other users sharing this subscription</h3>
+                            <ul>
+                                {% for osub in subscription.other_subscriptions %}
+                                    <li>{{ osub.user.name }} &lt;{{ osub.user.email }}&gt;</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if invitations %}
+                    <div class="row">
+                        <div class="column">
+                            <h3>Outstanding invitations to this subscription</h3>
+                            <ul>
+                                {% for invite in invitations %}
+                                    <li>{{ invite.email }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <form action="{% url 'create_invite' sub_id=subscription.stripe_id %}"
+                      method="POST">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="column">
+                            <h3>Invite other people to use your subscription</h3>
+                            {% form_field field=invite_form.email label="Email address" %}
+                            <button type="submit" class="button">Send invitation</button>
+                        </div>
+                    </div>
+                </form>
+
+
+                <div>
+                    <h3>Danger Zone</h3>
+                    <a href="{% url 'cancel_subscription' sub_id=subscription.stripe_id %}"
+                       class="alert button">Cancel subscription</a>
+                </div>
+            {% endif %}
+
+        </div>
     </div>
-</div>
 {% endblock %}

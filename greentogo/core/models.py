@@ -3,12 +3,15 @@ import shortuuid
 from django.conf import settings
 from django.contrib.auth import hashers
 from django.contrib.auth.models import AbstractUser
+from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import Case, Sum, When
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.template.loader import render_to_string
 from django_geocoder.wrapper import get_cached as geocode
 from pinax.stripe.actions import subscriptions
 
@@ -43,15 +46,15 @@ def available_boxes_for_subscription(pinax_sub):
     boxes_checked_out = LocationTag.objects \
         .filter(subscription=pinax_sub) \
         .aggregate(
-            checked_out=Sum(
-                Case(
-                    When(location__service=Location.CHECKOUT, then=1),
-                    When(location__service=Location.CHECKIN, then=-1),
-                    default=1,
-                    output_field=models.IntegerField()
-                )
+        checked_out=Sum(
+            Case(
+                When(location__service=Location.CHECKOUT, then=1),
+                When(location__service=Location.CHECKIN, then=-1),
+                default=1,
+                output_field=models.IntegerField()
             )
-        )['checked_out']
+        )
+    )['checked_out']
     return max_boxes_for_subscription(pinax_sub) - (boxes_checked_out or 0)
 
 
@@ -68,6 +71,7 @@ class User(AbstractUser):
 
 
 class SubscriptionInvitation(models.Model):
+    email = models.EmailField()
     code = models.CharField(max_length=40)
     pinax_subscription = models.ForeignKey(pinax_models.Subscription, related_name="invitations")
 
@@ -83,6 +87,26 @@ class SubscriptionInvitation(models.Model):
         )
         self.delete()
         return subscription
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('invitation', kwargs={"invitation_code": self.code})
+
+    def send_invitation(self):
+        site = Site.objects.get_current()
+        protocol = getattr(settings, "DEFAULT_HTTP_PROTOCOL", "https")
+        ctx = {
+            "owner": self.pinax_subscription.customer.user,
+            "invitation": self,
+            "site": site,
+            "protocol": protocol,
+        }
+        subject = "Invitation to share a GreenToGo subscription"
+        message = render_to_string("email/invitation.txt", ctx)
+
+        EmailMessage(
+            subject, message, to=[self.email], from_email=settings.DEFAULT_FROM_EMAIL
+        ).send()
 
 
 class SubscriptionQuerySet(models.QuerySet):
@@ -127,6 +151,10 @@ class Subscription(models.Model):
         except ObjectDoesNotExist:
             return cls.create_for_subscription_owner(pinax_sub)
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('subscription', kwargs={"sub_id": self.stripe_id})
+
     @property
     def customer(self):
         return self.pinax_subscription.customer
@@ -137,6 +165,10 @@ class Subscription(models.Model):
 
     def is_owner_subscription(self):
         return self.user == self.owner
+
+    @property
+    def other_subscriptions(self):
+        return self.pinax_subscription.user_subscriptions.exclude(user=self.user)
 
     @property
     def display_name(self):
@@ -222,6 +254,10 @@ class Location(models.Model):
         self._set_code()
         self._geocode()
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('location', kwargs={"location_code": self.code})
 
     def _set_code(self, force=False):
         if force or not self.code:

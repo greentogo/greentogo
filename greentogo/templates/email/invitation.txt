@@ -1,0 +1,7 @@
+You have been invited by {{ owner.name }} to share their GreenToGo subscription.
+To accept their invitation, click the following link:
+
+{{ protocol }}://{{ site.domain }}{{ invitation.get_absolute_url }}
+
+Thank you!
+The GreenToGo staff
