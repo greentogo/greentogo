@@ -23,19 +23,17 @@ def index(request):
 
 
 @login_required
-def account(request):
+def account_settings(request):
     if request.method == "POST":
         form = UserForm(request.POST, instance=request.user)
         if form.is_valid():
             messages.success(request, "You have updated your user information.")
             form.save()
-            return redirect(reverse("account"))
+            return redirect(reverse("account_settings"))
     else:
         form = UserForm(instance=request.user)
 
-    subscriptions = request.user.subscriptions.active().reverse_chrono_order()
-
-    return render(request, 'core/account.html', {"form": form, "subscriptions": subscriptions})
+    return render(request, 'core/account.html', {"form": form})
 
 
 @login_required
@@ -45,7 +43,7 @@ def change_password(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Your password has been changed.")
-            return redirect(reverse('account'))
+            return redirect(reverse('account_settings'))
     else:
         form = SetPasswordForm(request.user)
 
@@ -63,7 +61,7 @@ def change_payment_method(request):
                 source = sources.create_card(customer=customer, token=token)
                 customers.set_default_source(customer=customer, source=source)
                 messages.success(request, "You have updated your default payment " "source.")
-                return redirect(reverse('account'))
+                return redirect(reverse('account_settings'))
             except stripe.error.CardError as ex:
                 error = ex.json_body.get('error')
                 messages.error(

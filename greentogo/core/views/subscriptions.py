@@ -1,10 +1,11 @@
-import stripe
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+
+import stripe
 from pinax.stripe import models as pinax_models
 from pinax.stripe.actions import invoices, subscriptions
 
@@ -15,6 +16,12 @@ from core.models import Subscription, SubscriptionInvitation, get_plans
 
 
 @login_required
+def subscriptions(request):
+    subscriptions = request.user.subscriptions.active().reverse_chrono_order()
+    return render(request, 'core/subscriptions.html', {"subscriptions": subscriptions})
+
+
+@login_required
 def subscription(request, sub_id):
     sub = request.user.subscriptions.get(pinax_subscription__stripe_id=sub_id)
     if request.method == "POST":
@@ -22,7 +29,7 @@ def subscription(request, sub_id):
         if form.is_valid():
             form.save()
             messages.success(request, "You have updated your subscription.")
-            return redirect(reverse('account'))
+            return redirect(reverse('subscriptions'))
     else:
         form = SubscriptionForm(instance=sub)
         invite_form = SubscriptionInvitationForm()
@@ -53,7 +60,7 @@ def add_subscription(request):
                 messages.success(
                     request, "You have added a subscription to the plan {}.".format(plan.name)
                 )
-                return redirect(reverse('account'))
+                return redirect(reverse('subscriptions'))
             except stripe.error.CardError as ex:
                 error = ex.json_body.get('error')
                 messages.error(
@@ -88,7 +95,7 @@ def change_subscription_plan(request, sub_id):
             )
             invoices.create(customer=customer)
             messages.success(request, "Your plan has been updated to {}.".format(plan.name))
-            return redirect(reverse('account'))
+            return redirect(reverse('subscriptions'))
     else:
         form = SubscriptionPlanForm()
 
@@ -104,7 +111,7 @@ def cancel_subscription(request, sub_id):
     if request.method == "POST":
         subscription.cancel()
         messages.success(request, "Your subscription has been cancelled.")
-        return redirect(reverse('account'))
+        return redirect(reverse('subscriptions'))
 
     return render(request, "core/cancel_subscription.html", {"subscription": subscription})
 
@@ -121,7 +128,7 @@ def invitation(request, invitation_code):
         )
     )
 
-    return redirect(reverse('account'))
+    return redirect(reverse('subscriptions'))
 
 
 @login_required

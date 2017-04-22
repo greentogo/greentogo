@@ -4,7 +4,12 @@
 {% block content %}
 <div class="row">
     <div class="medium-12 columns">
-        <p>{% trans "Your account is now activated." %}</p>
+        <p>
+            Your account is now activated!
+            <a href="{% url 'subscriptions' }">Go to your subscriptions.</a>
+        </p>
     </div>
 </div>
 {% endblock %}
+
+{% block footer %}{% endblock %}

@@ -6,8 +6,7 @@
 {% block content %}
 <div class="row">
     <div class="medium-12 columns">
-        <h2>Manage Your Account</h2>
-        <h3>Your Login</h3>
+        <h2>Your Account Settings</h2>
         <form action="." method="POST">
             {% csrf_token %}
             {{ form.non_field_errors }}
@@ -26,49 +25,6 @@
             <li><a href="{% url 'change_password' %}">Change your password</a></li>
             <li><a href="{% url 'change_payment_method' %}">Change your default payment method</a></li>
         </ul>
-
-        <h3>Your Subscriptions</h3>
-        {% if subscriptions %}
-        {% for sub in subscriptions %}
-        <div class="row">
-            <div class="medium-6 columns">
-                <p class="lead">
-                    <a href="{{ sub.get_absolute_url }}">
-                        {{ sub.display_name }}
-                    </a>
-                </p>
-                <p>
-                    Plan: {{ sub.plan_display }}<br />
-                    Number of boxes: {{ sub.available_boxes }} / {{ sub.number_of_boxes }}<br />
-                    {% if sub.auto_renew %}
-                    Renews automatically on {{ sub.current_period_end }}
-                    {% else %}
-                    Ends on {{ sub.current_period_end }}
-                    {% endif %}
-                </p>
-            </div>
-
-            <div class="medium-6 columns text-right">
-                {% if sub.is_owner_subscription %}
-                <div class="button-group">
-                    <a href="{% url 'subscription_plan' sub_id=sub.stripe_id %}"
-                       class="small button">Change plan</a>
-                    <a href="{% url 'cancel_subscription' sub_id=sub.stripe_id %}" class="small alert button">Cancel</a>
-                </div>
-                {% else %}
-                Owned by: {{ sub.owner }}
-                {% endif %}
-            </div>
-        </div>
-        {% endfor %}
-        {% else %}
-        <div>
-            <p class="lead">You do not have any subscriptions currently.</p>
-        </div>
-        {% endif %}
-        <div>
-            <a href="{% url 'add_subscription' %}" class="button large">Add a new subscription</a>
-        </div>
     </div>
 </div>
 

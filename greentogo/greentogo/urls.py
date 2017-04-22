@@ -18,6 +18,7 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
+
 from pinax.stripe.views import Webhook as StripeWebhook
 from wagtail.wagtailadmin import urls as wagtailadmin_urls
 from wagtail.wagtailcore import urls as wagtail_urls
@@ -41,28 +42,27 @@ urlpatterns = [
         core.views.subscriptions.invitation,
         name='invitation'
     ),
+    url(r'^subscriptions/', core.views.subscriptions.subscriptions, name='subscriptions'),
     url(
-        r'^account/subscription(?P<sub_id>sub_[A-Za-z0-9]+)/invite/$',
-        core.views.subscriptions.create_invite,
-        name='create_invite'
-    ),
-    url(
-        r'^account/subscription/new/$',
-        core.views.subscriptions.add_subscription,
-        name='add_subscription'
-    ),
-    url(
-        r'^account/subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/$',
+        r'^subscriptions/(?P<sub_id>sub_[A-Za-z0-9]+)/$',
         core.views.subscriptions.subscription,
         name='subscription'
     ),
     url(
-        r'^account/subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/plan/$',
+        r'^subscriptions/(?P<sub_id>sub_[A-Za-z0-9]+)/invite/$',
+        core.views.subscriptions.create_invite,
+        name='create_invite'
+    ),
+    url(
+        r'^subscriptions/new/$', core.views.subscriptions.add_subscription, name='add_subscription'
+    ),
+    url(
+        r'^subscriptions/(?P<sub_id>sub_[A-Za-z0-9]+)/plan/$',
         core.views.subscriptions.change_subscription_plan,
         name='subscription_plan'
     ),
     url(
-        r'^account/subscription/(?P<sub_id>sub_[A-Za-z0-9]+)/cancel/$',
+        r'^subscriptions/(?P<sub_id>sub_[A-Za-z0-9]+)/cancel/$',
         core.views.subscriptions.cancel_subscription,
         name='cancel_subscription'
     ),
@@ -72,7 +72,7 @@ urlpatterns = [
         core_views.change_payment_method,
         name='change_payment_method'
     ),
-    url(r'^account/$', core_views.account, name='account'),
+    url(r'^account/$', core_views.account_settings, name='account_settings'),
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^auth/', include('djoser.urls.authtoken')),
     url(r'^webhook/', StripeWebhook.as_view(), name="pinax_stripe_webhook"),
