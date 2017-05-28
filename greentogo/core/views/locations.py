@@ -51,7 +51,7 @@ def location(request, location_code):
                 else:
                     msg = "You do not have enough boxes to check out with this subscription."
                     if subscription.is_owner_subscription():
-                        msg += """ <a href="{}">Change your subscription plan.</a>""".format(
+                        msg += """ <a href="{}">To check out additional boxes, upgrade your subscription.</a>""".format(
                             reverse('subscription_plan', kwargs={"sub_id": subscription.stripe_id})
                         )
                         msg = mark_safe(msg)

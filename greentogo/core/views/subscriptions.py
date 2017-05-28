@@ -6,17 +6,16 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 import stripe
-from pinax.stripe import models as pinax_models
-from pinax.stripe.actions import invoices, subscriptions
-
 from core.forms import (
     NewSubscriptionForm, SubscriptionForm, SubscriptionInvitationForm, SubscriptionPlanForm
 )
 from core.models import Subscription, SubscriptionInvitation, get_plans
+from pinax.stripe import models as pinax_models
+from pinax.stripe.actions import invoices, subscriptions
 
 
 @login_required
-def subscriptions(request):
+def subscriptions_view(request):
     subscriptions = request.user.subscriptions.active().reverse_chrono_order()
     return render(request, 'core/subscriptions.html', {"subscriptions": subscriptions})
 

@@ -19,15 +19,14 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 
-from pinax.stripe.views import Webhook as StripeWebhook
-from wagtail.wagtailadmin import urls as wagtailadmin_urls
-from wagtail.wagtailcore import urls as wagtail_urls
-from wagtail.wagtaildocs import urls as wagtaildocs_urls
-
 import core.views.locations
 import core.views.subscriptions
 from beta_signup import views as beta_views
 from core import views as core_views
+from pinax.stripe.views import Webhook as StripeWebhook
+from wagtail.wagtailadmin import urls as wagtailadmin_urls
+from wagtail.wagtailcore import urls as wagtail_urls
+from wagtail.wagtaildocs import urls as wagtaildocs_urls
 
 urlpatterns = [
     url(r'^locations/$', core.views.locations.locations, name='locations'),
@@ -42,7 +41,7 @@ urlpatterns = [
         core.views.subscriptions.invitation,
         name='invitation'
     ),
-    url(r'^subscriptions/', core.views.subscriptions.subscriptions, name='subscriptions'),
+    url(r'^subscriptions/$', core.views.subscriptions.subscriptions_view, name='subscriptions'),
     url(
         r'^subscriptions/(?P<sub_id>sub_[A-Za-z0-9]+)/$',
         core.views.subscriptions.subscription,
