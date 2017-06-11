@@ -4,9 +4,11 @@ import Expo from 'expo';
 import App from "./components/App";
 import { AppStore } from "./stores";
 
+import { observer } from 'mobx-react';
+
 const store = new AppStore();
 
-class GreenToGo extends React.Component {
+@observer class GreenToGo extends React.Component {
     state = { fontsAreLoaded: false };
 
     async componentWillMount() {

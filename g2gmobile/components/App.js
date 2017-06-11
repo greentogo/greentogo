@@ -5,6 +5,8 @@ import {
     View,
 } from 'react-native';
 
+import {observer} from "mobx-react";
+
 import {
     createRouter,
     NavigationProvider,
@@ -12,15 +14,18 @@ import {
 } from '@expo/ex-navigation';
 
 import LoginScreen from "./LoginScreen";
+import styles from "../styles";
 
 const Router = createRouter(() => ({
     home: () => HomeScreen,
 }));
 
-class App extends React.Component {
+@observer class App extends React.Component {
     render() {
-        if (true) {
-            return <LoginScreen store={this.props.store} />;
+        const store = this.props.store;
+
+        if (!store.authToken) {
+            return <LoginScreen store={store} />;
         } else {
             return (
                 <NavigationProvider router={Router}>
@@ -39,15 +44,11 @@ class HomeScreen extends React.Component {
     }
 
     render() {
-        if (true) {
-            return <LoginScreen />;
-        } else {
-            return (
-                <View style={styles.container}>
-                    <Text>Open up main.js to start working on your app!</Text>
-                </View>
-            )
-        }
+        return (
+            <View style={styles.container}>
+                <Text>Open up main.js to start working on your app!</Text>
+            </View>
+        )
     }
 }
 
