@@ -24,8 +24,9 @@ import stylesheet from "../styles";
 
 class ListMenuItem extends React.Component {
     render() {
+        const onPress = this.props.onPress || function () { };
         return (
-        <ListItem icon>
+        <ListItem icon onPress={onPress}>
             <Left>
                 <Icon name={this.props.icon}/>
             </Left>
@@ -45,6 +46,10 @@ class HomeScreen extends React.Component {
         }
     }
 
+    goToMap = () => {
+        this.props.navigator.push('map');
+    }
+
     render() {
         return (
             <Container style={styles.container}>
@@ -52,7 +57,7 @@ class HomeScreen extends React.Component {
                     <List>
                         <ListMenuItem icon="log-out" text="Check out container" />
                         <ListMenuItem icon="log-in" text="Return container" />
-                        <ListMenuItem icon="map" text="Map of participating restaurants" />
+                        <ListMenuItem icon="map" text="Map of participating restaurants" onPress={this.goToMap} />
                         <ListMenuItem icon="person" text="Your account" />
                     </List>
                 </Content>

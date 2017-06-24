@@ -15,13 +15,13 @@ import {
 
 import LoginScreen from "./LoginScreen";
 import HomeScreen from "./HomeScreen";
+import MapScreen from "./MapScreen";
 import stylesheet from "../styles";
 
 const Router = createRouter(() => ({
     home: () => HomeScreen,
+    map: () => MapScreen
 }));
-
-console.log("hi")
 
 @observer class App extends React.Component {
     render() {
