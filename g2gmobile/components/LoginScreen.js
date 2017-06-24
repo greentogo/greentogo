@@ -1,7 +1,12 @@
 import React from "react";
-import {Text, TextInput, View, StyleSheet} from "react-native";
 import {
-    Container,
+    Text,
+    TextInput,
+    View,
+    StyleSheet,
+    Alert,
+} from "react-native";
+import {
     Header,
     Body,
     Title,
@@ -30,13 +35,12 @@ class LoginScreen extends React.Component {
     }
 
     attemptLogin() {
-        console.log(this);
         this.props.store.attemptLogin(this.state.username, this.state.password);
     }
 
     render() {
         return (
-            <Container style={stylesheet.container}>
+            <View style={stylesheet.container}>
                 <Header>
                     <Body>
                     <Title>Login</Title>
@@ -58,14 +62,13 @@ class LoginScreen extends React.Component {
                             />
                         </Item>
                         <View style={stylesheet.buttonContainer}>
-                            <Button light style={stylesheet.fullWidthButton}
-                                    onPress={() => this.attemptLogin()}>
+                            <Button light style={stylesheet.fullWidthButton} title="Login" onPress={() => {this.attemptLogin()}}>
                                 <Text style={stylesheet.boldText}>Login</Text>
                             </Button>
                         </View>
                     </Form>
                 </Content>
-            </Container>
+            </View>
         )
     }
 }

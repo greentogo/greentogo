@@ -5,18 +5,6 @@ import {
     View,
 } from 'react-native';
 
-import {
-    Container,
-    Header,
-    Body,
-    Title,
-    Content,
-    Form,
-    Item,
-    Input,
-    Button,
-} from "native-base";
-
 import {observer} from "mobx-react";
 
 import {
@@ -33,13 +21,14 @@ const Router = createRouter(() => ({
     home: () => HomeScreen,
 }));
 
+console.log("hi")
+
 @observer class App extends React.Component {
     render() {
         const store = this.props.store;
 
         if (!store.authToken) {
-            console.log("stylesheet.container", stylesheet)
-            return (<LoginScreen store={store} />);
+            return <LoginScreen store={store} />;
         } else {
             return (
                 <NavigationProvider router={Router}>
