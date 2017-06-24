@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { Constants } from 'expo';
 
 const styles = {
     buttonContainer: {
@@ -11,8 +12,8 @@ const styles = {
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        alignItems: 'center',
         justifyContent: 'center',
+        paddingTop: Constants.statusBarHeight,
     },
     fullWidthButton: {
         width: '100%',
@@ -27,6 +28,6 @@ const styles = {
     }
 }
 
-const stylesheet = StyleSheet.create(styles)
+// const stylesheet = StyleSheet.create(styles)
 
-export default stylesheet;
+export default styles;

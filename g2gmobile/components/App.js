@@ -5,6 +5,18 @@ import {
     View,
 } from 'react-native';
 
+import {
+    Container,
+    Header,
+    Body,
+    Title,
+    Content,
+    Form,
+    Item,
+    Input,
+    Button,
+} from "native-base";
+
 import {observer} from "mobx-react";
 
 import {
@@ -14,7 +26,8 @@ import {
 } from '@expo/ex-navigation';
 
 import LoginScreen from "./LoginScreen";
-import styles from "../styles";
+import HomeScreen from "./HomeScreen";
+import stylesheet from "../styles";
 
 const Router = createRouter(() => ({
     home: () => HomeScreen,
@@ -25,7 +38,8 @@ const Router = createRouter(() => ({
         const store = this.props.store;
 
         if (!store.authToken) {
-            return <LoginScreen store={store} />;
+            console.log("stylesheet.container", stylesheet)
+            return (<LoginScreen store={store} />);
         } else {
             return (
                 <NavigationProvider router={Router}>
@@ -33,22 +47,6 @@ const Router = createRouter(() => ({
                 </NavigationProvider>
             );
         }
-    }
-}
-
-class HomeScreen extends React.Component {
-    static route = {
-        navigationBar: {
-            title: 'Home',
-        }
-    }
-
-    render() {
-        return (
-            <View style={styles.container}>
-                <Text>Open up main.js to start working on your app!</Text>
-            </View>
-        )
     }
 }
 

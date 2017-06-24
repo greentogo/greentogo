@@ -35,11 +35,8 @@ class LoginScreen extends React.Component {
     }
 
     render() {
-        // Button component does not accept styles correctly
-        const fullWidthButton = StyleSheet.flatten([stylesheet.fullWidthButton]);
-
         return (
-            <Container>
+            <Container style={stylesheet.container}>
                 <Header>
                     <Body>
                     <Title>Login</Title>
@@ -61,7 +58,7 @@ class LoginScreen extends React.Component {
                             />
                         </Item>
                         <View style={stylesheet.buttonContainer}>
-                            <Button light style={fullWidthButton}
+                            <Button light style={stylesheet.fullWidthButton}
                                     onPress={() => this.attemptLogin()}>
                                 <Text style={stylesheet.boldText}>Login</Text>
                             </Button>
