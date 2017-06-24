@@ -4,9 +4,9 @@ import {
     TextInput,
     View,
     StyleSheet,
-    Alert,
 } from "react-native";
 import {
+    Container,
     Header,
     Body,
     Title,
@@ -40,7 +40,7 @@ class LoginScreen extends React.Component {
 
     render() {
         return (
-            <View style={stylesheet.container}>
+            <Container style={stylesheet.container}>
                 <Header>
                     <Body>
                     <Title>Login</Title>
@@ -61,14 +61,12 @@ class LoginScreen extends React.Component {
                                    onChangeText={(text) => this.setState({ password: text })}
                             />
                         </Item>
-                        <View style={stylesheet.buttonContainer}>
-                            <Button light style={stylesheet.fullWidthButton} title="Login" onPress={() => {this.attemptLogin()}}>
-                                <Text style={stylesheet.boldText}>Login</Text>
-                            </Button>
-                        </View>
+                        <Button light full title="Login" onPress={() => {this.attemptLogin()}}>
+                            <Text style={stylesheet.boldText}>Login</Text>
+                        </Button>
                     </Form>
                 </Content>
-            </View>
+            </Container>
         )
     }
 }
