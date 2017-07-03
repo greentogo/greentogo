@@ -28,3 +28,6 @@ deploy:
 		-F environment=$(ENVIRONMENT) \
 		-F revision=$(REVISION) \
 		-F local_username=$(LOCAL_USERNAME)
+
+greentogo/greentogo/.env:
+	gpg greentogo/greentogo/.env.gpg

@@ -101,3 +101,4 @@ staticfiles/
 /.isort.cfg
 *.sql
 *.png
+.env
