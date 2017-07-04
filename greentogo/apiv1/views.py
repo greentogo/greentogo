@@ -73,9 +73,7 @@ class CheckinCheckoutView(APIView):
 class RestaurantsView(APIView):
     """Returns list of active restaurants"""
 
-    permission_classes = []
-
-    def post(self, request, format=None):
+    def get(self, request, format=None):
         phases = [1]
         serializer = RestaurantSerializer(Restaurant.objects.filter(phase__in=phases), many=True)
         return jsend_success(serializer.data)
