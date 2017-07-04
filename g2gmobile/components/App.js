@@ -5,7 +5,12 @@ import {
     View,
 } from 'react-native';
 
-import {observer} from "mobx-react";
+import {
+    Container,
+    Spinner
+} from 'native-base';
+
+import {observer} from 'mobx-react';
 
 import {
     createRouter,
@@ -13,21 +18,28 @@ import {
     StackNavigation,
 } from '@expo/ex-navigation';
 
-import LoginScreen from "./LoginScreen";
-import HomeScreen from "./HomeScreen";
-import MapScreen from "./MapScreen";
-import stylesheet from "../styles";
+import LoginScreen from './LoginScreen';
+import HomeScreen from './HomeScreen';
+import MapScreen from './MapScreen';
+import styles from '../styles';
 
 const Router = createRouter(() => ({
     home: () => HomeScreen,
     map: () => MapScreen
 }));
 
-@observer class App extends React.Component {
+@observer
+class App extends React.Component {
     render() {
         const store = this.props.store;
 
-        if (!store.authToken) {
+        if (store.loading) {
+            return (
+                <Container style={styles.centerContainer}>
+                    <Spinner color={styles.primaryColor}/>
+                </Container>
+            );
+        } else if (!store.authToken) {
             return <LoginScreen store={store} />;
         } else {
             return (

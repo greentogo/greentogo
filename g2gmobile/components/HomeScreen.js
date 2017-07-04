@@ -20,7 +20,6 @@ import {
     Left,
     Right
 } from "native-base";
-import stylesheet from "../styles";
 
 class ListMenuItem extends React.Component {
     render() {

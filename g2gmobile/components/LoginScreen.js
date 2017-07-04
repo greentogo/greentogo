@@ -1,10 +1,12 @@
 import React from "react";
+
 import {
     Text,
     TextInput,
     View,
     StyleSheet,
 } from "react-native";
+
 import {
     Container,
     Header,
@@ -17,7 +19,7 @@ import {
     Button,
 } from "native-base";
 
-import stylesheet from "../styles";
+import styles from "../styles";
 
 class LoginScreen extends React.Component {
     static route = {
@@ -40,7 +42,7 @@ class LoginScreen extends React.Component {
 
     render() {
         return (
-            <Container style={stylesheet.container}>
+            <Container style={styles.container}>
                 <Header>
                     <Body>
                     <Title>Login</Title>
@@ -62,7 +64,7 @@ class LoginScreen extends React.Component {
                             />
                         </Item>
                         <Button light full title="Login" onPress={() => {this.attemptLogin()}}>
-                            <Text style={stylesheet.boldText}>Login</Text>
+                            <Text style={styles.boldText}>Login</Text>
                         </Button>
                     </Form>
                 </Content>
