@@ -19,6 +19,7 @@ import environ
 __root__ = environ.Path(__file__) - 3  # three folder back (/a/b/c/ - 3 = /)
 # set default values and casting
 __env__ = environ.Env(DEBUG=(bool, False), EMAIL_SECURE=(bool, True), HOSTNAME=(str, 'greentogo'))
+environ.Env.read_env()  # reading .env file
 
 SITE_ROOT = __root__()
 
