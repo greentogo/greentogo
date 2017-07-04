@@ -10,7 +10,7 @@ from core.models import (
 class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
-        fields = ('name', 'available_boxes', 'max_boxes', )
+        fields = ('id', 'name', 'available_boxes', 'max_boxes', )
 
     name = serializers.CharField(source="display_name")
 
