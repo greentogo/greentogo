@@ -21,7 +21,7 @@ const store = new AppStore();
 
     render() {
         if (!this.state.fontsAreLoaded) {
-            return <Expo.AppLoading/>;
+             return <Expo.AppLoading/>;
         }
         return (
             <App store={store} />

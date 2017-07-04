@@ -21,7 +21,7 @@ export class AppStore {
     }
 
     @action attemptLogin(username, password) {
-        fetch('https://greentogo.ngrok.io/auth/login/', {
+        fetch('https://g2g.dreisbach.us/auth/login/', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
