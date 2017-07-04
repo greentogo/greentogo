@@ -5,16 +5,24 @@ from rest_framework.views import APIView
 
 from core.models import Location, LocationTag
 
+from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
-from .serializers import LocationTagSerializer
+from .serializers import LocationTagSerializer, SubscriptionSerializer, UserSerializer
 
 
-def jsend_fail(data):
-    return Response({"status": "fail", "data": data}, status=400)
+class UserView(APIView):
+    def get(self, request, format=None):
+        serializer = UserSerializer(request.user)
+        return jsend_success(serializer.data)
 
 
-def jsend_success(data):
-    return Response({"status": "success", "data": data})
+class SubscriptionsView(APIView):
+    """Return subscription info for a user."""
+
+    def get(self, request, format=None):
+        user = request.user
+        serializer = SubscriptionSerializer(user.subscriptions.all(), many=True)
+        return jsend_success(serializer.data)
 
 
 class CheckinCheckoutView(APIView):
