@@ -17,6 +17,7 @@ import {
     Item,
     Input,
     Button,
+    Spinner,
 } from "native-base";
 
 import styles from "../styles";
@@ -32,15 +33,43 @@ class LoginScreen extends React.Component {
         super(props)
         this.state = {
             username: null,
-            password: null
+            password: null,
+            error: null,
+            loading: false,
         }
     }
 
     attemptLogin() {
-        this.props.store.attemptLogin(this.state.username, this.state.password);
+        this.setState({error: null, loading: true});
+
+        return fetch('https://g2g.dreisbach.us/auth/login/', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: this.state.username,
+                password: this.state.password,
+            })
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            if (json.auth_token) {
+                this.setState({loading: false});
+                return this.props.store.setAuthToken(json.auth_token);
+            }
+        })
+        .catch((error) => {
+            this.setState({error: error, loading: false});
+        });
     }
 
     render() {
+        var loadingSpinner = this.state.loading ?
+            <Spinner color={styles.primaryColor} />
+            : null;
+
         return (
             <Container style={styles.container}>
                 <Header>
@@ -67,6 +96,7 @@ class LoginScreen extends React.Component {
                             <Text style={styles.boldText}>Login</Text>
                         </Button>
                     </Form>
+                    {loadingSpinner}
                 </Content>
             </Container>
         )

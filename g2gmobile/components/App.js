@@ -5,11 +5,6 @@ import {
     View,
 } from 'react-native';
 
-import {
-    Container,
-    Spinner
-} from 'native-base';
-
 import {observer} from 'mobx-react';
 
 import {
@@ -33,13 +28,7 @@ class App extends React.Component {
     render() {
         const store = this.props.store;
 
-        if (store.loading) {
-            return (
-                <Container style={styles.centerContainer}>
-                    <Spinner color={styles.primaryColor}/>
-                </Container>
-            );
-        } else if (!store.authToken) {
+        if (!store.authToken) {
             return <LoginScreen store={store} />;
         } else {
             return (
