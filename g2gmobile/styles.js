@@ -2,12 +2,19 @@ import { StyleSheet } from 'react-native';
 import { Constants } from 'expo';
 
 const styles = {
+    primaryColor: '#628e86',
     buttonContainer: {
         padding: 10,
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    centerContainer: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     container: {
         flex: 1,
