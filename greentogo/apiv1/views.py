@@ -3,25 +3,26 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import Location, LocationTag, Restaurant
+from core.models import Location, LocationTag, Restaurant, get_plans
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
 from .serializers import LocationTagSerializer, SubscriptionSerializer, UserSerializer, RestaurantSerializer
 
 
+# /subscriptions/plans/
+# /subscriptions/:id
+
+
+class SubscriptionPlansView(APIView):
+    def get(self, request, format=None):
+        plans = get_plans()
+        return jsend_success(plans)
+
+
 class UserView(APIView):
     def get(self, request, format=None):
         serializer = UserSerializer(request.user)
-        return jsend_success(serializer.data)
-
-
-class SubscriptionsView(APIView):
-    """Return subscription info for a user."""
-
-    def get(self, request, format=None):
-        user = request.user
-        serializer = SubscriptionSerializer(user.subscriptions.all(), many=True)
         return jsend_success(serializer.data)
 
 

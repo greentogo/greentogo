@@ -1,5 +1,3 @@
-import pinax.stripe.models as pinax_models
-import shortuuid
 from django.conf import settings
 from django.contrib.auth import hashers
 from django.contrib.auth.models import AbstractUser
@@ -12,6 +10,9 @@ from django.db.models import Case, Sum, When
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
+
+import pinax.stripe.models as pinax_models
+import shortuuid
 from django_geocoder.wrapper import get_cached as geocode
 from pinax.stripe.actions import subscriptions
 
@@ -25,7 +26,8 @@ def plan_to_dict(plan):
         'stripe_id': plan.stripe_id,
         'name': plan.name,
         'amount': int(plan.amount * 100),
-        'display_price': get_plan_price(plan)
+        'display_price': get_plan_price(plan),
+        'boxes': int(plan.metadata.get("number_of_boxes", "0"))
     }
 
 
@@ -36,7 +38,7 @@ def get_plans():
 
 def max_boxes_for_subscription(pinax_sub):
     try:
-        number_of_boxes = int(pinax_sub.plan.metadata.get("number_of_boxes", "1"))
+        number_of_boxes = int(pinax_sub.plan.metadata.get("number_of_boxes", "0"))
     except ValueError:
         number_of_boxes = 1
     return number_of_boxes
