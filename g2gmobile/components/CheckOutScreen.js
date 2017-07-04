@@ -1,8 +1,9 @@
 import React from 'react';
 import {StyleSheet, TextInput, View} from 'react-native';
-import {observer} from "mobx-react";
+import {inject, observer} from "mobx-react";
 import styles from "../styles";
-import { Permissions, BarCodeScanner } from 'expo';
+import { Permissions } from 'expo';
+import BarCodeScanner from './BarCodeScannerScreen'
 
 import {
     Container,
@@ -23,29 +24,26 @@ import {
 } from "native-base";
 import stylesheet from "../styles";
 
+@inject("appStore")
 @observer
-class CheckInScreen extends React.Component {
+class CheckOutScreen extends React.Component {
+    constructor(props) {
+      super(props)
+      let state = {
+        hasCameraPermission: null,
+        checkOut: true,
+        locationCode: null
+      }
+    }
     static route = {
         navigationBar: {
-            title: 'GreenToGo Take Home Screen'
+            title: 'GreenToGo Check Out Boxes'
         }
-    }
-
-    state = {
-      hasCameraPermission: null,
     }
 
     async componentWillMount() {
       const { status } = await Permissions.askAsync(Permissions.CAMERA);
       this.setState({hasCameraPermission: status === 'granted'});
-    }
-
-    _handleBarCodeRead = (data) => {
-      let url = JSON.stringify(data.data)
-      let newUrl = url.substring(0, url.length - 2)
-      let locationCode = newUrl.substr(newUrl.lastIndexOf('/') + 1)
-
-      alert(locationCode);
     }
 
     render() {
@@ -57,14 +55,11 @@ class CheckInScreen extends React.Component {
       } else {
         return (
           <View style={{flex: 1}}>
-            <BarCodeScanner
-              onBarCodeRead={this._handleBarCodeRead}
-              style={StyleSheet.absoluteFill}
-            />
+            <BarCodeScanner />
           </View>
         );
       }
     }
 }
 
-export default CheckInScreen;
+export default CheckOutScreen;
