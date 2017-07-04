@@ -206,6 +206,9 @@ class Subscription(models.Model):
     def available_boxes(self):
         return available_boxes_for_subscription(self.pinax_subscription)
 
+    def boxes_checked_out(self):
+        return self.number_of_boxes - self.available_boxes()
+
     def can_checkout(self):
         return self.available_boxes() > 0
 
