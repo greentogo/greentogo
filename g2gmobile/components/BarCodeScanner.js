@@ -2,7 +2,8 @@ import React from 'react';
 import {StyleSheet, TextInput, View} from 'react-native';
 import {observer} from "mobx-react";
 import styles from "../styles";
-import { Permissions, BarCodeScanner } from 'expo';
+import { Permissions } from 'expo';
+import BarCodeScanner from './BarCodeScanner'
 
 import {
     Container,
@@ -27,7 +28,7 @@ import stylesheet from "../styles";
 class CheckInScreen extends React.Component {
     static route = {
         navigationBar: {
-            title: 'GreenToGo Take Home Screen'
+            title: 'GreenToGo'
         }
     }
 
@@ -41,20 +42,12 @@ class CheckInScreen extends React.Component {
     }
 
     _handleBarCodeRead = (data) => {
-      let url = JSON.stringify(data.data)
-      let newUrl = url.substring(0, url.length - 2)
-      let locationCode = newUrl.substr(newUrl.lastIndexOf('/') + 1)
-
+      let url = JSON.stringify(data.data);
+      let locationCode = url.substr(url.lastIndexOf('/') + 1)
       alert(locationCode);
     }
 
     render() {
-      const { hasCameraPermission } = this.state;
-      if (hasCameraPermission === null) {
-        return <View />;
-      } else if (hasCameraPermission === false) {
-        return <Text>No access to camera</Text>;
-      } else {
         return (
           <View style={{flex: 1}}>
             <BarCodeScanner
@@ -63,7 +56,6 @@ class CheckInScreen extends React.Component {
             />
           </View>
         );
-      }
     }
 }
 
