@@ -1,10 +1,10 @@
 import React from 'react';
 import Expo from 'expo';
+import { observer } from 'mobx-react';
+import { Platform } from 'react-native';
 
 import App from "./components/App";
 import { AppStore } from "./stores";
-
-import { observer } from 'mobx-react';
 
 const store = new AppStore();
 
@@ -12,10 +12,12 @@ const store = new AppStore();
     state = { fontsAreLoaded: false };
 
     async componentWillMount() {
-        await Expo.Font.loadAsync({
-            'Roboto': require('native-base/Fonts/Roboto.ttf'),
-            'Roboto_medium': require('native-base/Fonts/Roboto_medium.ttf'),
-        });
+        if (Platform.OS === "android") {
+            await Expo.Font.loadAsync({
+                'Roboto': require('native-base/Fonts/Roboto.ttf'),
+                'Roboto_medium': require('native-base/Fonts/Roboto_medium.ttf'),
+            });
+        }
         this.setState({fontsAreLoaded: true});
     }
 
