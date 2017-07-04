@@ -6,12 +6,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.models import (
-    Location, LocationTag, Subscription, available_boxes_for_subscription, get_plans, plan_to_dict
+    Location, LocationTag, Restaurant, Subscription, available_boxes_for_subscription, get_plans, plan_to_dict
 )
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
-from .serializers import LocationTagSerializer, SubscriptionSerializer, UserSerializer
+from .serializers import LocationTagSerializer, SubscriptionSerializer, UserSerializer, RestaurantSerializer
 
 
 # /subscriptions/:id
@@ -114,3 +114,12 @@ class CheckinCheckoutView(APIView):
             return jsend_success(LocationTagSerializer(tag).data)
         else:
             return jsend_fail({"subscription": "no_boxes_available"})
+
+
+class RestaurantsView(APIView):
+    """Returns list of active restaurants"""
+
+    def get(self, request, format=None):
+        phases = [1]
+        serializer = RestaurantSerializer(Restaurant.objects.filter(phase__in=phases), many=True)
+        return jsend_success(serializer.data)

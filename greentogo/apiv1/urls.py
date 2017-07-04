@@ -13,4 +13,5 @@ urlpatterns = [
         views.SubscriptionView.as_view(),
         name="subscription"
     ),
+    url(r'^restaurants/', views.RestaurantsView.as_view(), name="restaurants"),
 ]

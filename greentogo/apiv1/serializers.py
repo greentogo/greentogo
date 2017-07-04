@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from core.models import (
-    LocationTag, Subscription, available_boxes_for_subscription, max_boxes_for_subscription
+    LocationTag, Subscription, available_boxes_for_subscription, max_boxes_for_subscription, Restaurant
 )
 
 
@@ -41,3 +41,14 @@ class LocationTagSerializer(serializers.Serializer):
 
     def get_available_boxes(self, obj):
         return available_boxes_for_subscription(obj.subscription)
+
+class RestaurantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Restaurant
+        fields = ('name', 'address', 'latitude', 'longitude', 'phase')
+
+    name = serializers.CharField()
+    address = serializers.CharField()
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+    phase = serializers.IntegerField()
