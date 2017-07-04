@@ -29,36 +29,36 @@ import stylesheet from "../styles";
 class ReturnScreen extends React.Component {
     constructor(props) {
       super(props)
-      this.state = {
-        hasCameraPermission: false
-      }
-      this.props.appStore.action = "returnBox";
+        this.state = {
+            hasCameraPermission: false
+        }
+        this.props.appStore.action = "returnBox";
     }
-    
+
     static route = {
-      navigationBar: {
-          title: 'Return Boxes'
-      }
+        navigationBar: {
+            title: 'Return Boxes'
+        }
     }
 
     async componentWillMount() {
-      const { status } = await Permissions.askAsync(Permissions.CAMERA);
-      this.setState({hasCameraPermission: status === 'granted'});
+        const { status } = await Permissions.askAsync(Permissions.CAMERA);
+        this.setState({hasCameraPermission: status === 'granted'});
     }
 
     render() {
-      const { hasCameraPermission } = this.state.hasCameraPermission;
-      if (hasCameraPermission === null) {
-        return <View />;
-      } else if (hasCameraPermission === false) {
-        return <Text>No access to camera</Text>;
-      } else {
-        return (
-          <View style={{flex: 1}}>
-            <BarCodeScannerScreen />
-          </View>
-        );
-      }
+        const { hasCameraPermission } = this.state.hasCameraPermission;
+        if (hasCameraPermission === null) {
+            return <View />;
+        } else if (hasCameraPermission === false) {
+            return <Text>No access to camera</Text>;
+        } else {
+            return (
+                <View style={{flex: 1}}>
+                    <BarCodeScannerScreen />
+                </View>
+            );
+        }
     }
 }
 
