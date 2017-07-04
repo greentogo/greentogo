@@ -12,12 +12,13 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 
-import environ
 from django.contrib.messages import constants as messages
+
+import environ
 
 __root__ = environ.Path(__file__) - 3  # three folder back (/a/b/c/ - 3 = /)
 # set default values and casting
-__env__ = environ.Env(DEBUG=(bool, False), EMAIL_SECURE=(bool, True))
+__env__ = environ.Env(DEBUG=(bool, False), EMAIL_SECURE=(bool, True), HOSTNAME=(str, 'greentogo'))
 
 SITE_ROOT = __root__()
 
@@ -33,10 +34,9 @@ SECRET_KEY = '1+rc*=eii(d_im=1%x(q4di-_)14=ksa6u70nzs_h61m(+1zda'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = __env__('DEBUG')
 
-ALLOWED_HOSTS = [
-    'g2g.dreisbach.us', 'purchase.durhamgreentogo.com', 'greentogo.ngrok.io', 'localhost',
-    '127.0.0.1'
-]
+ALLOWED_HOSTS = ['g2g.dreisbach.us', 'purchase.durhamgreentogo.com', 'localhost', '127.0.0.1']
+
+ALLOWED_HOSTS += [__env__('HOSTNAME') + '.ngrok.io']
 
 # Application definition
 

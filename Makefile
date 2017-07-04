@@ -1,11 +1,12 @@
 ENVIRONMENT := production
 LOCAL_USERNAME := $(shell whoami)
 REVISION := $(shell git log -n 1 --pretty=format:"%H")
+HOSTNAME := 'greentogo'
 
 .PHONY: deploy requirements server update_requirements
 
 server: requirements
-	tmux new-session './greentogo/manage.py runserver_plus' \; split-window -h 'ngrok http -subdomain=greentogo 8000'
+	tmux new-session './greentogo/manage.py runserver_plus' \; split-window -h 'ngrok http -subdomain=$(HOSTNAME) 8000'
 
 requirements: requirements.txt dev-requirements.txt bower.json
 	pip-sync requirements.txt dev-requirements.txt
