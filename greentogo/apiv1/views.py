@@ -3,11 +3,11 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import Location, LocationTag, get_plans
+from core.models import Location, LocationTag, Restaurant, get_plans
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
-from .serializers import LocationTagSerializer, SubscriptionSerializer, UserSerializer
+from .serializers import LocationTagSerializer, SubscriptionSerializer, UserSerializer, RestaurantSerializer
 
 
 # /subscriptions/plans/
@@ -69,3 +69,12 @@ class CheckinCheckoutView(APIView):
             return jsend_success(LocationTagSerializer(tag).data)
         else:
             return jsend_fail({"subscription": "no_boxes_available"})
+
+
+class RestaurantsView(APIView):
+    """Returns list of active restaurants"""
+
+    def get(self, request, format=None):
+        phases = [1]
+        serializer = RestaurantSerializer(Restaurant.objects.filter(phase__in=phases), many=True)
+        return jsend_success(serializer.data)
