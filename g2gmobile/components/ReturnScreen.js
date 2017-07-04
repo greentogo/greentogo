@@ -26,20 +26,18 @@ import stylesheet from "../styles";
 
 @inject("appStore")
 @observer
-class CheckOutScreen extends React.Component {
+class ReturnScreen extends React.Component {
     constructor(props) {
       super(props)
       this.state = {
         hasCameraPermission: false
       }
-      this.props.appStore.action = "checkOutBox";
+      this.props.appStore.action = "returnBox";
     }
-
-
-
+    
     static route = {
       navigationBar: {
-          title: 'Check Out Boxes'
+          title: 'Return Boxes'
       }
     }
 
@@ -64,4 +62,4 @@ class CheckOutScreen extends React.Component {
     }
 }
 
-export default CheckOutScreen;
+export default ReturnScreen;
