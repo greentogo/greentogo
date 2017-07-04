@@ -16,11 +16,13 @@ import {
 import LoginScreen from "./LoginScreen";
 import HomeScreen from "./HomeScreen";
 import MapScreen from "./MapScreen";
+import CheckInScreen from "./CheckInScreen";
 import stylesheet from "../styles";
-
 const Router = createRouter(() => ({
     home: () => HomeScreen,
-    map: () => MapScreen
+    map: () => MapScreen,
+    checkIn: () => CheckInScreen,
+    checkOut: () => CheckOutScreen
 }));
 
 @observer class App extends React.Component {
