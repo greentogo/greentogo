@@ -5,7 +5,7 @@ import {
     View,
 } from 'react-native';
 
-import {observer} from "mobx-react";
+import {observer, Provider} from "mobx-react";
 
 import {
     createRouter,
@@ -34,9 +34,11 @@ const Router = createRouter(() => ({
             return <LoginScreen store={store} />;
         } else {
             return (
-                <NavigationProvider router={Router}>
-                    <StackNavigation initialRoute={Router.getRoute('home')} />
-                </NavigationProvider>
+                <Provider appStore={store}>
+                    <NavigationProvider router={Router}>
+                        <StackNavigation initialRoute={Router.getRoute('home')} />
+                    </NavigationProvider>
+                </Provider>
             );
         }
     }
