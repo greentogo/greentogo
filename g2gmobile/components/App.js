@@ -18,6 +18,7 @@ import HomeScreen from "./HomeScreen";
 import MapScreen from "./MapScreen";
 import CheckInScreen from "./CheckInScreen";
 import stylesheet from "../styles";
+
 const Router = createRouter(() => ({
     home: () => HomeScreen,
     map: () => MapScreen,
