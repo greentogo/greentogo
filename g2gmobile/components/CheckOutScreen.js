@@ -35,8 +35,6 @@ class CheckOutScreen extends React.Component {
       this.props.appStore.action = "checkOutBox";
     }
 
-
-
     static route = {
       navigationBar: {
           title: 'Check Out Boxes'
