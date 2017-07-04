@@ -8,4 +8,9 @@ urlpatterns = [
     url(
         r'^subscriptions/plans/$', views.SubscriptionPlansView.as_view(), name="subscription_plans"
     ),
+    url(
+        r'^subscriptions/(?P<subscription_id>[0-9]+)/$',
+        views.SubscriptionView.as_view(),
+        name="subscription"
+    ),
 ]

@@ -3,17 +3,28 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import Location, LocationTag, get_plans
+from core.models import Location, LocationTag, Subscription, get_plans
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
 from .serializers import LocationTagSerializer, SubscriptionSerializer, UserSerializer
 
 
-# /subscriptions/plans/
 # /subscriptions/:id
+class SubscriptionView(APIView):
+    def get_object(self, request, subscription_id):
+        return Subscription.objects.owned_by(request.user).get(pk=subscription_id)
+
+    def get(self, request, subscription_id, format=None):
+        try:
+            subscription = self.get_object(request, subscription_id)
+            serializer = SubscriptionSerializer(subscription)
+            return jsend_success(serializer.data)
+        except Subscription.DoesNotExist:
+            return jsend_fail({"subscription": "not_subscription_owner"}, status=401)
 
 
+# /subscriptions/plans/
 class SubscriptionPlansView(APIView):
     def get(self, request, format=None):
         plans = get_plans()
