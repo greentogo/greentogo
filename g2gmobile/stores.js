@@ -10,38 +10,19 @@ enableLogging({
 });
 
 export class AppStore {
-    @observable authToken = "";
+    @observable authToken = '';
 
     constructor() {
-        console.log("appStore constructor")
+        console.log('appStore constructor')
         simpleStore.get('authToken').then(token => {
-            console.log("stored token", token)
+            console.log('stored token', token || 'not found')
             this.authToken = token
         })
     }
 
-    @action attemptLogin(username, password) {
-        fetch('https://g2g.dreisbach.us/auth/login/', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password,
-            })
-        })
-        .then((response) => response.json())
-        .then((json) => {
-            if (json.auth_token) {
-                console.log("setting authToken", json.auth_token);
-                this.authToken = json.auth_token;
-                simpleStore.save('authToken', json.auth_token)
-            }
-        })
-        .catch((error) => {
-            console.log(error)
-        })
+    @action setAuthToken(token) {
+        console.log('setting authToken', token);
+        this.authToken = token;
+        return simpleStore.save('authToken', token)
     }
 }

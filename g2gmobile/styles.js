@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native';
 import { Constants } from 'expo';
 
 const styles = {
+    primaryColor: '#628e86',
     buttonContainer: {
         padding: 10,
         flex: 1,

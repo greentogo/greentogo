@@ -1,28 +1,7 @@
 import React from 'react';
-import {observer} from "mobx-react";
-import styles from "../styles";
-
-import {
-    Container,
-    Header,
-    Body,
-    Title,
-    Content,
-    Form,
-    Item,
-    Input,
-    Button,
-    List,
-    ListItem,
-    Text,
-    Icon,
-    Left,
-    Right
-} from "native-base";
+import {observer} from 'mobx-react';
 
 import { MapView } from 'expo';
-
-import stylesheet from "../styles";
 
 @observer
 class MapScreen extends React.Component {
