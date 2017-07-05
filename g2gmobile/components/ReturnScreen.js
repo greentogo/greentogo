@@ -3,7 +3,7 @@ import {StyleSheet, TextInput, View} from 'react-native';
 import {inject, observer} from "mobx-react";
 import styles from "../styles";
 import { Permissions } from 'expo';
-import BarCodeScannerScreen from './BarCodeScannerScreen'
+import BarCodeScannerReader from './BarCodeScannerReader'
 
 import {
     Container,
@@ -34,11 +34,19 @@ class ReturnScreen extends React.Component {
       }
       this.props.appStore.action = "returnBox";
     }
-    
+
     static route = {
       navigationBar: {
           title: 'Return Boxes'
       }
+    }
+
+    handleBarCodeRead = (data) => {
+      let url = JSON.stringify(data.data);
+      let newUrl = url.substring(0, url.length - 2);
+      let locationCode = newUrl.substr(newUrl.lastIndexOf('/') + 1);
+      this.props.appStore.locationCode = locationCode;
+      this.props.navigator.push('submission');
     }
 
     async componentWillMount() {
@@ -55,7 +63,7 @@ class ReturnScreen extends React.Component {
       } else {
         return (
           <View style={{flex: 1}}>
-            <BarCodeScannerScreen />
+            <BarCodeScannerReader handleBarCodeRead={this.handleBarCodeRead}/>
           </View>
         );
       }
