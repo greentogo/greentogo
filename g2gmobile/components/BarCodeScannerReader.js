@@ -36,27 +36,13 @@ class BarCodeScannerReader extends React.Component {
         this.setState({hasCameraPermission: status === 'granted'});
     }
 
-    _handleBarCodeRead = (data) => {
-        let url = JSON.stringify(data.data);
-        let newUrl = url.substring(0, url.length - 2);
-        let locationCode = newUrl.substr(newUrl.lastIndexOf('/') + 1);
-        this.props.appStore.locationCode = locationCode;
-        if (this.props.appStore.action === 'checkOutBox') {
-            alert("You checked out a box");
-        } else {
-            alert("You returned a box");
-        }
-    }
-
     render() {
         return (
             <View style={{flex: 1}}>
                 <BarCodeScanner
-                  onBarCodeRead={this._handleBarCodeRead}
+                  onBarCodeRead={this.props.handleBarCodeRead}
                   style={StyleSheet.absoluteFill}
                 />
-
-          <SubmissionScreen />
             </View>
         );
     }
