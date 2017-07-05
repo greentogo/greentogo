@@ -65,7 +65,7 @@ class HomeScreen extends React.Component {
                     <List>
                         <ListMenuItem
                           icon="log-out"
-                          text="Check out container"
+                          text="Checkout container"
                           onPress={this.goToCheckOut}
                         />
                         <ListMenuItem

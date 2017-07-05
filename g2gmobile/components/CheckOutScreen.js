@@ -28,17 +28,17 @@ import stylesheet from "../styles";
 @observer
 class CheckOutScreen extends React.Component {
     constructor(props) {
-      super(props)
-      this.state = {
-        hasCameraPermission: false
-      }
-      this.props.appStore.action = "checkOutBox";
+        super(props)
+        this.state = {
+            hasCameraPermission: false
+        }
+        this.props.appStore.action = "checkOutBox";
     }
 
     static route = {
-      navigationBar: {
-          title: 'Check Out Boxes'
-      }
+        navigationBar: {
+            title: 'Checkout container'
+        }
     }
 
     handleBarCodeRead = (data) => {
@@ -50,8 +50,8 @@ class CheckOutScreen extends React.Component {
     }
 
     async componentWillMount() {
-      const { status } = await Permissions.askAsync(Permissions.CAMERA);
-      this.setState({hasCameraPermission: status === 'granted'});
+        const { status } = await Permissions.askAsync(Permissions.CAMERA);
+        this.setState({hasCameraPermission: status === 'granted'});
     }
 
     render() {

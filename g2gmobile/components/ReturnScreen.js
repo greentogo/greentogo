@@ -29,16 +29,16 @@ import stylesheet from "../styles";
 class ReturnScreen extends React.Component {
     constructor(props) {
       super(props)
-      this.state = {
-        hasCameraPermission: false
-      }
-      this.props.appStore.action = "returnBox";
+        this.state = {
+            hasCameraPermission: false
+        }
+        this.props.appStore.action = "returnBox";
     }
 
     static route = {
-      navigationBar: {
-          title: 'Return Boxes'
-      }
+        navigationBar: {
+            title: 'Return container'
+        }
     }
 
     handleBarCodeRead = (data) => {
@@ -50,8 +50,8 @@ class ReturnScreen extends React.Component {
     }
 
     async componentWillMount() {
-      const { status } = await Permissions.askAsync(Permissions.CAMERA);
-      this.setState({hasCameraPermission: status === 'granted'});
+        const { status } = await Permissions.askAsync(Permissions.CAMERA);
+        this.setState({hasCameraPermission: status === 'granted'});
     }
 
     render() {
