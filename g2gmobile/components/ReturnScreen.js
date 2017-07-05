@@ -37,7 +37,7 @@ class ReturnScreen extends React.Component {
 
     static route = {
         navigationBar: {
-            title: 'Return Boxes'
+            title: 'Return container'
         }
     }
 

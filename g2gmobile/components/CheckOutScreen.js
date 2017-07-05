@@ -37,7 +37,7 @@ class CheckOutScreen extends React.Component {
 
     static route = {
         navigationBar: {
-            title: 'Check Out Boxes'
+            title: 'Checkout container'
         }
     }
 
