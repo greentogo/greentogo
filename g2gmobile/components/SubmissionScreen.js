@@ -19,11 +19,46 @@ class SubmissionScreen extends React.Component {
             count: 1
         }
     }
+
+    componentDidMount() {
+        console.log(authToken);
+        let authToken = this.props.appStore.authToken;
+        let myHeaders = new Headers({
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Token ' + authToken
+        });
+
+        let myInit = {
+            method: 'GET',
+            headers: myHeaders,
+            credentials: 'include'
+        };
+
+        let request = new Request('https://g2g.dreisbach.us/api/v1/me', myInit);
+
+        console.log(request);
+
+        fetch(request)
+        .then((response) => console.log(response))
+        .then((response) => response.json())
+        .then((json) => {
+            console.log('JSON');
+            console.log(json);
+        })
+        .catch((error) => {
+            console.log('in the error');
+            console.log(error)
+        })
+    }
+
     static route = {
         navigationBar: {
             title: `Check Out/In Containers`
         }
     }
+
+
 
     _add = () => this.setState({count: this.state.count + 1})
     _subtract = () => {
@@ -80,7 +115,6 @@ class SubmissionScreen extends React.Component {
                 </View>
             </View>
         )
-
     }
 }
 
