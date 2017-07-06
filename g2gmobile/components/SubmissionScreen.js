@@ -104,7 +104,7 @@ class SubmissionScreen extends React.Component {
                 textAlign: 'center'
             }
         });
-        // api/v1/me
+
         return (
             <View>
                 <View style={{marginBottom: 10}}><Text style={styles.headerText}>How many boxes to {this.props.appStore.action}?</Text></View>
