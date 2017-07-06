@@ -1,10 +1,12 @@
 import React from "react";
+
 import {
     Text,
     TextInput,
     View,
     StyleSheet,
 } from "react-native";
+
 import {
     Container,
     Header,
@@ -15,9 +17,10 @@ import {
     Item,
     Input,
     Button,
+    Spinner,
 } from "native-base";
 
-import stylesheet from "../styles";
+import styles from "../styles";
 
 class LoginScreen extends React.Component {
     static route = {
@@ -30,17 +33,45 @@ class LoginScreen extends React.Component {
         super(props)
         this.state = {
             username: null,
-            password: null
+            password: null,
+            error: null,
+            loading: false,
         }
     }
 
     attemptLogin() {
-        this.props.store.attemptLogin(this.state.username, this.state.password);
+        this.setState({error: null, loading: true});
+
+        return fetch('https://g2g.dreisbach.us/auth/login/', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: this.state.username,
+                password: this.state.password,
+            })
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            if (json.auth_token) {
+                this.setState({loading: false});
+                return this.props.store.setAuthToken(json.auth_token);
+            }
+        })
+        .catch((error) => {
+            this.setState({error: error, loading: false});
+        });
     }
 
     render() {
+        var loadingSpinner = this.state.loading ?
+            <Spinner color={styles.primaryColor} />
+            : null;
+
         return (
-            <Container style={stylesheet.container}>
+            <Container style={styles.container}>
                 <Header>
                     <Body>
                     <Title>Login</Title>
@@ -62,9 +93,10 @@ class LoginScreen extends React.Component {
                             />
                         </Item>
                         <Button light full title="Login" onPress={() => {this.attemptLogin()}}>
-                            <Text style={stylesheet.boldText}>Login</Text>
+                            <Text style={styles.boldText}>Login</Text>
                         </Button>
                     </Form>
+                    {loadingSpinner}
                 </Content>
             </Container>
         )

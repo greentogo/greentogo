@@ -1,4 +1,4 @@
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import BasePermission, IsAuthenticated
 
 from core.models import Subscription
 
@@ -17,3 +17,8 @@ class HasSubscription(IsAuthenticated):
             return False
         except Subscription.DoesNotExist:
             return False
+
+
+class IsSubscriptionOwner(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.owner == request.user
