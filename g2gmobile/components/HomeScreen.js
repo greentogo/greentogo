@@ -49,14 +49,34 @@ class HomeScreen extends React.Component {
         this.props.navigator.push('map');
     }
 
+    goToCheckOut = () => {
+        this.props.navigator.push('checkOutBox');
+    }
+
+    goToReturn = () => {
+        this.props.navigator.push('returnBox');
+    }
+
     render() {
         return (
             <Container style={styles.container}>
                 <Content>
                     <List>
-                        <ListMenuItem icon="log-out" text="Check out container" />
-                        <ListMenuItem icon="log-in" text="Return container" />
-                        <ListMenuItem icon="map" text="Map of participating restaurants" onPress={this.goToMap} />
+                        <ListMenuItem
+                          icon="log-out"
+                          text="Checkout container"
+                          onPress={this.goToCheckOut}
+                        />
+                        <ListMenuItem
+                          icon="log-in"
+                          text="Return container"
+                          onPress={this.goToReturn}
+                        />
+                        <ListMenuItem
+                          icon="map"
+                          text="Map of participating restaurants"
+                          onPress={this.goToMap}
+                        />
                         <ListMenuItem icon="person" text="Your account" />
                     </List>
                 </Content>

@@ -5,7 +5,7 @@ import {
     View,
 } from 'react-native';
 
-import {observer} from 'mobx-react';
+import {observer, Provider} from 'mobx-react';
 
 import {
     createRouter,
@@ -16,11 +16,18 @@ import {
 import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
 import MapScreen from './MapScreen';
+import CheckOutScreen from './CheckOutScreen';
 import styles from '../styles';
+import ReturnBox from "./ReturnScreen";
+import SubmissionScreen from "./SubmissionScreen";
+import stylesheet from "../styles";
 
 const Router = createRouter(() => ({
     home: () => HomeScreen,
-    map: () => MapScreen
+    map: () => MapScreen,
+    checkOutBox: () => CheckOutScreen,
+    returnBox: () => ReturnBox,
+    submission: () => SubmissionScreen
 }));
 
 @observer
@@ -32,9 +39,11 @@ class App extends React.Component {
             return <LoginScreen store={store} />;
         } else {
             return (
-                <NavigationProvider router={Router}>
-                    <StackNavigation initialRoute={Router.getRoute('home')} />
-                </NavigationProvider>
+                <Provider appStore={store}>
+                    <NavigationProvider router={Router}>
+                        <StackNavigation initialRoute={Router.getRoute('home')} />
+                    </NavigationProvider>
+                </Provider>
             );
         }
     }
