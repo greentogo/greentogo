@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, TextInput, View} from 'react-native';
-import {observer} from "mobx-react";
+import {inject, observer} from "mobx-react";
 import styles from "../styles";
 
 import {
@@ -37,6 +37,7 @@ class ListMenuItem extends React.Component {
     }
 }
 
+@inject("appStore")
 @observer
 class HomeScreen extends React.Component {
     static route = {
@@ -55,6 +56,10 @@ class HomeScreen extends React.Component {
 
     goToReturn = () => {
         this.props.navigator.push('returnBox');
+    }
+
+    logOut = () => {
+        this.props.appStore.clearAuthToken()
     }
 
     render() {
@@ -78,6 +83,7 @@ class HomeScreen extends React.Component {
                           onPress={this.goToMap}
                         />
                         <ListMenuItem icon="person" text="Your account" />
+                        <ListMenuItem icon="unlock" text="Log out" onPress={this.logOut} />
                     </List>
                 </Content>
             </Container>

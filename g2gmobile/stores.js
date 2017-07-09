@@ -10,7 +10,8 @@ enableLogging({
 });
 
 export class AppStore {
-    @observable authToken = '';
+    @observable authToken = ''
+    siteUrl = "https://g2g.dreisbach.us"
 
     constructor() {
         console.log('appStore constructor')
@@ -20,9 +21,19 @@ export class AppStore {
         })
     }
 
+    makeUrl(path) {
+        return this.siteUrl + path;
+    }
+
     @action setAuthToken(token) {
-        console.log('setting authToken', token);
-        this.authToken = token;
-        return simpleStore.save('authToken', token)
+        console.log('setting authToken', token)
+        this.authToken = token
+        simpleStore.save('authToken', token)
+    }
+
+    @action clearAuthToken() {
+        console.log('clearing authToken')
+        this.authToken = null
+        simpleStore.save('authToken', null)
     }
 }

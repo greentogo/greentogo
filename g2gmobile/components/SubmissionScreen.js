@@ -10,7 +10,7 @@ import { Icon, Button } from 'native-base';
 
 import { inject, observer } from 'mobx-react';
 
-const apiEndpoint = 'https://g2g.dreisbach.us/api/v1';
+const apiEndpoint = '/api/v1';
 
 @inject('appStore')
 @observer
@@ -37,7 +37,8 @@ class SubmissionScreen extends React.Component {
             credentials: 'include'
         };
 
-        let request = new Request(`${apiEndpoint}/me`, myInit);
+        let request = new Request(this.props.appStore.makeUrl('/api/v1/me'), myInit);
+        console.log(request);
 
         fetch(request)
         .then((response) => console.log(response))
