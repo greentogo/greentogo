@@ -16,6 +16,7 @@ project:
   maintainer_email: clinton@dreisbach.us
   virtualenv: /opt/{{ project_name }}/env/
   domain: g2g.dreisbach.us
+  url: "https://g2g.dreisbach.us"
 
 django:
   root: "{{ project.srcroot }}greentogo/"

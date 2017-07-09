@@ -13,3 +13,4 @@ export EMAIL_SECURE={{ email.secure }}
 export EMAIL_REPLY_TO={{ email.reply_to }}
 export EMAIL_ADMINS={{ email.admins }}
 export GOOGLE_API_KEY={{ google.api_key }}
+export G2G_URL="{{ project.url }}"
