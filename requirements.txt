@@ -4,7 +4,6 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-appdirs==1.4.3            # via setuptools
 autorepr==0.3.0
 beautifulsoup4==4.5.3     # via wagtail
 click==6.7                # via geocoder
@@ -25,21 +24,19 @@ geocoder==1.15.1          # via django-geocoder
 html5lib==0.999999999     # via wagtail
 jsonfield==2.0.1          # via pinax-stripe
 olefile==0.44             # via pillow
-packaging==16.8           # via setuptools
-pillow==4.0.0             # via wagtail
+pillow==4.0.0
 pinax-stripe==3.3.0
 psycopg2==2.7.1
-pyparsing==2.2.0          # via packaging
-pypng==0.0.18
-pyqrcode==1.2.1
 pytz==2016.10             # via django-modelcluster, pinax-stripe
+qrcode==5.3
 ratelim==0.1.6            # via geocoder
 rcssmin==1.0.6            # via django-compressor
+reportlab==3.4.0
 requests==2.13.0          # via geocoder, rollbar, stripe, wagtail
 rjsmin==1.0.12            # via django-compressor
 rollbar==0.13.11
 shortuuid==0.5.0
-six==1.10.0               # via django-environ, django-extensions, geocoder, html5lib, packaging, pinax-stripe, rollbar, setuptools
+six==1.10.0               # via django-environ, django-extensions, geocoder, html5lib, pinax-stripe, qrcode, rollbar
 stripe==1.51.0
 unidecode==0.4.20         # via wagtail
 wagtail==1.9
@@ -47,6 +44,3 @@ wagtailmenus==2.2.1
 webencodings==0.5         # via html5lib
 werkzeug==0.12.1
 willow==0.4               # via wagtail
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools                # via html5lib

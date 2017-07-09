@@ -280,6 +280,31 @@ class Location(models.Model):
                 self.latitude = lat
                 self.longitude = lng
 
+    def add_qrcode_to_pdf(self, pdf):
+        import qrcode
+        from reportlab.lib.units import inch
+
+        width, height = pdf._pagesize
+
+        qr = qrcode.QRCode(box_size=10)
+        qr.add_data(settings.URL + self.get_absolute_url())
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="white", back_color="black")
+
+        image_y = 11 * inch - img.pixel_size
+        text_y = image_y + 15
+        font_size = 14
+
+        pdf.drawInlineImage(img, x=(width - img.pixel_size) / 2, y=image_y)
+        pdf.setFont("Helvetica-Bold", font_size)
+        pdf.drawCentredString(width / 2, text_y, self.code)
+        pdf.setFont("Helvetica", font_size)
+        pdf.drawCentredString(
+            width / 2, text_y - (font_size + 2), "{} - {}".format(self.name, self.service)
+        )
+        pdf.showPage()
+        return pdf
+
 
 class LocationTag(models.Model):
     subscription = models.ForeignKey(pinax_models.Subscription)
