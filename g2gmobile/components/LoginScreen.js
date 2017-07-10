@@ -20,11 +20,10 @@ import {
     Spinner,
 } from "native-base";
 
-import {inject, observer} from "mobx-react";
+import {observer} from "mobx-react";
 
 import styles from "../styles";
 
-@inject("appStore")
 class LoginScreen extends React.Component {
     static route = {
         navigationBar: {
@@ -45,7 +44,7 @@ class LoginScreen extends React.Component {
     attemptLogin() {
         this.setState({error: null, loading: true});
 
-        return fetch(this.props.appStore.makeUrl('/auth/login/'), {
+        return fetch(this.props.store.makeUrl('/auth/login/'), {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
