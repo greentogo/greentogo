@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from '../apiClient';
 import {
     StyleSheet,
     Text,
@@ -23,31 +24,22 @@ class SubmissionScreen extends React.Component {
     }
 
     componentDidMount() {
-        // Get subsciptions for the account
         let authToken = this.props.appStore.authToken;
-        let myHeaders = new Headers({
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Token ' + authToken
-        });
-
-        let myInit = {
-            method: 'GET',
-            headers: myHeaders,
-            credentials: 'include'
-        };
-
-        let request = new Request(this.props.appStore.makeUrl('/api/v1/me'), myInit);
-        console.log(request);
-
-        fetch(request)
+        axios.get('me', {
+            headers: {
+                'Authorization': `Token ${authToken}`
+            }
+        })
         .then((response) => console.log(response))
         .then((response) => response.json())
         .then((json) => {
             console.log(json);
         })
         .catch((error) => {
-            console.log(error)
+            console.log('In the error!');
+            console.log(error);
+            console.log(error.response);
+            console.log(error.response.status);
         })
     }
 
