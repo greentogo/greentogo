@@ -13,7 +13,7 @@ class CheckOutScreen extends React.Component {
     this.state = {
         hasCameraPermission: false
     }
-    this.props.appStore.action = "check out";
+    this.props.appStore.action = "checkOut";
   }
 
   static route = {
