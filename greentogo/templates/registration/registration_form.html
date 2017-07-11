@@ -6,7 +6,27 @@
     <div class="medium-12 columns">
         <form method="post" action=".">
             {% csrf_token %}
-            {{ form.as_p }}
+            {{ form.non_field_errors }}
+            <p class="required">
+                {{ form.username.errors }}
+                <label for="{{ form.username.id_for_label }}">Username:</label>
+                {{ form.username }}
+            </p>
+            <p class="required">
+                {{ form.email.errors }}
+                <label for="{{ form.email.id_for_label }}">Email address:</label>
+                {{ form.email }}
+            </p>
+            <p class="required">
+                {{ form.password1.errors }}
+                <label for="{{ form.password1.id_for_label }}">Password:</label>
+                {{ form.password1 }}
+            </p>
+            <p class="required">
+                {{ form.password2.errors }}
+                <label for="{{ form.password2.id_for_label }}">Password confirmation:</label>
+                {{ form.password2 }}
+            </p>
 
             <input type="submit" value="{% trans 'Submit' %}" />
         </form>
