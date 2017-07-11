@@ -35,6 +35,8 @@
     - { role: apt, tags: apt }
     - { role: postgres, tags: postgres }
     - { role: python, tags: python }
+    - { role: deploy, tags: deploy }
+
     # - role: lets-encrypt
     #   tags: ssl
     #   letsencrypt_email: "{{ lets_encrypt.email }}"
@@ -42,5 +44,4 @@
     #   letsencrypt_request_www: false
     #   letsencrypt_pause_services:
     #     - nginx
-    - { role: deploy, tags: deploy }
-    - { role: nginx, tags: nginx }
+    # - { role: nginx, tags: nginx }

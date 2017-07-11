@@ -43,8 +43,7 @@ DEBUG = __env__('DEBUG')
 URL = __env__('G2G_URL')
 
 ALLOWED_HOSTS = [
-    'app.durhamgreentogo.com', 'g2g.dreisbach.us', 'purchase.durhamgreentogo.com', 'localhost',
-    '127.0.0.1'
+    'app.durhamgreentogo.com', 'purchase.durhamgreentogo.com', 'localhost', '127.0.0.1'
 ]
 
 ALLOWED_HOSTS += [__env__('HOSTNAME') + '.ngrok.io']

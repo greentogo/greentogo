@@ -15,8 +15,8 @@ project:
   srcroot: /opt/{{ project_name }}/src/
   maintainer_email: clinton@dreisbach.us
   virtualenv: /opt/{{ project_name }}/env/
-  domain: g2g.dreisbach.us
-  url: "https://g2g.dreisbach.us"
+  domain: app.durhamgreentogo.com
+  url: "https://app.durhamgreentogo.com"
 
 django:
   root: "{{ project.srcroot }}greentogo/"
@@ -24,4 +24,4 @@ django:
 
 repo:
   branch: master
-  url: "git@github.com:cndreisbach/greentogo.git"
+  url: "git@github.com:greentogo/greentogo.git"

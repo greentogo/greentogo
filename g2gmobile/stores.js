@@ -11,7 +11,7 @@ enableLogging({
 
 export class AppStore {
     @observable authToken = ''
-    siteUrl = "https://g2g.dreisbach.us"
+    siteUrl = "https://app.durhamgreentogo.com"
 
     constructor() {
         console.log('appStore constructor')
