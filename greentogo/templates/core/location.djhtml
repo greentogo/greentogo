@@ -40,7 +40,7 @@
             {% else %}
                 <p>
                 You do not have any current subscriptions.
-                <a href="{% url 'add_subscription' %}">Go add one now.</a>
+                <!--<a href="{% url 'add_subscription' %}">Go add one now.</a>-->
                 </p>
             {% endif %}
         </div>
