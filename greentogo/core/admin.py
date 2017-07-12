@@ -1,6 +1,9 @@
 from django.contrib import admin
+from django.contrib.auth.models import Group
 
-from .models import Location, Restaurant, Subscription, User
+import pinax.stripe.models as pinax_models
+
+from .models import Location, Plan, Restaurant, Subscription, User
 
 
 class LocationAdmin(admin.ModelAdmin):
@@ -32,3 +35,13 @@ admin.site.register(User)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(Restaurant)
 admin.site.register(Subscription)
+admin.site.register(Plan)
+
+admin.site.unregister(Group)
+admin.site.unregister(pinax_models.Charge)
+admin.site.unregister(pinax_models.Customer)
+admin.site.unregister(pinax_models.EventProcessingException)
+admin.site.unregister(pinax_models.Event)
+admin.site.unregister(pinax_models.Invoice)
+admin.site.unregister(pinax_models.Plan)
+admin.site.unregister(pinax_models.Transfer)

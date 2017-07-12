@@ -6,17 +6,16 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 import stripe
-from core.forms import (
-    NewSubscriptionForm, SubscriptionForm, SubscriptionInvitationForm, SubscriptionPlanForm
-)
-from core.models import Subscription, SubscriptionInvitation, get_plans
 from pinax.stripe import models as pinax_models
 from pinax.stripe.actions import invoices, subscriptions
+
+from core.forms import NewSubscriptionForm, SubscriptionForm, SubscriptionPlanForm
+from core.models import Subscription, get_plans
 
 
 @login_required
 def subscriptions_view(request):
-    subscriptions = request.user.subscriptions.active().reverse_chrono_order()
+    subscriptions = request.user.subscriptions.active().order_by("starts_at")
     return render(request, 'core/subscriptions.html', {"subscriptions": subscriptions})
 
 
@@ -31,10 +30,6 @@ def subscription(request, sub_id):
             return redirect(reverse('subscriptions'))
     else:
         form = SubscriptionForm(instance=sub)
-        invite_form = SubscriptionInvitationForm()
-        invitations = SubscriptionInvitation.objects.filter(
-            pinax_subscription=sub.pinax_subscription
-        )
 
     return render(
         request, "core/subscription.html", {
@@ -102,53 +97,3 @@ def change_subscription_plan(request, sub_id):
         request, "core/subscription_plan.html", {"subscription": subscription,
                                                  "form": form}
     )
-
-
-@login_required
-def cancel_subscription(request, sub_id):
-    subscription = Subscription.lookup_by_customer_and_sub_id(request.user.customer, sub_id)
-    if request.method == "POST":
-        subscription.cancel()
-        messages.success(request, "Your subscription has been cancelled.")
-        return redirect(reverse('subscriptions'))
-
-    return render(request, "core/cancel_subscription.html", {"subscription": subscription})
-
-
-@login_required
-def invitation(request, invitation_code):
-    user = request.user
-    invitation = get_object_or_404(SubscriptionInvitation, code=invitation_code)
-
-    subscription = invitation.accept(user)
-    messages.success(
-        request, "You have accepted an invitation to {}'s {} subscription.".format(
-            subscription.owner.name, subscription.plan_display()
-        )
-    )
-
-    return redirect(reverse('subscriptions'))
-
-
-@login_required
-@require_POST
-def create_invite(request, sub_id):
-    customer = request.user.customer
-    sub = Subscription.lookup_by_customer_and_sub_id(customer, sub_id)
-    # TODO handle people going to the wrong subscription
-
-    form = SubscriptionInvitationForm(request.POST)
-    if form.is_valid():
-        invite, _ = SubscriptionInvitation.objects.get_or_create(
-            pinax_subscription=sub.pinax_subscription, **form.cleaned_data
-        )
-        invite.send_invitation()
-        messages.success(
-            request, """You have invited {} to share your subscription "{}".""".format(
-                form.cleaned_data['email'], sub.display_name
-            )
-        )
-    else:
-        messages.error(request, "There was a problem completing your invitation.")
-
-    return redirect(reverse('subscription', kwargs=dict(sub_id=sub.stripe_id)))

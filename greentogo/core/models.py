@@ -6,58 +6,33 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
 from django.db import models
-from django.db.models import Case, Sum, When
+from django.db.models import Case, Q, Sum, When
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
+from django.utils import timezone
 
-import pinax.stripe.models as pinax_models
 import shortuuid
 from django_geocoder.wrapper import get_cached as geocode
-from pinax.stripe.actions import subscriptions
 
 
 def get_plan_price(plan):
-    return "${:.02f}".format(plan.amount)
+    return "${:.02f}".format(plan.amount / 100)
 
 
 def plan_to_dict(plan):
     return {
         'stripe_id': plan.stripe_id,
         'name': plan.name,
-        'amount': int(plan.amount * 100),
+        'amount': plan.amount,
         'display_price': get_plan_price(plan),
-        'boxes': int(plan.metadata.get("number_of_boxes", "0"))
+        'boxes': plan.number_of_boxes
     }
 
 
 def get_plans():
-    plans = pinax_models.Plan.objects.order_by('amount')
+    plans = Plan.objects.order_by('amount')
     return [plan_to_dict(plan) for plan in plans]
-
-
-def max_boxes_for_subscription(pinax_sub):
-    try:
-        number_of_boxes = int(pinax_sub.plan.metadata.get("number_of_boxes", "0"))
-    except ValueError:
-        number_of_boxes = 1
-    return number_of_boxes
-
-
-def available_boxes_for_subscription(pinax_sub):
-    boxes_checked_out = LocationTag.objects \
-        .filter(subscription=pinax_sub) \
-        .aggregate(
-        checked_out=Sum(
-            Case(
-                When(location__service=Location.CHECKOUT, then=1),
-                When(location__service=Location.CHECKIN, then=-1),
-                default=1,
-                output_field=models.IntegerField()
-            )
-        )
-    )['checked_out']
-    return max_boxes_for_subscription(pinax_sub) - (boxes_checked_out or 0)
 
 
 class User(AbstractUser):
@@ -72,148 +47,82 @@ class User(AbstractUser):
         return self.name or self.username
 
 
-class SubscriptionInvitation(models.Model):
-    email = models.EmailField()
-    code = models.CharField(max_length=40)
-    pinax_subscription = models.ForeignKey(pinax_models.Subscription, related_name="invitations")
+class Plan(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    available = models.BooleanField(default=True)
+    amount = models.PositiveIntegerField()
+    number_of_boxes = models.PositiveIntegerField()
 
-    def save(self, *args, **kwargs):
-        if not self.code:
-            shortuuid.set_alphabet("23456789ABCDEFGHJKLMNPQRSTUVWXYZ")
-            self.code = shortuuid.uuid()
-        return super().save(*args, **kwargs)
-
-    def accept(self, user):
-        subscription, created = Subscription.objects.get_or_create(
-            user=user, pinax_subscription=self.pinax_subscription
-        )
-        self.delete()
-        return subscription
-
-    def get_absolute_url(self):
-        from django.urls import reverse
-        return reverse('invitation', kwargs={"invitation_code": self.code})
-
-    def send_invitation(self):
-        site = Site.objects.get_current()
-        protocol = getattr(settings, "DEFAULT_HTTP_PROTOCOL", "https")
-        ctx = {
-            "owner": self.pinax_subscription.customer.user,
-            "invitation": self,
-            "site": site,
-            "protocol": protocol,
-        }
-        subject = "Invitation to share a GreenToGo subscription"
-        message = render_to_string("email/invitation.txt", ctx)
-
-        EmailMessage(
-            subject, message, to=[self.email], from_email=settings.DEFAULT_FROM_EMAIL
-        ).send()
+    def __str__(self):
+        return self.name
 
 
 class SubscriptionQuerySet(models.QuerySet):
     def active(self):
-        return self.filter(pinax_subscription__ended_at=None)
+        return self.filter(Q(ends_at=None) | Q(ends_at__gt=timezone.now()))
 
     def owned_by(self, user):
-        return self.filter(pinax_subscription__customer=user.customer)
-
-    def reverse_chrono_order(self):
-        return self.order_by("-pinax_subscription__current_period_end")
+        return self.filter(user=user)
 
 
 class Subscription(models.Model):
-    """GreenToGo subscription model.
-
-    Connects users to subscription objects in Stripe.
-    """
     objects = SubscriptionQuerySet.as_manager()
 
     name = models.CharField(max_length=255, null=True, blank=True)
     user = models.ForeignKey(User, related_name="subscriptions")
-    pinax_subscription = models.ForeignKey(
-        pinax_models.Subscription, related_name="user_subscriptions"
-    )
+    plan = models.ForeignKey(Plan, null=True)
+    starts_at = models.DateTimeField(default=timezone.now)
+    ends_at = models.DateTimeField(null=True, blank=True)
 
-    class Meta:
-        unique_together = (('user', 'pinax_subscription', ), )
-
-    @classmethod
-    def create_for_subscription_owner(cls, pinax_subscription):
-        return cls.objects.create(
-            pinax_subscription=pinax_subscription, user=pinax_subscription.customer.user
-        )
-
-    @classmethod
-    def lookup_by_customer_and_sub_id(cls, customer, sub_id):
-        # TODO handle exceptions
-        pinax_sub = customer.subscription_set.get(stripe_id=sub_id)
-        try:
-            return pinax_sub.user_subscriptions.get(user=customer.user)
-        except ObjectDoesNotExist:
-            return cls.create_for_subscription_owner(pinax_sub)
+    def __str__(self):
+        return "{} - {}".format(self.user.name, self.display_name)
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('subscription', kwargs={"sub_id": self.stripe_id})
-
-    @property
-    def customer(self):
-        return self.pinax_subscription.customer
-
-    @property
-    def owner(self):
-        return self.customer.user
-
-    def is_owner_subscription(self):
-        return self.user == self.owner
-
-    @property
-    def other_subscriptions(self):
-        return self.pinax_subscription.user_subscriptions.exclude(user=self.user)
+        return reverse('subscription', kwargs={"sub_id": self.id})
 
     @property
     def display_name(self):
         return self.name or self.plan_display()
 
     def plan_display(self):
-        return self.pinax_subscription.plan_display()
-
-    @property
-    def stripe_id(self):
-        return self.pinax_subscription.stripe_id
-
-    @property
-    def canceled(self):
-        return self.pinax_subscription.canceled_at is not None
-
-    @property
-    def total_amount(self):
-        return self.pinax_subscription.total_amount
-
-    @property
-    def current_period_end(self):
-        return self.pinax_subscription.current_period_end
-
-    @property
-    def auto_renew(self):
-        return not self.pinax_subscription.cancel_at_period_end
+        if self.plan:
+            return self.plan.name
+        return "None"
 
     @property
     def number_of_boxes(self):
-        return max_boxes_for_subscription(self.pinax_subscription)
+        if self.plan:
+            return self.plan.number_of_boxes
 
+        return 0
+
+    @property
+    def max_boxes(self):
+        return self.number_of_boxes
+
+    @property
     def available_boxes(self):
-        return available_boxes_for_subscription(self.pinax_subscription)
+        boxes_checked_out = LocationTag.objects.filter(subscription=self).aggregate(
+            checked_out=Sum(
+                Case(
+                    When(location__service=Location.CHECKOUT, then=1),
+                    When(location__service=Location.CHECKIN, then=-1),
+                    default=1,
+                    output_field=models.IntegerField()
+                )
+            )
+        )['checked_out']
+        return self.number_of_boxes - (boxes_checked_out or 0)
 
     def boxes_checked_out(self):
-        return self.number_of_boxes - self.available_boxes()
+        return self.number_of_boxes - self.available_boxes
 
     def can_checkout(self):
-        return self.available_boxes() > 0
+        return self.available_boxes > 0
 
     def can_checkin(self):
-        return self.available_boxes() < self.number_of_boxes
+        return self.available_boxes < self.number_of_boxes
 
     def can_tag_location(self, location):
         if location.service == Location.CHECKIN:
@@ -222,25 +131,8 @@ class Subscription(models.Model):
             return self.can_checkout()
 
     def tag_location(self, location):
-        tag = LocationTag.objects.create(subscription=self.pinax_subscription, location=location)
-        # TODO raise exception if you illegally tag
+        tag = LocationTag.objects.create(subscription=self, location=location)
         return tag
-
-    def cancel(self):
-        subscriptions.cancel(self.pinax_subscription, at_period_end=False)
-
-
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_stripe_customer(sender, instance, created, **kwargs):
-    if created:
-        from pinax.stripe.actions import customers
-        customers.create(user=instance)
-
-
-@receiver(post_save, sender=pinax_models.Subscription)
-def create_g2g_subscription(sender, instance, created, **kwargs):
-    if created:
-        Subscription.create_for_subscription_owner(instance)
 
 
 class Location(models.Model):
@@ -254,6 +146,9 @@ class Location(models.Model):
     address = models.CharField(max_length=1023)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
+
+    def __str__(self):
+        return "{} - {}".format(self.name, self.service)
 
     def save(self, *args, **kwargs):
         self._set_code()
@@ -307,7 +202,7 @@ class Location(models.Model):
 
 
 class LocationTag(models.Model):
-    subscription = models.ForeignKey(pinax_models.Subscription)
+    subscription = models.ForeignKey(Subscription)
     location = models.ForeignKey(Location)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -5,13 +5,13 @@ from pinax.stripe.actions import invoices, subscriptions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import (
-    Location, LocationTag, Restaurant, Subscription, available_boxes_for_subscription, get_plans, plan_to_dict
-)
+from core.models import Location, LocationTag, Restaurant, Subscription, get_plans, plan_to_dict
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
-from .serializers import LocationTagSerializer, SubscriptionSerializer, UserSerializer, RestaurantSerializer
+from .serializers import (
+    LocationTagSerializer, RestaurantSerializer, SubscriptionSerializer, UserSerializer
+)
 
 
 # /subscriptions/:id

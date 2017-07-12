@@ -50,20 +50,15 @@ def location(request, location_code):
                     msg = "You have checked in all of your boxes for this subscription."
                 else:
                     msg = "You do not have enough boxes to check out with this subscription."
-                    if subscription.is_owner_subscription():
-                        msg += """ <a href="{}">To check out additional boxes, upgrade your subscription.</a>""".format(
-                            reverse('subscription_plan', kwargs={"sub_id": subscription.stripe_id})
-                        )
-                        msg = mark_safe(msg)
 
                 messages.error(request, msg)
 
     subscriptions = [
         {
             "id": subscription.pk,
-            "name": subscription.plan_display(),
+            "name": subscription.plan_display,
             "max_boxes": subscription.number_of_boxes,
-            "available_boxes": subscription.available_boxes(),
+            "available_boxes": subscription.available_boxes,
         } for subscription in user.subscriptions.active()
     ]
 
