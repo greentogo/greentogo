@@ -35,4 +35,11 @@
             {% endif %}
         </ul>
     </div>
+    {% if user.is_authenticated and user.has_active_subscription %}
+    <div class="top-bar-right">
+        <ul class="menu">
+            <li><div class="active-user">Active Member</div></li>
+        </ul>
+    </div>
+    {% endif %}
 </div>

@@ -46,6 +46,9 @@ class User(AbstractUser):
     def __str__(self):
         return self.name or self.username
 
+    def has_active_subscription(self):
+        return self.subscriptions.active().count() > 0
+
 
 class Plan(models.Model):
     name = models.CharField(max_length=255, unique=True)
