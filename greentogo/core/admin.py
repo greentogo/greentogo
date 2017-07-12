@@ -3,7 +3,7 @@ from django.contrib.auth.models import Group
 
 import pinax.stripe.models as pinax_models
 
-from .models import Location, Plan, Restaurant, Subscription, User
+from .models import Location, Plan, Restaurant, Subscription, UnclaimedSubscription, User
 
 
 class LocationAdmin(admin.ModelAdmin):
@@ -36,6 +36,7 @@ admin.site.register(Location, LocationAdmin)
 admin.site.register(Restaurant)
 admin.site.register(Subscription)
 admin.site.register(Plan)
+admin.site.register(UnclaimedSubscription)
 
 admin.site.unregister(Group)
 admin.site.unregister(pinax_models.Charge)

@@ -57,6 +57,25 @@ class Plan(models.Model):
         return self.name
 
 
+class UnclaimedSubscription(models.Model):
+    email = models.EmailField(unique=True)
+    plan = models.ForeignKey(Plan)
+    claimed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "{} - {}".format(self.email, self.plan)
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def claim_subscriptions(sender, instance, created, **kwargs):
+    if created:
+        unsub = UnclaimedSubscription.objects.filter(email=instance.email).first()
+        if unsub:
+            subscription, _ = Subscription.objects.get_or_create(user=instance, plan=unsub.plan)
+            unsub.claimed = True
+            unsub.save()
+
+
 class SubscriptionQuerySet(models.QuerySet):
     def active(self):
         return self.filter(Q(ends_at=None) | Q(ends_at__gt=timezone.now()))
