@@ -126,11 +126,10 @@ form {
     }
 }
 
-.active-user {
-    margin-top: 1.1rem;
-    margin-right: 0.5rem;
-    padding: 0.2rem 0.5rem;
-    background-color: map-get($foundation-palette, "success");
-    color: black;
-    font-weight: bold;
+.active-member {
+  background-color: map-get($foundation-palette, "success");
+  color: black;
+  font-weight: bold;
+  text-align: center;
+  padding: 0.25rem 0;
 }

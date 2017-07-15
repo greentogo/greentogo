@@ -21,6 +21,14 @@
             <div class="column">
                 {% main_menu template="menus/top_menu.html" %}
             </div>
+            {% if user.is_authenticated and user.has_active_subscription %}
+
+              <div class="column">
+                <div class="active-member">
+                  Active Member
+                </div>
+              </div>
+            {% endif %}
         </div>
 
         {% if messages %}
