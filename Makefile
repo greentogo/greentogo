@@ -1,9 +1,8 @@
-ENVIRONMENT := production
 LOCAL_USERNAME := $(shell whoami)
 REVISION := $(shell git log -n 1 --pretty=format:"%H")
 HOSTNAME := 'greentogo'
 
-.PHONY: deploy requirements server update_requirements
+.PHONY: deploy-staging deploy-production requirements server update_requirements
 
 server: requirements
 	tmux new-session './greentogo/manage.py runserver_plus' \; split-window -h 'ngrok http -subdomain=$(HOSTNAME) 8000'
@@ -22,11 +21,19 @@ update_requirements:
 	pip-compile --upgrade requirements.in
 	pip-compile --upgrade dev-requirements.in
 
-deploy:
-	ansible-playbook -i deployment/hosts  --vault-password-file=.password  deployment/playbook.yml
+deploy-staging:
+	ansible-playbook -i deployment/environments/staging/hosts --vault-password-file=.password  deployment/playbook.yml
 	curl https://api.rollbar.com/api/1/deploy/ \
 		-F access_token=$(ROLLBAR_KEY) \
-		-F environment=$(ENVIRONMENT) \
+		-F environment=staging \
+		-F revision=$(REVISION) \
+		-F local_username=$(LOCAL_USERNAME)
+
+deploy-production:
+	ansible-playbook -i deployment/environments/production/hosts --vault-password-file=.password  deployment/playbook.yml
+	curl https://api.rollbar.com/api/1/deploy/ \
+		-F access_token=$(ROLLBAR_KEY) \
+		-F environment=staging \
 		-F revision=$(REVISION) \
 		-F local_username=$(LOCAL_USERNAME)
 
