@@ -102,3 +102,4 @@ staticfiles/
 *.sql
 *.png
 .env
+playbook.retry
