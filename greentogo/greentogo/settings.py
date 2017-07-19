@@ -68,7 +68,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
-    "pinax.stripe",
 
     # wagtail
     'wagtail.wagtailforms',
@@ -88,7 +87,6 @@ INSTALLED_APPS = [
     'taggit',
 
     # ours
-    'beta_signup',
     'core',
     'apiv1',
     'cms',

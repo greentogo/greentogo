@@ -8,28 +8,35 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pinax_stripe', '0004_plan_metadata'),
         ('core', '0002_auto_20170218_1627'),
     ]
 
     operations = [
         migrations.RemoveField(
             model_name='subscription',
-            name='admin', ),
+            name='admin',
+        ),
         migrations.RemoveField(
             model_name='subscription',
-            name='plan', ),
+            name='plan',
+        ),
         migrations.AlterField(
             model_name='subscriber',
             name='subscriptions',
-            field=models.ManyToManyField(to='core.Subscription'), ),
+            field=models.ManyToManyField(to='core.Subscription'),
+        ),
         migrations.DeleteModel(
-            name='Subscription', ),
+            name='Subscription',
+        ),
         migrations.DeleteModel(
-            name='SubscriptionPlan', ),
+            name='SubscriptionPlan',
+        ),
         migrations.CreateModel(
             name='Subscription',
             fields=[],
-            options={'proxy': True, },
-            bases=('pinax_stripe.subscription', ), ),
+            options={
+                'proxy': True,
+            },
+            bases=('pinax_stripe.subscription', ),
+        ),
     ]

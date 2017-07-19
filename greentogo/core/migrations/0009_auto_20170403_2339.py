@@ -9,7 +9,6 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pinax_stripe', '0004_plan_metadata'),
         ('core', '0008_restaurant_phase'),
     ]
 
