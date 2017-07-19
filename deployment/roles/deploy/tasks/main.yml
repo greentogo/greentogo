@@ -38,7 +38,7 @@
       virtualenv_python=python3
   - name: Migrate Django database
     django_manage: >
-      command="migrate --fake"
+      command="migrate --no-input"
       app_path={{ django.root }}
       settings={{ django.settings }}
       virtualenv={{ project.virtualenv }}
