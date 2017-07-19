@@ -23,5 +23,5 @@ django:
   settings: greentogo.settings
 
 repo:
-  branch: master
+  branch: remove-payments-completely
   url: "git@github.com:greentogo/greentogo.git"
