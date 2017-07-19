@@ -77,6 +77,9 @@ celerybeat-schedule
 
 # dotenv
 .env
+.direnv
+.DS_Store
+.envrc
 
 # virtualenv
 .venv/
