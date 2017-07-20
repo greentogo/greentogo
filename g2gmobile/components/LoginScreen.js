@@ -91,6 +91,7 @@ class LoginScreen extends React.Component {
                         <Item last>
                             <Input placeholder="Password"
                                    secureTextEntry={true}
+                                   onSubmitEditing={() => this.attemptLogin()}
                                    onChangeText={(text) => this.setState({ password: text })}
                             />
                         </Item>
