@@ -193,13 +193,13 @@ class SubmissionScreen extends React.Component {
                         success
                         onPress={this.add} >
                         <Text style={styles.icon}>+</Text>
-                    </ Button>
+                    </Button>
                     <Text style={{marginLeft: 10, marginRight: 10, fontSize: 20}}>{this.state.boxCount}</Text>
                     <Button
                         success
                         onPress={this.subtract} >
                         <Text style={styles.icon}>-</Text>
-                    </ Button>
+                    </Button>
                 </View>
                 <View>
                     <Text style={styles.headerText}>Which subscription?</Text>
@@ -217,7 +217,7 @@ class SubmissionScreen extends React.Component {
                                         />
                             })
                         }
-                    </ Picker>
+                    </Picker>
                     <View style={styles.centeredRow}>
                         <Button
                             success
