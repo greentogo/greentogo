@@ -1,5 +1,6 @@
 import React from 'react';
-import {inject, observer} from 'mobx-react';
+import { Image } from 'react-native';
+import { inject, observer } from 'mobx-react';
 import axios from '../apiClient';
 import { MapView } from 'expo';
 
@@ -51,7 +52,13 @@ class MapScreen extends React.Component {
                     title={marker.name}
                     description={marker.address}
                     key={marker.name}
-                  />
+
+                  >
+                    <Image
+                      source={require('../assets/icons/g2gpickuplocation.png')}
+                      style={{ height: 75, width: 75 }}
+                    />
+                  </MapView.Marker>
                 ))}
             </MapView>
         )
