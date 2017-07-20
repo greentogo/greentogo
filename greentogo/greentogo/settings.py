@@ -23,6 +23,7 @@ __env__ = environ.Env(
     EMAIL_SECURE=(bool, True),
     HOSTNAME=(str, 'greentogo'),
     G2G_URL=(str, 'http://localhost:3000'),
+    EMAIL_FROM=(str, None),
 )
 environ.Env.read_env()  # reading .env file
 
@@ -225,7 +226,7 @@ PINAX_STRIPE_HOOKSET = 'core.hookset.StripeHookset'
 
 # Email
 REGISTRATION_DEFAULT_FROM_EMAIL = __env__('EMAIL_ADDRESS')
-DEFAULT_FROM_EMAIL = __env__('EMAIL_ADDRESS')
+DEFAULT_FROM_EMAIL = __env__('EMAIL_FROM') or __env__('EMAIL_ADDRESS')
 EMAIL_HOST_USER = __env__('EMAIL_ADDRESS')
 EMAIL_HOST_PASSWORD = __env__('EMAIL_PASSWORD')
 EMAIL_HOST = __env__('EMAIL_SMTP_SERVER')

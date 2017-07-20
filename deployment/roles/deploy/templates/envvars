@@ -5,6 +5,7 @@ export SECRET_KEY={{ secret.secret_key }}
 export STRIPE_SECRET_KEY={{ stripe.secret_key }}
 export STRIPE_PUBLISHABLE_KEY={{ stripe.publishable_key }}
 export ROLLBAR_KEY={{ rollbar.key }}
+export EMAIL_FROM={{ email.from }}
 export EMAIL_ADDRESS={{ email.address }}
 export EMAIL_PASSWORD={{ email.password }}
 export EMAIL_SMTP_SERVER={{ email.smtp_server }}
