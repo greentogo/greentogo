@@ -1,7 +1,5 @@
 from django.shortcuts import render
 
-import pinax.stripe.models as pinax_models
-from pinax.stripe.actions import invoices, subscriptions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 

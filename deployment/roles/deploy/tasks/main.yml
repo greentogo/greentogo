@@ -3,10 +3,11 @@
   block:
   - name: Check out code
     local_action: git repo="{{ repo.url }}" dest="{{ git_tmp_dir }}" version={{ repo.branch }}
-- name: Push files to production
+- name: Push files to server
   synchronize:
     src="{{ git_tmp_dir }}"
     dest="{{ project.srcroot }}"
+    delete=yes
     recursive=yes
   notify:
     - Reload systemd
@@ -38,7 +39,7 @@
       virtualenv_python=python3
   - name: Migrate Django database
     django_manage: >
-      command="migrate --fake"
+      command="migrate --no-input"
       app_path={{ django.root }}
       settings={{ django.settings }}
       virtualenv={{ project.virtualenv }}

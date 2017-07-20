@@ -6,8 +6,6 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 import stripe
-from pinax.stripe import models as pinax_models
-from pinax.stripe.actions import invoices, subscriptions
 
 from core.forms import NewSubscriptionForm, SubscriptionForm, SubscriptionPlanForm
 from core.models import Subscription, get_plans

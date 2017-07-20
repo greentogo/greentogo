@@ -19,14 +19,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 
-from pinax.stripe.views import Webhook as StripeWebhook
 from wagtail.wagtailadmin import urls as wagtailadmin_urls
 from wagtail.wagtailcore import urls as wagtail_urls
 from wagtail.wagtaildocs import urls as wagtaildocs_urls
 
 import core.views.locations
 import core.views.subscriptions
-from beta_signup import views as beta_views
 from core import views as core_views
 
 urlpatterns = [
@@ -60,8 +58,6 @@ urlpatterns = [
     url(r'^account/$', core_views.account_settings, name='account_settings'),
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^auth/', include('djoser.urls.authtoken')),
-    url(r'^webhook/', StripeWebhook.as_view(), name="pinax_stripe_webhook"),
-    url(r'^beta-subscribe/$', beta_views.SubscriptionView.as_view(), name="beta-subscribe"),
     url(r'^thanks/', TemplateView.as_view(template_name="thanks.html"), name="beta-thanks"),
     url(r'^error/', TemplateView.as_view(template_name="error.html"), name="beta-error"),
     url(r'^admin/', admin.site.urls),

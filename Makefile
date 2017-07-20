@@ -33,7 +33,7 @@ deploy-production:
 	ansible-playbook -i deployment/environments/production/hosts --vault-password-file=.password  deployment/playbook.yml
 	curl https://api.rollbar.com/api/1/deploy/ \
 		-F access_token=$(ROLLBAR_KEY) \
-		-F environment=staging \
+		-F environment=production \
 		-F revision=$(REVISION) \
 		-F local_username=$(LOCAL_USERNAME)
 
