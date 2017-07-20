@@ -103,6 +103,5 @@ bower_components/
 staticfiles/
 /.isort.cfg
 *.sql
-*.png
 .env
 playbook.retry
