@@ -8,9 +8,9 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "primaryColor": "#cccccc",
-    "icon": "./assets/icons/g2g.png",
+    "icon": "./assets/icons/GTG-Box-App.png",
     "loading": {
-      "icon": "./assets/icons/g2g.png",
+      "icon": "./assets/icons/GTG-Box-App.png",
       "hideExponentText": false
     },
     "packagerOpts": {
