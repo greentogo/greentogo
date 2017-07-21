@@ -82,7 +82,7 @@ class LoginScreen extends React.Component {
                 <Content>
                     <Form>
                         <Item>
-                            <Input placeholder="Username"
+                            <Input placeholder="Email"
                                    autoCapitalize="none"
                                    autoCorrect={false}
                                    onChangeText={(text) => this.setState({ username: text })}
@@ -91,6 +91,7 @@ class LoginScreen extends React.Component {
                         <Item last>
                             <Input placeholder="Password"
                                    secureTextEntry={true}
+                                   onSubmitEditing={() => this.attemptLogin()}
                                    onChangeText={(text) => this.setState({ password: text })}
                             />
                         </Item>
