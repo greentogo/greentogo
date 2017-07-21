@@ -25,55 +25,22 @@ class SubmissionScreen extends React.Component {
     }
 
     componentWillMount() {
-        // mock getting the subscriptions
-        const response = {
-            status: "success",
-            data: {
-                name: "Erin Brown",
-                email: "emberbrown@gmail.com",
-                subscriptions: [
-                    {
-                        id: 11,
-                        name: "1 Box",
-                        available_boxes: 1,
-                        max_boxes: 1
-                    },
-                    {
-                        id: 12,
-                        name: "3 Boxes",
-                        available_boxes: 3,
-                        max_boxes: 3
-                    }
-                ]
+        let authToken = this.props.appStore.authToken;
+        axios.get('me/', {
+            headers: {
+                'Authorization': `Token ${authToken}`
             }
-        };
-        const promise = new Promise((resolve, reject) => {
-            resolve(response);
-        });
-
-        promise.then((response) => {
-            subscriptions = response.data.subscriptions;
-            // @TODO handle empty array?
-            this.subscriptionChange(subscriptions[0].id);
-        });
-
-        // let authToken = this.props.appStore.authToken;
-        // axios.get('me', {
-        //     headers: {
-        //         'Authorization': `Token ${authToken}`
-        //     }
-        // })
-        // .then((response) => console.log(response))
-        // .then((response) => response.json())
-        // .then((json) => {
-        //     console.log(json);
-        // })
-        // .catch((error) => {
-        //     console.log('In the error!');
-        //     console.log(error);
-        //     console.log(error.response);
-        //     console.log(error.response.status);
-        // })
+        })
+        .then((response) => {
+            subscriptions = response.data.data.subscriptions;
+            if (subscriptions.length > 0) {
+                this.subscriptionChange(subscriptions[0].id);
+            }
+        })
+        .catch((error) => {
+            console.log('In the error!');
+            console.log(error);
+        })
     }
 
     static route = {
@@ -185,49 +152,52 @@ class SubmissionScreen extends React.Component {
         });
 
         return (
-            <View>
-                <Text>{this.state.subscriptionId}</Text>
-                <View style={{marginBottom: 10}}><Text style={styles.headerText}>How many boxes to {this.props.appStore.action}?</Text></View>
-                <View style={styles.centeredRow}>
-                    <Button
-                        success
-                        onPress={this.add} >
-                        <Text style={styles.icon}>+</Text>
-                    </ Button>
-                    <Text style={{marginLeft: 10, marginRight: 10, fontSize: 20}}>{this.state.boxCount}</Text>
-                    <Button
-                        success
-                        onPress={this.subtract} >
-                        <Text style={styles.icon}>-</Text>
-                    </ Button>
-                </View>
+            subscriptions.length > 0 ? (
                 <View>
-                    <Text style={styles.headerText}>Which subscription?</Text>
-                    <Picker
-                        mode="dropdown"
-                        selectedValue={this.state.subscriptionId}
-                        onValueChange={(itemValue, itemIndex) => this.subscriptionChange(itemValue)}
-                    >
-                        {
-                            subscriptions.map((subscription, index) => {
-                                return <Picker.Item
-                                            key={index}
-                                            label={`${subscription.name} (${subscription.available_boxes}/${subscription.max_boxes})`}
-                                            value={subscription.id}
-                                        />
-                            })
-                        }
-                    </ Picker>
+                    <View style={{marginBottom: 10}}><Text style={styles.headerText}>How many boxes to {this.props.appStore.action}?</Text></View>
                     <View style={styles.centeredRow}>
                         <Button
                             success
-                            onPress={this.submit}
+                            onPress={this.add} >
+                            <Text style={styles.icon}>+</Text>
+                        </ Button>
+                        <Text style={{marginLeft: 10, marginRight: 10, fontSize: 20}}>{this.state.boxCount}</Text>
+                        <Button
+                            success
+                            onPress={this.subtract} >
+                            <Text style={styles.icon}>-</Text>
+                        </ Button>
+                    </View>
+                    <View>
+                        <Text style={styles.headerText}>Which subscription?</Text>
+                        <Picker
+                            mode="dropdown"
+                            selectedValue={this.state.subscriptionId}
+                            onValueChange={(itemValue, itemIndex) => this.subscriptionChange(itemValue)}
                         >
-                            <Text style={{color: '#FFFFFF'}}>Submit</Text>
-                        </Button>
+                            {
+                                subscriptions.map((subscription, index) => {
+                                    return <Picker.Item
+                                                key={index}
+                                                label={`${subscription.name} (${subscription.available_boxes}/${subscription.max_boxes})`}
+                                                value={subscription.id}
+                                            />
+                                })
+                            }
+                        </ Picker>
+                        <View style={styles.centeredRow}>
+                            <Button
+                                success
+                                onPress={this.submit}
+                            >
+                                <Text style={{color: '#FFFFFF'}}>Submit</Text>
+                            </Button>
+                        </View>
                     </View>
                 </View>
-            </View>
+            ) : (
+                <View><Text>Your account has no subscriptions</Text></View>
+            )
         )
     }
 }
