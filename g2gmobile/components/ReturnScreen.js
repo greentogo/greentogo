@@ -13,7 +13,7 @@ class ReturnScreen extends React.Component {
         this.state = {
             hasCameraPermission: false
         }
-        this.props.appStore.action = "return";
+        this.props.appStore.action = "IN";
     }
 
     static route = {
