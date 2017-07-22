@@ -85,7 +85,7 @@ class SubmissionScreen extends React.Component {
             }
         });
         switch(this.props.appStore.action) {
-            case 'return':
+            case 'checkin':
                 console.log(selectedSubscription);
                 if (selectedSubscription.available_boxes === selectedSubscription.max_boxes) {
                     boxCount = 0;
@@ -93,7 +93,7 @@ class SubmissionScreen extends React.Component {
                     boxCount = 1;
                 }
                 break;
-            case 'checkOut':
+            case 'checkout':
                 if (selectedSubscription.available_boxes === 0) {
                     boxCount = 0;
                 } else {
@@ -110,27 +110,25 @@ class SubmissionScreen extends React.Component {
     }
 
     submit = () => {
-       fetch(`${apiEndpoint}/tag`, {
-           method: 'POST',
-           headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': `Token ${this.props.appStore.authToken}`
-           },
-           body: JSON.stringify({
-               subscription: this.state.subscriptionId,
-               location: this.props.appStore.locationCode
-               // @TODO should also send number of boxes
-           })
-       })
-       .then((response) => console.log(response))
-       .then((response) => response.json())
-       .then((json) => {
-           this.props.navigator.push('home');
-       })
-       .catch((error) => {
-           console.log(error);
-       });
+        let config = {
+            headers: {
+                'Authorization': `Token ${this.props.appStore.authToken}`
+            }
+        }
+        axios.post('tag/', {
+            body: {
+                subscription: this.state.subscriptionId,
+                location: this.props.appStore.locationCode,
+                action: this.props.appStore.action
+            }
+        }, config)
+        .then((response) => {
+            // TODO: Route to a success screen
+            this.props.navigator.push('home');
+        })
+        .catch((error) => {
+            console.log(error.response);
+        });
     }
 
     render() {
