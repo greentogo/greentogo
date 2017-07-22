@@ -150,7 +150,8 @@ class SubmissionScreen extends React.Component {
         return (
             subscriptions.length > 0 ? (
                 <View>
-                    <View style={{marginBottom: 10}}><Text style={styles.headerText}>How many boxes to {this.props.appStore.action}?</Text></View>
+                     {/* TODO: Add this back in once the tag/ endpoint accepts # of boxes
+                     <View style={{marginBottom: 10}}><Text style={styles.headerText}>How many boxes to {this.props.appStore.action}?</Text></View>
                     <View style={styles.centeredRow}>
                         <Button
                             success
@@ -163,9 +164,9 @@ class SubmissionScreen extends React.Component {
                             onPress={this.subtract} >
                             <Text style={styles.icon}>-</Text>
                         </ Button>
-                    </View>
+                    </View> */}
                     <View>
-                        <Text style={styles.headerText}>Which subscription?</Text>
+                        <Text style={styles.headerText}>Check {this.props.appStore.action.toLowerCase()} 1 box on which subscription?</Text>
                         <Picker
                             mode="dropdown"
                             selectedValue={this.state.subscriptionId}
