@@ -116,11 +116,9 @@ class SubmissionScreen extends React.Component {
             }
         }
         axios.post('tag/', {
-            body: {
-                subscription: this.state.subscriptionId,
-                location: this.props.appStore.locationCode,
-                action: this.props.appStore.action
-            }
+            subscription: this.state.subscriptionId,
+            location: this.props.appStore.locationCode,
+            action: this.props.appStore.action
         }, config)
         .then((response) => {
             // TODO: Route to a success screen
