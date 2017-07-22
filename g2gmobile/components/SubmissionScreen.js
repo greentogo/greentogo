@@ -52,14 +52,14 @@ class SubmissionScreen extends React.Component {
     add = () => {
         let returnableBoxes = this.state.selectedSubscription.max_boxes - this.state.selectedSubscription.available_boxes;
         switch(this.props.appStore.action) {
-            case 'return':
+            case 'IN':
                 if (this.state.boxCount === returnableBoxes) {
                     return;
                 } else {
                     this.setState({boxCount: this.state.boxCount + 1})
                 }
                 break;
-            case 'checkOut':
+            case 'OUT':
                 if (this.state.boxCount === this.state.selectedSubscription.available_boxes) {
                     return;
                 } else {
@@ -85,7 +85,7 @@ class SubmissionScreen extends React.Component {
             }
         });
         switch(this.props.appStore.action) {
-            case 'checkin':
+            case 'IN':
                 console.log(selectedSubscription);
                 if (selectedSubscription.available_boxes === selectedSubscription.max_boxes) {
                     boxCount = 0;
@@ -93,7 +93,7 @@ class SubmissionScreen extends React.Component {
                     boxCount = 1;
                 }
                 break;
-            case 'checkout':
+            case 'OUT':
                 if (selectedSubscription.available_boxes === 0) {
                     boxCount = 0;
                 } else {
