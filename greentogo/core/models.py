@@ -11,9 +11,12 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.utils.text import slugify
 
 import shortuuid
 from django_geocoder.wrapper import get_cached as geocode
+
+from core.stripe import stripe
 
 
 def get_plan_price(plan):
@@ -50,14 +53,61 @@ class User(AbstractUser):
         return self.subscriptions.active().count() > 0
 
 
+class CannotChangeException(Exception):
+    """Raise when model field should not change after initial creation."""
+
+
 class Plan(models.Model):
     name = models.CharField(max_length=255, unique=True)
     available = models.BooleanField(default=True)
-    amount = models.PositiveIntegerField()
+    amount = models.PositiveIntegerField(help_text="Amount in cents.")
     number_of_boxes = models.PositiveIntegerField()
+    stripe_id = models.CharField(max_length=255, unique=True, blank=True, null=True, editable=False)
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        instance = super().from_db(db, field_names, values)
+        instance._loaded_values = dict(zip(field_names, values))
+        return instance
+
+    def is_changed(self, field_name):
+        old_value = self._loaded_values[field_name]
+        new_value = getattr(self, field_name)
+        return not old_value == new_value
 
     def __str__(self):
         return self.name
+
+    def _gen_id(self, force=False):
+        if force or not self.stripe_id:
+            shortuuid.set_alphabet("23456789ABCDEFGHJKLMNPQRSTUVWXYZ")
+            stripe_id = slugify(self.name) + shortuuid.uuid()[:6]
+            while Plan.objects.filter(stripe_id=stripe_id).count() > 0:
+                stripe_id = slugify(self.name) + "-" + shortuuid.uuid()[:6]
+            return stripe_id
+
+    def save(self, *args, **kwargs):
+        if self.stripe_id:
+            if self.is_changed('amount'):
+                raise CannotChangeException({"model": self, "field": "amount"})
+            if self.is_changed('name'):
+                stripe_plan = stripe.Plan.retrieve(self.stripe_id)
+                stripe_plan.name = self.name
+                stripe_plan.save()
+        else:
+            self.stripe_id = self._gen_id()
+            plan = stripe.Plan.create(
+                name=self.name,
+                id=self.stripe_id,
+                interval="year",
+                currency="usd",
+                amount=self.amount,
+            )
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.available = False
+        self.save()
 
 
 class UnclaimedSubscription(models.Model):
