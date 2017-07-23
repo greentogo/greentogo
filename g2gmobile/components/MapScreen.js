@@ -55,7 +55,7 @@ class MapScreen extends React.Component {
 
                   >
                     <Image
-                      source={require('../assets/icons/g2gpickuplocation.png')}
+                      source={require('../assets/icons/Drop-Pin_Box.png')}
                       style={{ height: 75, width: 75 }}
                     />
                   </MapView.Marker>

@@ -148,39 +148,10 @@ class SubmissionScreen extends React.Component {
         });
 
         return (
-            <View>
-                <Text>{this.state.subscriptionId}</Text>
-                <View style={{marginBottom: 10}}><Text style={styles.headerText}>How many boxes to {this.props.appStore.action}?</Text></View>
-                <View style={styles.centeredRow}>
-                    <Button
-                        success
-                        onPress={this.add} >
-                        <Text style={styles.icon}>+</Text>
-                    </Button>
-                    <Text style={{marginLeft: 10, marginRight: 10, fontSize: 20}}>{this.state.boxCount}</Text>
-                    <Button
-                        success
-                        onPress={this.subtract} >
-                        <Text style={styles.icon}>-</Text>
-                    </Button>
-                </View>
+            subscriptions.length > 0 ? (
                 <View>
-                    <Text style={styles.headerText}>Which subscription?</Text>
-                    <Picker
-                        mode="dropdown"
-                        selectedValue={this.state.subscriptionId}
-                        onValueChange={(itemValue, itemIndex) => this.subscriptionChange(itemValue)}
-                    >
-                        {
-                            subscriptions.map((subscription, index) => {
-                                return <Picker.Item
-                                            key={index}
-                                            label={`${subscription.name} (${subscription.available_boxes}/${subscription.max_boxes})`}
-                                            value={subscription.id}
-                                        />
-                            })
-                        }
-                    </Picker>
+                     {/* TODO: Add this back in once the tag/ endpoint accepts # of boxes
+                     <View style={{marginBottom: 10}}><Text style={styles.headerText}>How many boxes to {this.props.appStore.action}?</Text></View>
                     <View style={styles.centeredRow}>
                         <Button
                             success
