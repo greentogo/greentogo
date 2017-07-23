@@ -25,55 +25,22 @@ class SubmissionScreen extends React.Component {
     }
 
     componentWillMount() {
-        // mock getting the subscriptions
-        const response = {
-            status: "success",
-            data: {
-                name: "Erin Brown",
-                email: "emberbrown@gmail.com",
-                subscriptions: [
-                    {
-                        id: 11,
-                        name: "1 Box",
-                        available_boxes: 1,
-                        max_boxes: 1
-                    },
-                    {
-                        id: 12,
-                        name: "3 Boxes",
-                        available_boxes: 3,
-                        max_boxes: 3
-                    }
-                ]
+        let authToken = this.props.appStore.authToken;
+        axios.get('me/', {
+            headers: {
+                'Authorization': `Token ${authToken}`
             }
-        };
-        const promise = new Promise((resolve, reject) => {
-            resolve(response);
-        });
-
-        promise.then((response) => {
-            subscriptions = response.data.subscriptions;
-            // @TODO handle empty array?
-            this.subscriptionChange(subscriptions[0].id);
-        });
-
-        // let authToken = this.props.appStore.authToken;
-        // axios.get('me', {
-        //     headers: {
-        //         'Authorization': `Token ${authToken}`
-        //     }
-        // })
-        // .then((response) => console.log(response))
-        // .then((response) => response.json())
-        // .then((json) => {
-        //     console.log(json);
-        // })
-        // .catch((error) => {
-        //     console.log('In the error!');
-        //     console.log(error);
-        //     console.log(error.response);
-        //     console.log(error.response.status);
-        // })
+        })
+        .then((response) => {
+            subscriptions = response.data.data.subscriptions;
+            if (subscriptions.length > 0) {
+                this.subscriptionChange(subscriptions[0].id);
+            }
+        })
+        .catch((error) => {
+            console.log('In the error!');
+            console.log(error);
+        })
     }
 
     static route = {
@@ -85,14 +52,14 @@ class SubmissionScreen extends React.Component {
     add = () => {
         let returnableBoxes = this.state.selectedSubscription.max_boxes - this.state.selectedSubscription.available_boxes;
         switch(this.props.appStore.action) {
-            case 'return':
+            case 'IN':
                 if (this.state.boxCount === returnableBoxes) {
                     return;
                 } else {
                     this.setState({boxCount: this.state.boxCount + 1})
                 }
                 break;
-            case 'checkOut':
+            case 'OUT':
                 if (this.state.boxCount === this.state.selectedSubscription.available_boxes) {
                     return;
                 } else {
@@ -118,7 +85,7 @@ class SubmissionScreen extends React.Component {
             }
         });
         switch(this.props.appStore.action) {
-            case 'return':
+            case 'IN':
                 console.log(selectedSubscription);
                 if (selectedSubscription.available_boxes === selectedSubscription.max_boxes) {
                     boxCount = 0;
@@ -126,7 +93,7 @@ class SubmissionScreen extends React.Component {
                     boxCount = 1;
                 }
                 break;
-            case 'checkOut':
+            case 'OUT':
                 if (selectedSubscription.available_boxes === 0) {
                     boxCount = 0;
                 } else {
@@ -143,27 +110,23 @@ class SubmissionScreen extends React.Component {
     }
 
     submit = () => {
-       fetch(`${apiEndpoint}/tag`, {
-           method: 'POST',
-           headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': `Token ${this.props.appStore.authToken}`
-           },
-           body: JSON.stringify({
-               subscription: this.state.subscriptionId,
-               location: this.props.appStore.locationCode
-               // @TODO should also send number of boxes
-           })
-       })
-       .then((response) => console.log(response))
-       .then((response) => response.json())
-       .then((json) => {
-           this.props.navigator.push('home');
-       })
-       .catch((error) => {
-           console.log(error);
-       });
+        let config = {
+            headers: {
+                'Authorization': `Token ${this.props.appStore.authToken}`
+            }
+        }
+        axios.post('tag/', {
+            subscription: this.state.subscriptionId,
+            location: this.props.appStore.locationCode,
+            action: this.props.appStore.action
+        }, config)
+        .then((response) => {
+            // TODO: Route to a success screen
+            this.props.navigator.push('home');
+        })
+        .catch((error) => {
+            console.log(error.response);
+        });
     }
 
     render() {
@@ -221,13 +184,46 @@ class SubmissionScreen extends React.Component {
                     <View style={styles.centeredRow}>
                         <Button
                             success
-                            onPress={this.submit}
+                            onPress={this.add} >
+                            <Text style={styles.icon}>+</Text>
+                        </ Button>
+                        <Text style={{marginLeft: 10, marginRight: 10, fontSize: 20}}>{this.state.boxCount}</Text>
+                        <Button
+                            success
+                            onPress={this.subtract} >
+                            <Text style={styles.icon}>-</Text>
+                        </ Button>
+                    </View> */}
+                    <View>
+                        <Text style={styles.headerText}>Check {this.props.appStore.action.toLowerCase()} 1 box on which subscription?</Text>
+                        <Picker
+                            mode="dropdown"
+                            selectedValue={this.state.subscriptionId}
+                            onValueChange={(itemValue, itemIndex) => this.subscriptionChange(itemValue)}
                         >
-                            <Text style={{color: '#FFFFFF'}}>Submit</Text>
-                        </Button>
+                            {
+                                subscriptions.map((subscription, index) => {
+                                    return <Picker.Item
+                                                key={index}
+                                                label={`${subscription.name} (${subscription.available_boxes}/${subscription.max_boxes})`}
+                                                value={subscription.id}
+                                            />
+                                })
+                            }
+                        </ Picker>
+                        <View style={styles.centeredRow}>
+                            <Button
+                                success
+                                onPress={this.submit}
+                            >
+                                <Text style={{color: '#FFFFFF'}}>Submit</Text>
+                            </Button>
+                        </View>
                     </View>
                 </View>
-            </View>
+            ) : (
+                <View><Text>Your account has no subscriptions</Text></View>
+            )
         )
     }
 }
