@@ -18,3 +18,4 @@ shortuuid
 qrcode
 pillow
 reportlab
+django-adminplus

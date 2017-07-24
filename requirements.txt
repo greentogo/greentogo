@@ -8,6 +8,7 @@ autorepr==0.3.0
 beautifulsoup4==4.5.3     # via wagtail
 click==6.7                # via geocoder
 decorator==4.0.11         # via ratelim
+django-adminplus==0.5
 django-appconf==1.0.2     # via django-compressor, pinax-stripe
 django-compressor==2.1.1
 django-environ==0.4.1

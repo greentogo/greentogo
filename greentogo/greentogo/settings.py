@@ -54,7 +54,8 @@ ALLOWED_HOSTS += [__env__('HOSTNAME') + '.ngrok.io']
 
 INSTALLED_APPS = [
     # core
-    'django.contrib.admin',
+    #'django.contrib.admin',
+    'django.contrib.admin.apps.SimpleAdminConfig',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -69,6 +70,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
+    'adminplus',
 
     # wagtail
     'wagtail.wagtailforms',

@@ -19,6 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 
+from adminplus.sites import AdminSitePlus
 from wagtail.wagtailadmin import urls as wagtailadmin_urls
 from wagtail.wagtailcore import urls as wagtail_urls
 from wagtail.wagtaildocs import urls as wagtaildocs_urls
@@ -26,6 +27,9 @@ from wagtail.wagtaildocs import urls as wagtaildocs_urls
 import core.views.locations
 import core.views.subscriptions
 from core import views as core_views
+
+admin.site = AdminSitePlus()
+admin.autodiscover()
 
 urlpatterns = [
     url(r'^locations/$', core.views.locations.locations, name='locations'),
