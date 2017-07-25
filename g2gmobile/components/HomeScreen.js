@@ -1,5 +1,10 @@
 import React from 'react';
-import {StyleSheet, TextInput, View} from 'react-native';
+import {
+  StyleSheet,
+  TextInput,
+  View,
+  TouchableHighlight
+} from 'react-native';
 import {inject, observer} from "mobx-react";
 import styles from "../styles";
 
@@ -25,14 +30,16 @@ class ListMenuItem extends React.Component {
     render() {
         const onPress = this.props.onPress || function () { };
         return (
-        <ListItem icon onPress={onPress}>
-            <Left>
-                <Icon name={this.props.icon}/>
-            </Left>
-            <Body>
-                <Text>{this.props.text}</Text>
-            </Body>
-        </ListItem>
+          <TouchableHighlight>
+            <ListItem icon onPress={onPress}>
+                <Left>
+                    <Icon name={this.props.icon}/>
+                </Left>
+                <Body>
+                    <Text>{this.props.text}</Text>
+                </Body>
+            </ListItem>
+          </TouchableHighlight>
         );
     }
 }
@@ -82,8 +89,8 @@ class HomeScreen extends React.Component {
                           text="Map of participating restaurants"
                           onPress={this.goToMap}
                         />
-                        <ListMenuItem icon="person" text="Your account" />
-                        <ListMenuItem icon="unlock" text="Log out" onPress={this.logOut} />
+                        <ListMenuItem icon="person" text="Your account"/>
+                        <ListMenuItem icon="unlock" text="Log out" onPress={this.logOut}/>
                     </List>
                 </Content>
             </Container>
