@@ -30,16 +30,16 @@ class ListMenuItem extends React.Component {
     render() {
         const onPress = this.props.onPress || function () { };
         return (
-          <TouchableHighlight>
-            <ListItem icon onPress={onPress}>
-                <Left>
-                    <Icon name={this.props.icon}/>
-                </Left>
-                <Body>
-                    <Text>{this.props.text}</Text>
-                </Body>
-            </ListItem>
-          </TouchableHighlight>
+            <TouchableHighlight>
+                <ListItem icon onPress={onPress}>
+                    <Left>
+                        <Icon name={this.props.icon}/>
+                    </Left>
+                    <Body>
+                        <Text>{this.props.text}</Text>
+                    </Body>
+                </ListItem>
+            </TouchableHighlight>
         );
     }
 }
@@ -75,22 +75,29 @@ class HomeScreen extends React.Component {
                 <Content>
                     <List>
                         <ListMenuItem
-                          icon="log-out"
-                          text="Checkout container"
-                          onPress={this.goToCheckOut}
+                            icon="log-out"
+                            text="Checkout container"
+                            onPress={this.goToCheckOut}
                         />
                         <ListMenuItem
-                          icon="log-in"
-                          text="Return container"
-                          onPress={this.goToReturn}
+                            icon="log-in"
+                            text="Return container"
+                            onPress={this.goToReturn}
                         />
                         <ListMenuItem
-                          icon="map"
-                          text="Map of participating restaurants"
-                          onPress={this.goToMap}
+                            icon="map"
+                            text="Map of participating restaurants"
+                            onPress={this.goToMap}
                         />
-                        <ListMenuItem icon="person" text="Your account"/>
-                        <ListMenuItem icon="unlock" text="Log out" onPress={this.logOut}/>
+                        <ListMenuItem
+                            icon="person" 
+                            text="Your account"
+                        />
+                        <ListMenuItem
+                            icon="unlock"
+                            text="Log out"
+                            onPress={this.logOut}
+                        />
                     </List>
                 </Content>
             </Container>
