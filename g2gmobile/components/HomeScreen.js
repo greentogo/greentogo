@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import {inject, observer} from "mobx-react";
 import styles from "../styles";
-
+import HomeScreenGreenToGoImage from "./HomeScreenGreenToGoImage";
 import {
     Container,
     Header,
@@ -31,7 +31,7 @@ class ListMenuItem extends React.Component {
         const onPress = this.props.onPress || function () { };
         return (
             <TouchableHighlight>
-                <ListItem icon onPress={onPress}>
+                <ListItem style={{height: 80 }} icon onPress={onPress}>
                     <Left>
                         <Icon name={this.props.icon}/>
                     </Left>
@@ -49,7 +49,8 @@ class ListMenuItem extends React.Component {
 class HomeScreen extends React.Component {
     static route = {
         navigationBar: {
-            title: 'GreenToGo'
+            renderTitle: (route, props) => <HomeScreenGreenToGoImage />, 
+            backgroundColor: '#ffffff'
         }
     }
 
