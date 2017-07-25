@@ -6,6 +6,7 @@ import {
     Image,
     TouchableOpacity
 } from 'react-native';
+import { Constants } from 'expo';
 
 class CheckOutSuccessScreen extends React.Component {
    constructor(props) {
@@ -28,7 +29,7 @@ class CheckOutSuccessScreen extends React.Component {
                 flexDirection: 'column'
             },
             statusBar: {
-              paddingTop: 18,
+              paddingTop: Constants.statusBarHeight,
               backgroundColor: '#ffffff'
             },
             goHomeButton: {
