@@ -4,13 +4,13 @@ import {
     Text,
     View,
 } from 'react-native';
-
+import { Constants } from 'expo';
 import {observer, Provider} from 'mobx-react';
 
 import {
     createRouter,
     NavigationProvider,
-    StackNavigation,
+    StackNavigation
 } from '@expo/ex-navigation';
 
 import LoginScreen from './LoginScreen';
@@ -41,7 +41,15 @@ class App extends React.Component {
             return (
                 <Provider appStore={store}>
                     <NavigationProvider router={Router}>
-                        <StackNavigation initialRoute={Router.getRoute('home')} />
+                        <StackNavigation 
+                            defaultRouteConfig={{
+                                navigationBar: {
+                                    backgroundColor: styles.primaryColor,
+                                    tintColor: 'white',
+                                    borderTopWidth: Constants.statusBarHeight
+                                }
+                            }}
+                            initialRoute={Router.getRoute('home')} />
                     </NavigationProvider>
                 </Provider>
             );

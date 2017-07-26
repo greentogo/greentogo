@@ -14,7 +14,6 @@ const styles = {
         flex: 1,
         backgroundColor: '#fff',
         justifyContent: 'center',
-        paddingTop: Constants.statusBarHeight,
     },
     fullWidthButton: {
         width: '100%',

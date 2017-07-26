@@ -1,10 +1,12 @@
 import React from "react";
+import HomeScreenGreenToGoImage from "./HomeScreenGreenToGoImage";
 
 import {
     Text,
     TextInput,
     View,
     StyleSheet,
+    TouchableHighlight
 } from "react-native";
 
 import {
@@ -25,12 +27,6 @@ import {observer} from "mobx-react";
 import styles from "../styles";
 
 class LoginScreen extends React.Component {
-    static route = {
-        navigationBar: {
-            title: 'Login',
-        }
-    }
-
     constructor(props) {
         super(props)
         this.state = {
@@ -74,11 +70,9 @@ class LoginScreen extends React.Component {
 
         return (
             <Container style={styles.container}>
-                <Header>
-                    <Body>
-                    <Title>Login</Title>
-                    </Body>
-                </Header>
+                 <Header style={{backgroundColor: styles.primaryColor}}>
+                    <HomeScreenGreenToGoImage />
+                </Header> 
                 <Content>
                     <Form>
                         <Item>
