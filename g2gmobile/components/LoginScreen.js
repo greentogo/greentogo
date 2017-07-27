@@ -1,5 +1,6 @@
 import React from "react";
 import HomeScreenGreenToGoImage from "./HomeScreenGreenToGoImage";
+import { Constants } from 'expo';
 
 import {
     Text,
@@ -70,7 +71,7 @@ class LoginScreen extends React.Component {
 
         return (
             <Container style={styles.container}>
-                 <Header style={{backgroundColor: styles.primaryColor}}>
+                 <Header style={{backgroundColor: styles.primaryColor, marginTop: Constants.statusBarHeight}}>
                     <HomeScreenGreenToGoImage />
                 </Header> 
                 <Content>

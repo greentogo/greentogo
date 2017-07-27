@@ -22,10 +22,10 @@ class ListMenuItem extends React.Component {
     render() {
         const onPress = this.props.onPress || function () { };
         return (
-            <TouchableHighlight style={{flex: 1}}>
+            <TouchableHighlight>
                 <ListItem style={{flex: 1, height: 100, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: styles.primaryColor }} icon onPress={onPress}>
                     <Left>
-                        <Icon name={this.props.icon}/>
+                        <Icon style={{color: styles.primaryColor}} name={this.props.icon}/>
                     </Left>
                     <Body style={{borderBottomWidth: 0 }}>
                         <Text>{this.props.text}</Text>
