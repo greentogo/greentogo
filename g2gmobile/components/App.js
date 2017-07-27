@@ -45,7 +45,7 @@ class App extends React.Component {
                             defaultRouteConfig={{
                                 navigationBar: {
                                     backgroundColor: styles.primaryColor,
-                                    tintColor: 'white',
+                                    tintColor: styles.primaryCream,
                                     borderTopWidth: Constants.statusBarHeight
                                 }
                             }}

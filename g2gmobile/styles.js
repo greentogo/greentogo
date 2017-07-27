@@ -3,6 +3,7 @@ import { Constants } from 'expo';
 
 const styles = {
     primaryColor: '#628e86',
+    primaryCream: '#FAF3CB',
     buttonContainer: {
         padding: 10,
         flex: 1,
@@ -12,7 +13,7 @@ const styles = {
     },
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FAF3CB',
         justifyContent: 'center',
     },
     fullWidthButton: {

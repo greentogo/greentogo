@@ -23,7 +23,7 @@ class ListMenuItem extends React.Component {
         const onPress = this.props.onPress || function () { };
         return (
             <TouchableHighlight>
-                <ListItem style={{flex: 1, height: 100, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: styles.primaryColor }} icon onPress={onPress}>
+                <ListItem style={{flex: 1, height: 100, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: styles.primaryColor, backgroundColor: styles.primaryCream }} icon onPress={onPress}>
                     <Left>
                         <Icon style={{color: styles.primaryColor}} name={this.props.icon}/>
                     </Left>
@@ -64,8 +64,8 @@ class HomeScreen extends React.Component {
 
     render() {
         return (
-            <Content style={{flex: 1}}>
-                <List style={{flex: 1}}>
+            <Content style={{flex: 1, backgroundColor: styles.primaryCream}}>
+                <List>
                     <ListMenuItem
                         icon="log-out"
                         text="Checkout container"

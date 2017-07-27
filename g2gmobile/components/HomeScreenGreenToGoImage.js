@@ -6,7 +6,7 @@ class HomeScreenGreenToGoImage extends React.Component {
         return (
             <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                 <Image
-                    source={require('../assets/icons/g2g-white.png')}
+                    source={require('../assets/icons/g2g-cream.png')}
                     style={{ height: 50, width: 160}}
                 />
             </View>
