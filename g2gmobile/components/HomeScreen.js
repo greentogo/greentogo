@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import {inject, observer} from "mobx-react";
 import styles from "../styles";
-import HomeScreenGreenToGoImage from "./HomeScreenGreenToGoImage";
+import G2GTitleImage from "./G2GTitleImage";
 import {
     Header,
     Body,
@@ -41,7 +41,7 @@ class ListMenuItem extends React.Component {
 class HomeScreen extends React.Component {
     static route = {
         navigationBar: {
-            renderTitle: (route, props) => <HomeScreenGreenToGoImage />, 
+            renderTitle: (route, props) => <G2GTitleImage />, 
             backgroundColor: '#628e86'
         }
     }

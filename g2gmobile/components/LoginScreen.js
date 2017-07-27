@@ -1,5 +1,5 @@
 import React from "react";
-import HomeScreenGreenToGoImage from "./HomeScreenGreenToGoImage";
+import G2GTitleImage from "./G2GTitleImage";
 import { Constants } from 'expo';
 
 import {
@@ -72,7 +72,7 @@ class LoginScreen extends React.Component {
         return (
             <Container style={styles.container}>
                  <Header style={{backgroundColor: styles.primaryColor, marginTop: Constants.statusBarHeight}}>
-                    <HomeScreenGreenToGoImage />
+                    <G2GTitleImage />
                 </Header> 
                 <Content>
                     <Form>
