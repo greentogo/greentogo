@@ -90,7 +90,7 @@ class LoginScreen extends React.Component {
                                    onChangeText={(text) => this.setState({ password: text })}
                             />
                         </Item>
-                        <Button light full title="Login" onPress={() => {this.attemptLogin()}}>
+                        <Button style={{backgroundColor: styles.primaryCream}}light full title="Login" onPress={() => {this.attemptLogin()}}>
                             <Text style={styles.boldText}>Login</Text>
                         </Button>
                     </Form>
