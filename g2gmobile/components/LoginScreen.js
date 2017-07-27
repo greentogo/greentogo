@@ -73,12 +73,12 @@ class LoginScreen extends React.Component {
     }
 
     render() {
-        var loadingSpinner = this.state.loading ?
+        let loadingSpinner = this.state.loading ?
             <Spinner color={styles.primaryColor} />
             : null;
-        var errorMessages = this.state.error.map((error, index) => {
-                        return <Text key={index} style={{color: 'red', textAlign: 'center'}}>{error}</Text>;
-                });
+        let errorMessages = this.state.error.map((error, index) => {
+                                return <Text key={index} style={{color: 'red', textAlign: 'center'}}>{error}</Text>;
+                            });
         return (
             <Container style={styles.container}>
                 <Header>
