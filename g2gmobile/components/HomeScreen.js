@@ -1,38 +1,37 @@
 import React from 'react';
-import {StyleSheet, TextInput, View} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  TouchableHighlight
+} from 'react-native';
 import {inject, observer} from "mobx-react";
 import styles from "../styles";
-
+import G2GTitleImage from "./G2GTitleImage";
 import {
-    Container,
     Header,
     Body,
-    Title,
     Content,
-    Form,
-    Item,
-    Input,
-    Button,
     List,
     ListItem,
     Text,
     Icon,
-    Left,
-    Right
+    Left
 } from "native-base";
 
 class ListMenuItem extends React.Component {
     render() {
         const onPress = this.props.onPress || function () { };
         return (
-        <ListItem icon onPress={onPress}>
-            <Left>
-                <Icon name={this.props.icon}/>
-            </Left>
-            <Body>
-                <Text>{this.props.text}</Text>
-            </Body>
-        </ListItem>
+            <TouchableHighlight>
+                <ListItem style={{flex: 1, height: 100, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: styles.primaryColor, backgroundColor: styles.primaryCream }} icon onPress={onPress}>
+                    <Left>
+                        <Icon style={{color: styles.primaryColor}} name={this.props.icon}/>
+                    </Left>
+                    <Body style={{borderBottomWidth: 0 }}>
+                        <Text>{this.props.text}</Text>
+                    </Body>
+                </ListItem>
+            </TouchableHighlight>
         );
     }
 }
@@ -42,7 +41,8 @@ class ListMenuItem extends React.Component {
 class HomeScreen extends React.Component {
     static route = {
         navigationBar: {
-            title: 'GreenToGo'
+            renderTitle: (route, props) => <G2GTitleImage />, 
+            backgroundColor: '#628e86'
         }
     }
 
@@ -64,29 +64,34 @@ class HomeScreen extends React.Component {
 
     render() {
         return (
-            <Container style={styles.container}>
-                <Content>
-                    <List>
-                        <ListMenuItem
-                          icon="log-out"
-                          text="Checkout container"
-                          onPress={this.goToCheckOut}
-                        />
-                        <ListMenuItem
-                          icon="log-in"
-                          text="Return container"
-                          onPress={this.goToReturn}
-                        />
-                        <ListMenuItem
-                          icon="map"
-                          text="Map of participating restaurants"
-                          onPress={this.goToMap}
-                        />
-                        <ListMenuItem icon="person" text="Your account" />
-                        <ListMenuItem icon="unlock" text="Log out" onPress={this.logOut} />
-                    </List>
-                </Content>
-            </Container>
+            <Content style={{flex: 1, backgroundColor: styles.primaryCream}}>
+                <List>
+                    <ListMenuItem
+                        icon="log-out"
+                        text="Checkout container"
+                        onPress={this.goToCheckOut}
+                    />
+                    <ListMenuItem
+                        icon="log-in"
+                        text="Return container"
+                        onPress={this.goToReturn}
+                    />
+                    <ListMenuItem
+                        icon="map"
+                        text="Map of participating restaurants"
+                        onPress={this.goToMap}
+                    />
+                    <ListMenuItem
+                        icon="person" 
+                        text="Your account"
+                    />
+                    <ListMenuItem
+                        icon="unlock"
+                        text="Log out"
+                        onPress={this.logOut}
+                    />
+                </List>
+            </Content>
         )
     }
 }

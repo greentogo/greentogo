@@ -1,4 +1,6 @@
 import React from "react";
+import G2GTitleImage from "./G2GTitleImage";
+import { Constants } from 'expo';
 import axios from '../apiClient';
 
 import {
@@ -6,6 +8,7 @@ import {
     TextInput,
     View,
     StyleSheet,
+    TouchableHighlight
 } from "react-native";
 
 import {
@@ -26,12 +29,6 @@ import {observer} from "mobx-react";
 import styles from "../styles";
 
 class LoginScreen extends React.Component {
-    static route = {
-        navigationBar: {
-            title: 'Login',
-        }
-    }
-
     constructor(props) {
         super(props)
         this.state = {
@@ -81,11 +78,9 @@ class LoginScreen extends React.Component {
                             });
         return (
             <Container style={styles.container}>
-                <Header>
-                    <Body>
-                    <Title>Login</Title>
-                    </Body>
-                </Header>
+                 <Header style={{backgroundColor: styles.primaryColor, marginTop: Constants.statusBarHeight}}>
+                    <G2GTitleImage />
+                </Header> 
                 <Content style={{alignContent: 'center'}}>
                     <Form>
                         <Item>
@@ -102,7 +97,7 @@ class LoginScreen extends React.Component {
                                    onChangeText={(text) => this.setState({ password: text })}
                             />
                         </Item>
-                        <Button light full title="Login" onPress={() => {this.attemptLogin()}}>
+                        <Button style={{backgroundColor: styles.primaryCream}}light full title="Login" onPress={() => {this.attemptLogin()}}>
                             <Text style={styles.boldText}>Login</Text>
                         </Button>
                     </Form>
