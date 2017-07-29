@@ -20,6 +20,8 @@ import CheckOutScreen from './CheckOutScreen';
 import styles from '../styles';
 import ReturnBox from "./ReturnScreen";
 import SubmissionScreen from "./SubmissionScreen";
+import CheckOutSuccessScreen from "./CheckOutSuccessScreen";
+import ReturnSuccessScreen from "./ReturnSuccessScreen";
 import stylesheet from "../styles";
 
 const Router = createRouter(() => ({
@@ -27,7 +29,9 @@ const Router = createRouter(() => ({
     map: () => MapScreen,
     checkOutBox: () => CheckOutScreen,
     returnBox: () => ReturnBox,
-    submission: () => SubmissionScreen
+    submission: () => SubmissionScreen,
+    checkOutSuccess: () => CheckOutSuccessScreen,
+    returnSuccess: () => ReturnSuccessScreen
 }));
 
 @observer
