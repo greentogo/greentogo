@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
-from .models import Subscription, get_plans
+from .models import Plan, Subscription
 
 
 class UserForm(forms.ModelForm):
@@ -24,18 +24,19 @@ class SubscriptionPlanForm(forms.Form):
     pass
     # plan = forms.ChoiceField(
     #     choices=[
-    #         (plan['stripe_id'], "{name}: {display_price}".format(**plan), ) for plan in get_plans()
+    #         (plan['stripe_id'], "{name}: {display_price}".format(**plan), ) for plan in Plan.objects.available.as_dicts()
     #     ]
     # )
 
 
 class NewSubscriptionForm(forms.Form):
     token = forms.CharField(max_length=100, widget=forms.HiddenInput)
-    # plan = forms.ChoiceField(
-    #     choices=[
-    #         (plan['stripe_id'], "{name}: {display_price}".format(**plan), ) for plan in get_plans()
-    #     ]
-    # )
+    plan = forms.ChoiceField(
+        choices=[
+            (plan['stripe_id'], "{name}: {display_price}".format(**plan), )
+            for plan in Plan.objects.available().as_dicts()
+        ]
+    )
 
 
 class SubscriptionForm(forms.ModelForm):

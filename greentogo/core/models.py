@@ -20,25 +20,6 @@ from django_geocoder.wrapper import get_cached as geocode
 from core.stripe import stripe
 
 
-def get_plan_price(plan):
-    return "${:.02f}".format(plan.amount / 100)
-
-
-def plan_to_dict(plan):
-    return {
-        'stripe_id': plan.stripe_id,
-        'name': plan.name,
-        'amount': plan.amount,
-        'display_price': get_plan_price(plan),
-        'boxes': plan.number_of_boxes
-    }
-
-
-def get_plans():
-    plans = Plan.objects.order_by('amount')
-    return [plan_to_dict(plan) for plan in plans]
-
-
 class User(AbstractUser):
     name = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(
@@ -46,6 +27,7 @@ class User(AbstractUser):
         max_length=255,
         unique=True,
     )
+    stripe_id = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.name or self.username
@@ -58,20 +40,47 @@ class CannotChangeException(Exception):
     """Raise when model field should not change after initial creation."""
 
 
+class PlanQuerySet(models.QuerySet):
+    def available(self):
+        return self.filter(available=True).exclude(stripe_id=None)
+
+    def as_dicts(self):
+        return [plan.as_dict() for plan in self.all()]
+
+
 class Plan(models.Model):
+    objects = PlanQuerySet.as_manager()
+
     name = models.CharField(max_length=255, unique=True)
     available = models.BooleanField(default=True)
     amount = models.PositiveIntegerField(help_text="Amount in cents.")
     number_of_boxes = models.PositiveIntegerField()
     stripe_id = models.CharField(max_length=255, unique=True, blank=True, null=True, editable=False)
 
+    class Meta:
+        ordering = ['amount', 'number_of_boxes']
+
     @classmethod
     def from_db(cls, db, field_names, values):
+        """Overridden in order to allow us to see if a value has changed."""
         instance = super().from_db(db, field_names, values)
         instance._loaded_values = dict(zip(field_names, values))
         return instance
 
+    def as_dict(self):
+        return {
+            'stripe_id': self.stripe_id,
+            'name': self.name,
+            'amount': self.amount,
+            'display_price': self.display_price(),
+            'boxes': self.number_of_boxes
+        }
+
+    def display_price(self):
+        return "${:.02f}".format(self.amount / 100)
+
     def is_changed(self, field_name):
+        """Find out if a value has changed since it was pulled from the DB."""
         old_value = self._loaded_values[field_name]
         new_value = getattr(self, field_name)
         return not old_value == new_value
@@ -79,7 +88,7 @@ class Plan(models.Model):
     def __str__(self):
         return self.name
 
-    def _gen_id(self, force=False):
+    def _generate_stripe_id(self, force=False):
         if force or not self.stripe_id:
             shortuuid.set_alphabet("23456789ABCDEFGHJKLMNPQRSTUVWXYZ")
             stripe_id = slugify(self.name) + shortuuid.uuid()[:6]
@@ -96,7 +105,7 @@ class Plan(models.Model):
                 stripe_plan.name = self.name
                 stripe_plan.save()
         else:
-            self.stripe_id = self._gen_id()
+            self.stripe_id = self._generate_stripe_id()
             plan = stripe.Plan.create(
                 name=self.name,
                 id=self.stripe_id,
@@ -155,6 +164,7 @@ class Subscription(models.Model):
     plan = models.ForeignKey(Plan, null=True)
     starts_at = models.DateTimeField(default=timezone.now)
     ends_at = models.DateTimeField(null=True, blank=True)
+    stripe_id = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return "{} - {}".format(self.user.name, self.display_name)

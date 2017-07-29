@@ -2,15 +2,19 @@ import json
 from collections import OrderedDict
 from itertools import groupby
 
-import stripe
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import SetPasswordForm
 from django.core import serializers
-from django.utils.safestring import mark_safe
-from django.shortcuts import redirect, render, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.safestring import mark_safe
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+
+import stripe
 
 from ..forms import UserForm
 from ..models import Restaurant

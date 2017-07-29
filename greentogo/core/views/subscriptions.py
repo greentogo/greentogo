@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -8,7 +10,7 @@ from django.views.decorators.http import require_POST
 import stripe
 
 from core.forms import NewSubscriptionForm, SubscriptionForm, SubscriptionPlanForm
-from core.models import Subscription, get_plans
+from core.models import Plan, Subscription
 
 
 @login_required
@@ -44,13 +46,39 @@ def add_subscription(request):
     if request.method == "POST":
         form = NewSubscriptionForm(request.POST)
         if form.is_valid():
-            plan = pinax_models.Plan.objects.get(stripe_id=form.cleaned_data['plan'])
-            try:
-                subscriptions.create(
-                    customer=request.user.customer, plan=plan, token=form.cleaned_data['token']
+            # if customer does not have a stripe_id
+            #    create a customer from token
+            # if customer does have a stripe_id
+            #    update source with token?
+            # create a subscription with customer, plan, and token
+            # on failure, let customer know
+
+            plan_stripe_id = form.cleaned_data['plan']
+            token = form.cleaned_data['token']
+
+            plan = Plan.objects.get(stripe_id=plan_stripe_id)
+            # TODO handle no plan
+            user = request.user
+
+            if not user.stripe_id:
+                customer = stripe.Customer.create(
+                    email=user.email,
+                    source=form.cleaned_data['token'],
                 )
-                messages.success(
-                    request, "You have added a subscription to the plan {}.".format(plan.name)
+                user.stripe_id = customer.id
+                user.save()
+
+            try:
+                stripe_subscription = stripe.Subscription.create(
+                    customer=user.stripe_id, source=token, items=[{
+                        "plan": plan_stripe_id
+                    }]
+                )
+                subscription = Subscription.objects.create(
+                    user=user,
+                    stripe_id=stripe_subscription.id,
+                    plan=plan,
+                    ends_at=datetime.fromtimestamp(stripe_subscription.current_period_end)
                 )
                 return redirect(reverse('subscriptions'))
             except stripe.error.CardError as ex:
@@ -64,7 +92,7 @@ def add_subscription(request):
     return render(
         request, "core/add_subscription.html", {
             "form": form,
-            "plans": get_plans(),
+            "plans": Plan.objects.available().as_dicts(),
             "email": request.user.email,
             "stripe_key": settings.STRIPE_PUBLISHABLE_KEY
         }
