@@ -3,7 +3,6 @@ pytest-django
 ipython
 yapf
 faker
-pre-commit
 vcrpy
 jedi
 isort
