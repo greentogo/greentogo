@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib import messages
@@ -74,11 +74,10 @@ def add_subscription(request):
                         "plan": plan_stripe_id
                     }]
                 )
-                subscription = Subscription.objects.create(
+                subscription = Subscription.create_from_stripe_sub(
                     user=user,
-                    stripe_id=stripe_subscription.id,
                     plan=plan,
-                    ends_at=datetime.fromtimestamp(stripe_subscription.current_period_end)
+                    stripe_subscription=stripe_subscription,
                 )
                 return redirect(reverse('subscriptions'))
             except stripe.error.CardError as ex:

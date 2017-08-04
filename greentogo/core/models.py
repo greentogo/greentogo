@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.conf import settings
 from django.contrib.auth import hashers
 from django.contrib.auth.models import AbstractUser
@@ -165,6 +167,7 @@ class Subscription(models.Model):
     starts_at = models.DateTimeField(default=timezone.now)
     ends_at = models.DateTimeField(null=True, blank=True)
     stripe_id = models.CharField(max_length=100, blank=True, null=True)
+    stripe_status = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return "{} - {}".format(self.user.name, self.display_name)
@@ -172,6 +175,18 @@ class Subscription(models.Model):
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse('subscription', kwargs={"sub_id": self.id})
+
+    @classmethod
+    def create_from_stripe_sub(cls, user, plan, stripe_subscription):
+        subscription = Subscription.objects.create(
+            user=user,
+            stripe_id=stripe_subscription.id,
+            plan=plan,
+            ends_at=datetime.fromtimestamp(stripe_subscription.current_period_end) +
+            timedelta(days=3),
+            stripe_status=stripe_subscription.status
+        )
+        return subscription
 
     @property
     def display_name(self):
