@@ -122,7 +122,11 @@ class SubmissionScreen extends React.Component {
         }, config)
         .then((response) => {
             // TODO: Route to a success screen
-            this.props.navigator.push('home');
+            if(this.props.appStore.action === 'OUT') {
+              this.props.navigator.push('checkOutSuccess', {boxCount: this.state.boxCount});
+            } else {
+              this.props.navigator.push('returnSuccess', {boxCount: this.state.boxCount});
+            }
         })
         .catch((error) => {
             console.log(error.response);

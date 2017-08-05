@@ -4,13 +4,13 @@ import {
     Text,
     View,
 } from 'react-native';
-
+import { Constants } from 'expo';
 import {observer, Provider} from 'mobx-react';
 
 import {
     createRouter,
     NavigationProvider,
-    StackNavigation,
+    StackNavigation
 } from '@expo/ex-navigation';
 
 import LoginScreen from './LoginScreen';
@@ -20,6 +20,8 @@ import CheckOutScreen from './CheckOutScreen';
 import styles from '../styles';
 import ReturnBox from "./ReturnScreen";
 import SubmissionScreen from "./SubmissionScreen";
+import CheckOutSuccessScreen from "./CheckOutSuccessScreen";
+import ReturnSuccessScreen from "./ReturnSuccessScreen";
 import stylesheet from "../styles";
 
 const Router = createRouter(() => ({
@@ -27,7 +29,9 @@ const Router = createRouter(() => ({
     map: () => MapScreen,
     checkOutBox: () => CheckOutScreen,
     returnBox: () => ReturnBox,
-    submission: () => SubmissionScreen
+    submission: () => SubmissionScreen,
+    checkOutSuccess: () => CheckOutSuccessScreen,
+    returnSuccess: () => ReturnSuccessScreen
 }));
 
 @observer
@@ -41,7 +45,15 @@ class App extends React.Component {
             return (
                 <Provider appStore={store}>
                     <NavigationProvider router={Router}>
-                        <StackNavigation initialRoute={Router.getRoute('home')} />
+                        <StackNavigation 
+                            defaultRouteConfig={{
+                                navigationBar: {
+                                    backgroundColor: styles.primaryColor,
+                                    tintColor: styles.primaryCream,
+                                    borderTopWidth: Constants.statusBarHeight
+                                }
+                            }}
+                            initialRoute={Router.getRoute('home')} />
                     </NavigationProvider>
                 </Provider>
             );
