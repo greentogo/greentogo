@@ -17,10 +17,12 @@
                 <p>
                     Plan: {{ sub.plan_display }}<br />
                     Number of boxes: {{ sub.available_boxes }} / {{ sub.number_of_boxes }}<br />
-                    {% if sub.auto_renew and sub.ends_on %}
-                        Renews automatically on {{ sub.ends_on }}
-                    {% elif sub.ends_on %}
-                        Ends on {{ sub.ends_on }}
+                    {% if sub.will_auto_renew and sub.ends_at %}
+                        Renews automatically on {{ sub.ends_at }}
+                    {% elif sub.ends_at %}
+                        Ends on {{ sub.ends_at }}
+                    {% else %}
+                        No end date
                     {% endif %}
                 </p>
             </div>

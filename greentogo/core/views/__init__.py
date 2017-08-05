@@ -52,17 +52,28 @@ def change_password(request):
     return render(request, "core/change_password.html", {"form": form})
 
 
+def first(lst, predicate):
+    for x in lst:
+        if predicate(x): return x
+    return None
+
+
 @login_required
 def change_payment_method(request):
-    customer = request.user.customer
-    card = pinax_models.Card.objects.get(stripe_id=customer.default_source)
+    user = request.user
+    customer = user.get_stripe_customer(create=True)
+
+    card = None
+    if customer.default_source:
+        card = first(customer.sources.data, lambda source: source.id == customer.default_source)
+
     if request.method == "POST":
         token = request.POST.get('token')
         if token:
             try:
-                source = sources.create_card(customer=customer, token=token)
-                customers.set_default_source(customer=customer, source=source)
-                messages.success(request, "You have updated your default payment " "source.")
+                customer.source = token
+                customer.save()
+                messages.success(request, "You have updated your default payment source.")
                 return redirect(reverse('account_settings'))
             except stripe.error.CardError as ex:
                 error = ex.json_body.get('error')

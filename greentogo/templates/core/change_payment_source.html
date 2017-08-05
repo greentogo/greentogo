@@ -5,9 +5,15 @@
     <div class="medium-12 columns">
         <h2>Update Payment Source</h2>
 
+        {% if card %}
         <p>
             Your current payment source is the <strong>{{ card.brand }}</strong> card ending in <strong>{{ card.last4 }}</strong> and expiring on <strong>{{ card.exp_month }}/{{ card.exp_year }}</strong>.
         </p>
+        {% else %}
+        <p>
+            You do not have a current payment source.
+        </p>
+        {% endif %}
         <form action="." method="POST" id="change-payment-form">
             {% csrf_token %}
             <input id="token" name="token" type="hidden" value="" />

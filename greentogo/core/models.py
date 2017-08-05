@@ -37,6 +37,34 @@ class User(AbstractUser):
     def has_active_subscription(self):
         return self.subscriptions.active().count() > 0
 
+    def create_stripe_customer(self, token=None):
+        if self.stripe_id is not None:
+            return
+
+        if token is None:
+            customer = stripe.Customer.create(
+                email=self.email,
+            )
+        else:
+            customer = stripe.Customer.create(
+                email=self.email,
+                source=token,
+            )
+
+        self.stripe_id = customer.id
+        self.save()
+        return customer
+
+    def get_stripe_customer(self, create=False):
+        if self.stripe_id is None:
+            if create:
+                return self.create_stripe_customer()
+            else:
+                return None
+
+        customer = stripe.Customer.retrieve(self.stripe_id)
+        return customer
+
 
 class CannotChangeException(Exception):
     """Raise when model field should not change after initial creation."""
@@ -240,6 +268,9 @@ class Subscription(models.Model):
     def tag_location(self, location):
         tag = LocationTag.objects.create(subscription=self, location=location)
         return tag
+
+    def will_auto_renew(self):
+        return self.stripe_id and self.stripe_status == "active"
 
     def sync_with_stripe(self, stripe_sub=None):
         if stripe_sub is None and self.stripe_id:
