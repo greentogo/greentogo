@@ -252,12 +252,21 @@ if DEBUG:
         'handlers': {
             'console': {
                 'class': 'logging.StreamHandler',
+                'formatter': 'simple',
+            },
+        },
+        'formatters': {
+            'verbose': {
+                'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            },
+            'simple': {
+                'format': '%(levelname)s %(message)s'
             },
         },
         'loggers': {
             'django': {
                 'handlers': ['console'],
-                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+                'level': 'DEBUG',
             },
         },
     }

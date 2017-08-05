@@ -39,6 +39,8 @@ def stripe_webhook(request):
         # Invalid signature
         return HttpResponse(status=400)
 
+    logger.info(payload)
+
     # Do something with event
     if event.type in handlers:
         handlers[event.type](event)
@@ -52,31 +54,75 @@ def handle_customer_subscription_deleted(event):
 
     subscription = Subscription.objects.filter(stripe_id=event_sub.id).first()
     if not subscription:
+        logger.warn(
+            "Subscription {} not found for customer.subscription.deleted webhook".
+            format(event_sub.id)
+        )
         return
 
-    subscription.ends_at = event_sub.ended_at
-    subscription.stripe_status = event_sub.status
-    subscription.save()
-
-    logger.info("Subscription found")
-
-
-@handle_event('invoice.payment_succeeded')
-def handle_invoice_payment_succeeded(event):
-    """When an invoice payment is successful, update the subscription ends_at and status."""
-
-
-@handle_event('invoice.payment_failed')
-def handle_invoice_payment_failed(event):
-    """When an invoice payment fails, let the customer know and update their subscription (how?)"""
-    """
-    $customer = \Stripe\Customer::retrieve($event->data->object->customer);
-    $email = $customer->email;
-    // Sending your customers the amount in pennies is weird, so convert to dollars
-    $amount = sprintf('$%0.2f', $event->data->object->amount_due / 100.0);
-    """
+    subscription.sync_with_stripe(event_sub)
 
 
 @handle_event('customer.subscription.updated')
 def handle_subscription_updated(event):
     """When a subscription is updated, update it in our DB."""
+    event_sub = event.data.object
+
+    subscription = Subscription.objects.filter(stripe_id=event_sub.id).first()
+    if not subscription:
+        logger.warn(
+            "Subscription {} not found for customer.subscription.updated webhook".
+            format(event_sub.id)
+        )
+        return
+
+    subscription.sync_with_stripe(event_sub)
+
+
+@handle_event('invoice.payment_succeeded')
+def handle_invoice_payment_succeeded(event):
+    """When an invoice payment is successful, update the subscription ends_at and status."""
+    # TODO send an email to customer
+    invoice = event.data.object
+    customer = User.objects.filter(stripe_id=invoice.customer).first()
+    if not customer:
+        logger.warn(
+            "Customer {} not found for invoice.payment_succeeded webhook".format(invoice.customer)
+        )
+        return
+
+    if not invoice.lines.data:
+        return
+    for line in invoice.lines.data:
+        if line.id.startswith("sub_"):
+            subscription = Subscription.objects.filter(stripe_id=line.id).first()
+            if not subscription:
+                logger.warn(
+                    "Subscription {} not found for invoice.payment_succeeded webhook".
+                    format(line.id)
+                )
+            subscription.sync_with_stripe()
+
+
+@handle_event('invoice.payment_failed')
+def handle_invoice_payment_failed(event):
+    """When an invoice payment fails, let the customer know and update their subscription (how?)"""
+    # TODO send an email to customer
+    invoice = event.data.object
+    customer = User.objects.filter(stripe_id=invoice.customer).first()
+    if not customer:
+        logger.warn(
+            "Customer {} not found for invoice.payment_failed webhook".format(invoice.customer)
+        )
+        return
+
+    if not invoice.lines.data:
+        return
+    for line in invoice.lines.data:
+        if line.id.startswith("sub_"):
+            subscription = Subscription.objects.filter(stripe_id=line.id).first()
+            if not subscription:
+                logger.warn(
+                    "Subscription {} not found for invoice.payment_failed webhook".format(line.id)
+                )
+            subscription.sync_with_stripe()

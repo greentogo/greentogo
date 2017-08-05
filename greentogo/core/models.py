@@ -167,7 +167,7 @@ class Subscription(models.Model):
     starts_at = models.DateTimeField(default=timezone.now)
     ends_at = models.DateTimeField(null=True, blank=True)
     stripe_id = models.CharField(max_length=100, blank=True, null=True)
-    stripe_status = models.CharField(max_length=100, blank=True, null=True)
+    stripe_status = models.CharField(max_length=100, default="active")
 
     def __str__(self):
         return "{} - {}".format(self.user.name, self.display_name)
@@ -240,6 +240,23 @@ class Subscription(models.Model):
     def tag_location(self, location):
         tag = LocationTag.objects.create(subscription=self, location=location)
         return tag
+
+    def sync_with_stripe(self, stripe_sub=None):
+        if stripe_sub is None and self.stripe_id:
+            stripe_sub = stripe.Subscription.retrieve(self.stripe_id)
+
+        if not stripe_sub:
+            return
+
+        self.stripe_id = stripe_sub.id
+        self.stripe_status = stripe_sub.status
+        if stripe_sub.ended_at:
+            self.ends_at = timezone.make_aware(datetime.fromtimestamp(stripe_sub.ended_at))
+        else:
+            self.ends_at = timezone.make_aware(
+                datetime.fromtimestamp(stripe_sub.current_period_end) + timedelta(days=3)
+            )
+        self.save()
 
 
 class Location(models.Model):
