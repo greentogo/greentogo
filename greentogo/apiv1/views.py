@@ -3,7 +3,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import Location, LocationTag, Restaurant, Subscription, get_plans, plan_to_dict
+from core.models import Location, LocationTag, Plan, Restaurant, Subscription
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
@@ -37,7 +37,7 @@ class SubscriptionView(APIView):
             return jsend_fail({"plan": "no_plan"})
 
         plan = pinax_models.Plan.objects.get(stripe_id=request.data.get('plan'))
-        plandict = plan_to_dict(plan)
+        plandict = plan.as_dict()
 
         if plandict['boxes'] < subscription.boxes_checked_out():
             return jsend_fail({"plan": "plan_not_enough_boxes"})
@@ -59,7 +59,7 @@ class SubscriptionView(APIView):
 # /subscriptions/plans/
 class SubscriptionPlansView(APIView):
     def get(self, request, format=None):
-        plans = get_plans()
+        plans = Plans.objects.available().as_dicts()
         return jsend_success(plans)
 
 

@@ -221,10 +221,7 @@ GOOGLE_API_KEY = __env__('GOOGLE_API_KEY')
 
 STRIPE_SECRET_KEY = __env__('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = __env__('STRIPE_PUBLISHABLE_KEY')
-
-PINAX_STRIPE_PUBLIC_KEY = __env__('STRIPE_PUBLISHABLE_KEY')
-PINAX_STRIPE_SECRET_KEY = __env__('STRIPE_SECRET_KEY')
-PINAX_STRIPE_HOOKSET = 'core.hookset.StripeHookset'
+STRIPE_WEBHOOK_SECRET = __env__('STRIPE_WEBHOOK_SECRET')
 
 # Email
 REGISTRATION_DEFAULT_FROM_EMAIL = __env__('EMAIL_FROM') or __env__('EMAIL_ADDRESS')
@@ -248,7 +245,32 @@ if len(EMAIL_ADMINS) == 1 and not EMAIL_ADMINS[0]:
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-if not DEBUG:
+if DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'simple',
+            },
+        },
+        'formatters': {
+            'verbose': {
+                'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            },
+            'simple': {
+                'format': '%(levelname)s %(message)s'
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': 'INFO',
+            },
+        },
+    }
+else:
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,

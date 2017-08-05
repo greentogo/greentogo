@@ -2,15 +2,19 @@ import json
 from collections import OrderedDict
 from itertools import groupby
 
-import stripe
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import SetPasswordForm
 from django.core import serializers
-from django.utils.safestring import mark_safe
-from django.shortcuts import redirect, render, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.safestring import mark_safe
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+
+import stripe
 
 from ..forms import UserForm
 from ..models import Restaurant
@@ -48,17 +52,28 @@ def change_password(request):
     return render(request, "core/change_password.html", {"form": form})
 
 
+def first(lst, predicate):
+    for x in lst:
+        if predicate(x): return x
+    return None
+
+
 @login_required
 def change_payment_method(request):
-    customer = request.user.customer
-    card = pinax_models.Card.objects.get(stripe_id=customer.default_source)
+    user = request.user
+    customer = user.get_stripe_customer(create=True)
+
+    card = None
+    if customer.default_source:
+        card = first(customer.sources.data, lambda source: source.id == customer.default_source)
+
     if request.method == "POST":
         token = request.POST.get('token')
         if token:
             try:
-                source = sources.create_card(customer=customer, token=token)
-                customers.set_default_source(customer=customer, source=source)
-                messages.success(request, "You have updated your default payment " "source.")
+                customer.source = token
+                customer.save()
+                messages.success(request, "You have updated your default payment source.")
                 return redirect(reverse('account_settings'))
             except stripe.error.CardError as ex:
                 error = ex.json_body.get('error')

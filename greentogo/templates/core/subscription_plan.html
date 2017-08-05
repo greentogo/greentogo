@@ -6,7 +6,7 @@
         <h2>Change Subscription Plan</h2>
 
         <p>
-            <strong>Your current plan</strong>: {{ subscription.plan_display }} @ ${{ subscription.total_amount }}
+            <strong>Your current plan</strong>: {{ subscription.plan_display }} @ {{ subscription.amount_display }}
         </p>
 
         <form action="." method="POST">

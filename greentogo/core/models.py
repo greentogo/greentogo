@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.conf import settings
 from django.contrib.auth import hashers
 from django.contrib.auth.models import AbstractUser
@@ -18,25 +20,7 @@ import shortuuid
 from django_geocoder.wrapper import get_cached as geocode
 
 from core.stripe import stripe
-
-
-def get_plan_price(plan):
-    return "${:.02f}".format(plan.amount / 100)
-
-
-def plan_to_dict(plan):
-    return {
-        'stripe_id': plan.stripe_id,
-        'name': plan.name,
-        'amount': plan.amount,
-        'display_price': get_plan_price(plan),
-        'boxes': plan.number_of_boxes
-    }
-
-
-def get_plans():
-    plans = Plan.objects.order_by('amount')
-    return [plan_to_dict(plan) for plan in plans]
+from core.utils import decode_id, encode_nums
 
 
 class User(AbstractUser):
@@ -46,6 +30,7 @@ class User(AbstractUser):
         max_length=255,
         unique=True,
     )
+    stripe_id = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.name or self.username
@@ -53,25 +38,80 @@ class User(AbstractUser):
     def has_active_subscription(self):
         return self.subscriptions.active().count() > 0
 
+    def create_stripe_customer(self, token=None):
+        if self.stripe_id is not None:
+            return
+
+        if token is None:
+            customer = stripe.Customer.create(
+                email=self.email,
+            )
+        else:
+            customer = stripe.Customer.create(
+                email=self.email,
+                source=token,
+            )
+
+        self.stripe_id = customer.id
+        self.save()
+        return customer
+
+    def get_stripe_customer(self, create=False):
+        if self.stripe_id is None:
+            if create:
+                return self.create_stripe_customer()
+            else:
+                return None
+
+        customer = stripe.Customer.retrieve(self.stripe_id)
+        return customer
+
 
 class CannotChangeException(Exception):
     """Raise when model field should not change after initial creation."""
 
 
+class PlanQuerySet(models.QuerySet):
+    def available(self):
+        return self.filter(available=True).exclude(stripe_id=None)
+
+    def as_dicts(self):
+        return [plan.as_dict() for plan in self.all()]
+
+
 class Plan(models.Model):
+    objects = PlanQuerySet.as_manager()
+
     name = models.CharField(max_length=255, unique=True)
     available = models.BooleanField(default=True)
     amount = models.PositiveIntegerField(help_text="Amount in cents.")
     number_of_boxes = models.PositiveIntegerField()
     stripe_id = models.CharField(max_length=255, unique=True, blank=True, null=True, editable=False)
 
+    class Meta:
+        ordering = ['amount', 'number_of_boxes']
+
     @classmethod
     def from_db(cls, db, field_names, values):
+        """Overridden in order to allow us to see if a value has changed."""
         instance = super().from_db(db, field_names, values)
         instance._loaded_values = dict(zip(field_names, values))
         return instance
 
+    def as_dict(self):
+        return {
+            'stripe_id': self.stripe_id,
+            'name': self.name,
+            'amount': self.amount,
+            'display_price': self.display_price(),
+            'boxes': self.number_of_boxes
+        }
+
+    def display_price(self):
+        return "${:.02f}".format(self.amount / 100)
+
     def is_changed(self, field_name):
+        """Find out if a value has changed since it was pulled from the DB."""
         old_value = self._loaded_values[field_name]
         new_value = getattr(self, field_name)
         return not old_value == new_value
@@ -79,7 +119,7 @@ class Plan(models.Model):
     def __str__(self):
         return self.name
 
-    def _gen_id(self, force=False):
+    def _generate_stripe_id(self, force=False):
         if force or not self.stripe_id:
             shortuuid.set_alphabet("23456789ABCDEFGHJKLMNPQRSTUVWXYZ")
             stripe_id = slugify(self.name) + shortuuid.uuid()[:6]
@@ -96,7 +136,7 @@ class Plan(models.Model):
                 stripe_plan.name = self.name
                 stripe_plan.save()
         else:
-            self.stripe_id = self._gen_id()
+            self.stripe_id = self._generate_stripe_id()
             plan = stripe.Plan.create(
                 name=self.name,
                 id=self.stripe_id,
@@ -155,6 +195,8 @@ class Subscription(models.Model):
     plan = models.ForeignKey(Plan, null=True)
     starts_at = models.DateTimeField(default=timezone.now)
     ends_at = models.DateTimeField(null=True, blank=True)
+    stripe_id = models.CharField(max_length=100, blank=True, null=True)
+    stripe_status = models.CharField(max_length=100, default="active")
 
     def __str__(self):
         return "{} - {}".format(self.user.name, self.display_name)
@@ -162,6 +204,27 @@ class Subscription(models.Model):
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse('subscription', kwargs={"sub_id": self.id})
+
+    @classmethod
+    def create_from_stripe_sub(cls, user, plan, stripe_subscription):
+        subscription = Subscription.objects.create(
+            user=user,
+            stripe_id=stripe_subscription.id,
+            plan=plan,
+            ends_at=datetime.fromtimestamp(stripe_subscription.current_period_end) +
+            timedelta(days=3),
+            stripe_status=stripe_subscription.status
+        )
+        return subscription
+
+    @classmethod
+    def get_from_hashed_id(cls, hashed_id):
+        real_id = decode_id(hashed_id)[0]
+        return cls.objects.get(id=real_id)
+
+    @property
+    def hashed_id(self):
+        return encode_nums(self.id)
 
     @property
     def display_name(self):
@@ -171,6 +234,9 @@ class Subscription(models.Model):
         if self.plan:
             return self.plan.name
         return "None"
+
+    def amount_display(self):
+        return "${:.2f}".format(self.amount() / 100)
 
     @property
     def number_of_boxes(self):
@@ -200,6 +266,9 @@ class Subscription(models.Model):
     def boxes_checked_out(self):
         return self.number_of_boxes - self.available_boxes
 
+    def amount(self):
+        return self.plan.amount
+
     def can_checkout(self):
         return self.available_boxes > 0
 
@@ -215,6 +284,35 @@ class Subscription(models.Model):
     def tag_location(self, location):
         tag = LocationTag.objects.create(subscription=self, location=location)
         return tag
+
+    def will_auto_renew(self):
+        return self.stripe_id and self.stripe_status == "active"
+
+    def has_stripe_subscription(self):
+        return self.stripe_id is not None
+
+    def get_stripe_subscription(self):
+        if self.stripe_id is None:
+            return None
+
+        return stripe.Subscription.retrieve(self.stripe_id)
+
+    def sync_with_stripe(self, stripe_sub=None):
+        if stripe_sub is None:
+            stripe_sub = self.get_stripe_subscription()
+
+        if stripe_sub is None:
+            return
+
+        self.stripe_id = stripe_sub.id
+        self.stripe_status = stripe_sub.status
+        if stripe_sub.ended_at:
+            self.ends_at = timezone.make_aware(datetime.fromtimestamp(stripe_sub.ended_at))
+        else:
+            self.ends_at = timezone.make_aware(
+                datetime.fromtimestamp(stripe_sub.current_period_end) + timedelta(days=3)
+            )
+        self.save()
 
 
 class Location(models.Model):

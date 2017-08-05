@@ -27,11 +27,13 @@ from wagtail.wagtaildocs import urls as wagtaildocs_urls
 import core.views.locations
 import core.views.subscriptions
 from core import views as core_views
+from core.views.webhook import stripe_webhook
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
 
 urlpatterns = [
+    url(r'^webhook/$', stripe_webhook),
     url(r'^locations/$', core.views.locations.locations, name='locations'),
     url(
         r'^locations/(?P<location_code>[A-Za-z1-9]{6})/$',
@@ -41,15 +43,10 @@ urlpatterns = [
     url(r'^restaurants/$', core_views.restaurants, name='restaurants'),
     url(r'^subscriptions/$', core.views.subscriptions.subscriptions_view, name='subscriptions'),
     url(
-        r'^subscriptions/(?P<sub_id>[0-9]+)/$',
-        core.views.subscriptions.subscription,
-        name='subscription'
-    ),
-    url(
         r'^subscriptions/new/$', core.views.subscriptions.add_subscription, name='add_subscription'
     ),
     url(
-        r'^subscriptions/(?P<sub_id>sub_[A-Za-z0-9]+)/plan/$',
+        r'^subscriptions/(?P<sub_id>[A-Za-z0-9]+)/plan/$',
         core.views.subscriptions.change_subscription_plan,
         name='subscription_plan'
     ),
