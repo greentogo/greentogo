@@ -21,12 +21,15 @@ class UserForm(forms.ModelForm):
 
 
 class SubscriptionPlanForm(forms.Form):
-    pass
-    # plan = forms.ChoiceField(
-    #     choices=[
-    #         (plan['stripe_id'], "{name}: {display_price}".format(**plan), ) for plan in Plan.objects.available.as_dicts()
-    #     ]
-    # )
+    plan = forms.ChoiceField(
+        choices=[
+            (
+                plan.id, "{name}: {display_price}".format(
+                    name=plan.name, display_price=plan.display_price()
+                ),
+            ) for plan in Plan.objects.available()
+        ]
+    )
 
 
 class NewSubscriptionForm(forms.Form):

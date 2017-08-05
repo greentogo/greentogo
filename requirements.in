@@ -19,3 +19,4 @@ qrcode
 pillow
 reportlab
 django-adminplus
+hashids

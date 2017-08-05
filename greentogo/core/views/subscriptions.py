@@ -11,34 +11,13 @@ import stripe
 
 from core.forms import NewSubscriptionForm, SubscriptionForm, SubscriptionPlanForm
 from core.models import Plan, Subscription
+from core.utils import decode_id, encode_nums
 
 
 @login_required
 def subscriptions_view(request):
     subscriptions = request.user.subscriptions.active().order_by("starts_at")
     return render(request, 'core/subscriptions.html', {"subscriptions": subscriptions})
-
-
-@login_required
-def subscription(request, sub_id):
-    sub = request.user.subscriptions.get(pinax_subscription__stripe_id=sub_id)
-    if request.method == "POST":
-        form = SubscriptionForm(request.POST, instance=sub)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "You have updated your subscription.")
-            return redirect(reverse('subscriptions'))
-    else:
-        form = SubscriptionForm(instance=sub)
-
-    return render(
-        request, "core/subscription.html", {
-            "form": form,
-            "invite_form": invite_form,
-            "invitations": invitations,
-            "subscription": sub,
-        }
-    )
 
 
 @login_required
@@ -61,12 +40,7 @@ def add_subscription(request):
             user = request.user
 
             if not user.stripe_id:
-                customer = stripe.Customer.create(
-                    email=user.email,
-                    source=form.cleaned_data['token'],
-                )
-                user.stripe_id = customer.id
-                user.save()
+                user.create_stripe_customer(form.cleaned_data['token'])
 
             try:
                 stripe_subscription = stripe.Subscription.create(
@@ -100,19 +74,29 @@ def add_subscription(request):
 
 @login_required
 def change_subscription_plan(request, sub_id):
-    customer = request.user.customer
-    subscription = Subscription.lookup_by_customer_and_sub_id(customer, sub_id)
+    real_id = decode_id(sub_id)[0]
+    user = request.user
+    subscription = user.subscriptions.get(id=real_id)
     if request.method == "POST":
         form = SubscriptionPlanForm(request.POST)
         if form.is_valid():
-            plan = pinax_models.Plan.objects.get(stripe_id=form.cleaned_data['plan'])
-            subscriptions.update(
-                subscription=subscription.pinax_subscription,
-                plan=plan,
-                prorate=True,
-                charge_immediately=True
+            plan = Plan.objects.get(id=form.cleaned_data['plan'])
+            stripe_sub = subscription.get_stripe_subscription()
+
+            if not stripe_sub:
+                messages.error(request, "You cannot update a non-billing plan.")
+                return redirect(reverse('subscriptions'))
+
+            item_id = stripe_sub['items']['data'][0].id
+            stripe.Subscription.modify(
+                stripe_sub.id, items=[{
+                    "id": item_id,
+                    "plan": plan.stripe_id
+                }]
             )
-            invoices.create(customer=customer)
+            subscription.plan = plan
+            subscription.save()
+
             messages.success(request, "Your plan has been updated to {}.".format(plan.name))
             return redirect(reverse('subscriptions'))
     else:

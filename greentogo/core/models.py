@@ -20,6 +20,7 @@ import shortuuid
 from django_geocoder.wrapper import get_cached as geocode
 
 from core.stripe import stripe
+from core.utils import decode_id, encode_nums
 
 
 class User(AbstractUser):
@@ -216,6 +217,15 @@ class Subscription(models.Model):
         )
         return subscription
 
+    @classmethod
+    def get_from_hashed_id(cls, hashed_id):
+        real_id = decode_id(hashed_id)[0]
+        return cls.objects.get(id=real_id)
+
+    @property
+    def hashed_id(self):
+        return encode_nums(self.id)
+
     @property
     def display_name(self):
         return self.name or self.plan_display()
@@ -224,6 +234,9 @@ class Subscription(models.Model):
         if self.plan:
             return self.plan.name
         return "None"
+
+    def amount_display(self):
+        return "${:.2f}".format(self.amount() / 100)
 
     @property
     def number_of_boxes(self):
@@ -253,6 +266,9 @@ class Subscription(models.Model):
     def boxes_checked_out(self):
         return self.number_of_boxes - self.available_boxes
 
+    def amount(self):
+        return self.plan.amount
+
     def can_checkout(self):
         return self.available_boxes > 0
 
@@ -272,11 +288,20 @@ class Subscription(models.Model):
     def will_auto_renew(self):
         return self.stripe_id and self.stripe_status == "active"
 
-    def sync_with_stripe(self, stripe_sub=None):
-        if stripe_sub is None and self.stripe_id:
-            stripe_sub = stripe.Subscription.retrieve(self.stripe_id)
+    def has_stripe_subscription(self):
+        return self.stripe_id is not None
 
-        if not stripe_sub:
+    def get_stripe_subscription(self):
+        if self.stripe_id is None:
+            return None
+
+        return stripe.Subscription.retrieve(self.stripe_id)
+
+    def sync_with_stripe(self, stripe_sub=None):
+        if stripe_sub is None:
+            stripe_sub = self.get_stripe_subscription()
+
+        if stripe_sub is None:
             return
 
         self.stripe_id = stripe_sub.id

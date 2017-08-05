@@ -26,6 +26,11 @@
                     {% endif %}
                 </p>
             </div>
+            <div class="medium-6 columns">
+                {% if sub.has_stripe_subscription %}
+                    <a href="{% url 'subscription_plan' sub_id=sub.hashed_id %}" class="button">Change subscription plan</a>
+                {% endif %}
+            </div>
         </div>
         {% endfor %}
         {% else %}

@@ -22,6 +22,7 @@ django==1.10.6
 djangorestframework==3.6.3
 djoser==0.5.4
 geocoder==1.15.1          # via django-geocoder
+hashids==1.2.0
 html5lib==0.999999999     # via wagtail
 jsonfield==2.0.2          # via pinax-stripe
 olefile==0.44             # via pillow
