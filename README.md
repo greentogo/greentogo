@@ -1,65 +1,22 @@
 # GreenToGo
 
-This project contains both the GreenToGo subscription site and API for use by the mobile app.
+This project contains both the GreenToGo mobile app and the Django web application with an API.
 
 The files are laid out in accordance with recommendations from Two Scoops of Django.
 
-## Docs
+## Django setup
+
+1. This application uses Python 3.6, so ensure you have that installed.
+1. Setup PostgreSQL. On a Mac with Homebrew, run `brew install postgresql`. If you are on a Mac without Homebrew, download and install [Postgres.app](https://postgresapp.com/). If you are on Windows, see https://www.postgresql.org/download/windows/. If you are on Linux, you know what to do.
+1. Make sure you have the following installed:
+   - bower: `npm install -g bower`
+   - gpg: depends on your OS. `brew install gpg` on Mac.
+1. Make sure you are in a virtualenv. Using [direnv](https://direnv.net/) is a very easy way to make this happen.
+1. Install pip-tools: `pip install pip-tools`.
+1. Run `make requirements`. If that worked, you should be ready for the next part!
+1. Run `make greentogo/greentogo/.env`. This will decrypt a file that contains the API keys you will need. If you need the password, ask Erin or Clinton.
+1. Run `./greentogo/manage.py migrate`.
+
+## Docs for libraries used
 
 * [Wagtail Menus](https://github.com/rkhleics/wagtailmenus)
-
-
-Development Setup
-
-1. pip install -r requirements.txt
-2. createdb -E UTF-8 greentogo
-
-## Things that can happen
-
-- Customers can buy a subscription
-- Customers can renew a subscription
-- Customers can upgrade a subscription
-- Customers can downgrade a subscription
-- Customers can cancel a subscription
-
-- Companies can buy a subscription for their employees
-- Employees will not be able to upgrade, downgrade, cancel, or renew their subscription
-
-## Models
-
-### Customer
-
-* name
-* password
-* stripe_id?
-* subscriptions -- many to many
-
-### Email
-
-* customer
-* email
-
-### Company
-
-* admin -- Customer
-
-### Subscription
-
-* admin -- Customer
-* user -- Customer -- many to many
-* plan
-* started_on
-* expires_on
-* stripe_id
-* parent_subscription? -- this is to handle corporate subscriptions
-    * maybe corporate subscriptions work differently, with a separate table for them and each of the sub-subscriptions are in this table
-
-## Notes
-
-* Models are done. There's some confusion understanding owned subscriptions vs linked subscriptions and I think they need to be looked at again.
-* Admin has begun. May need to make something easier in the long run.
-* Authentication works with Customer objects!
-* Next steps: API
-  * Authenticate and get token
-  * Check out box
-  * Check in box
