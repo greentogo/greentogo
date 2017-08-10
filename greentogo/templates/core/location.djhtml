@@ -15,7 +15,7 @@
             </h2>
 
             {% if subscriptions %}
-            <form action="." method="POST">
+            <form action="." method="POST" id="checkin-checkout-form">
                 {% csrf_token %}
                 <label for="subscription_id">Subscription</label>
                 <select name="subscription_id" id="subscription_id">                    
@@ -29,7 +29,7 @@
                     {% endfor %}
                 </select>
 
-                <button type="submit" class="button">
+                <button type="submit" class="button" id="checkin-checkout-button">
                     {% if location.service == location.CHECKIN %}
                         Check in
                     {% else %}
@@ -45,4 +45,14 @@
             {% endif %}
         </div>
     </div>
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript">
+     $(function () {
+         $("#checkin-checkout-form").on('submit', function (event) {
+             $("#checkin-checkout-button").prop('disabled', 'disabled');
+         });
+     })
+    </script>
 {% endblock %}

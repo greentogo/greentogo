@@ -11,6 +11,7 @@ The files are laid out in accordance with recommendations from Two Scoops of Dja
 1. Make sure you have the following installed:
    - bower: `npm install -g bower`
    - gpg: depends on your OS. `brew install gpg` on Mac.
+   - node-sass: `npm install -g node-sass`
 1. Make sure you are in a virtualenv. Using [direnv](https://direnv.net/) is a very easy way to make this happen.
 1. Install pip-tools: `pip install pip-tools`.
 1. Run `make requirements`. If that worked, you should be ready for the next part!
