@@ -163,7 +163,7 @@ class UnclaimedSubscription(models.Model):
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def claim_subscriptions(sender, instance, created, **kwargs):
     if created:
-        unsub = UnclaimedSubscription.objects.filter(email=instance.email, claimed=False)
+        unsubs = UnclaimedSubscription.objects.filter(email=instance.email, claimed=False)
         for unsub in unsubs:
             subscription, _ = Subscription.objects.get_or_create(user=instance, plan=unsub.plan)
             unsub.claimed = True
