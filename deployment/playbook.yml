@@ -21,6 +21,7 @@
     SECRET_KEY: "{{ secret.secret_key }}"
     STRIPE_SECRET_KEY: "{{ stripe.secret_key }}"
     STRIPE_PUBLISHABLE_KEY: "{{ stripe.publishable_key }}"
+    STRIPE_WEBHOOK_SECRET: "{{ stripe.webhook_secret }}"
     ROLLBAR_KEY: "{{ rollbar.key }}"
     EMAIL_ADDRESS: "{{ email.address }}"
     EMAIL_PASSWORD: "{{ email.password }}"

@@ -1,5 +1,5 @@
 ---
-- name: Restart uWSGI
-  service: name=uwsgi state=restarted
 - name: Reload systemd
   command: systemctl daemon-reload
+- name: Restart uWSGI
+  service: name=uwsgi state=restarted

@@ -4,6 +4,7 @@ export DATABASE_URL=postgresql://{{ secret.db_user }}:{{ secret.db_password }}@{
 export SECRET_KEY={{ secret.secret_key }}
 export STRIPE_SECRET_KEY={{ stripe.secret_key }}
 export STRIPE_PUBLISHABLE_KEY={{ stripe.publishable_key }}
+export STRIPE_WEBHOOK_SECRET={{ stripe.webhook_secret }}
 export ROLLBAR_KEY={{ rollbar.key }}
 export EMAIL_FROM={{ email.from }}
 export EMAIL_ADDRESS={{ email.address }}
