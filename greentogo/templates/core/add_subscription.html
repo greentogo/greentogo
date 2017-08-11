@@ -9,7 +9,11 @@
             {% csrf_token %}
             {{ form.token }}
             <label for="{{ form.plan.id_for_label }}">Choose a subscription plan</label>
-            {{ form.plan }}
+            <select id="{{ form.plan.id_for_label }}" name="plan" required>
+                {% for plan in plans %}
+                <option value="{{ plan.stripe_id }}">{{ plan.name }}: {{ plan.display_price}}</option>
+                {% endfor %}
+            </select>
             <div>
                 <button type="submit" id="subscribe-button" class="button">Add subscription</button>
                 <a href="{% url 'subscriptions' %}" class="alert button">Go back to subscriptions</a>

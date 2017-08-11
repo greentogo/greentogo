@@ -65,7 +65,7 @@ def add_subscription(request):
     return render(
         request, "core/add_subscription.html", {
             "form": form,
-            "plans": Plan.objects.available().as_dicts(),
+            "plans": Plan.objects.available(),
             "email": request.user.email,
             "stripe_key": settings.STRIPE_PUBLISHABLE_KEY
         }
