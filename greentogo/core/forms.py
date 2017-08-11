@@ -36,8 +36,8 @@ class NewSubscriptionForm(forms.Form):
     token = forms.CharField(max_length=100, widget=forms.HiddenInput)
     plan = forms.ChoiceField(
         choices=[
-            (plan['stripe_id'], "{name}: {display_price}".format(**plan), )
-            for plan in Plan.objects.available().as_dicts()
+            (plan.stripe_id, "{}: {}".format(plan.name, plan.display_price()), )
+            for plan in Plan.objects.available()
         ]
     )
 
