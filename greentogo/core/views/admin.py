@@ -1,4 +1,5 @@
 import csv
+import json
 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -19,6 +20,35 @@ def unclaimed_subscription_status_csv(request, *args, **kwargs):
     for unsub in unsubs:
         writer.writerow([unsub.email, unsub.plan.name, unsub.claimed])
     return response
+
+
+def stock_report(request, *args, **kwargs):
+    """Show a report of current stock at each location."""
+    checkout_locations = Location.objects.checkout().order_by('name')
+    checkin_locations = Location.objects.checkin().order_by('name')
+
+    checkout_data = {
+        "names": [],
+        "count": [],
+    }
+
+    for loc in checkout_locations:
+        checkout_data["names"].append(loc.name)
+        checkout_data["count"].append(loc.get_estimated_stock())
+
+    checkin_data = {
+        "names": [],
+        "count": [],
+    }
+
+    for loc in checkin_locations:
+        checkin_data["names"].append(loc.name)
+        checkin_data["count"].append(loc.get_estimated_stock())
+
+    return render(
+        request, "admin/stock_report.html",
+        {"data_json": json.dumps(dict(checkin=checkin_data, checkout=checkout_data))}
+    )
 
 
 def restock_locations(request, *args, **kwargs):

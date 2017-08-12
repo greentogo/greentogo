@@ -6,7 +6,7 @@ from django.views.generic import View
 from core.admin import LocationAdmin
 from core.models import Location, Plan, Restaurant, Subscription, UnclaimedSubscription, User
 from core.views.admin import (
-    empty_location, empty_locations, restock_location, restock_locations,
+    empty_location, empty_locations, restock_location, restock_locations, stock_report,
     unclaimed_subscription_status_csv
 )
 
@@ -79,7 +79,7 @@ class G2GAdminSite(admin.AdminSite):
                     if name:
                         custom_list[section].append((path, name))
                     else:
-                        custom_list[section].append((path, capfirst(view.__name__)))
+                        custom_list[section].append((path, view.__name__))
 
         # Sort views alphabetically.
         # custom_list.sort(key=lambda x: x[1])
@@ -126,6 +126,14 @@ admin_site.register_view(
     section="Stock Management",
     visible=False,
     urlname="empty_location",
+)
+
+admin_site.register_view(
+    path='stock_report/',
+    view=stock_report,
+    section="Reports",
+    name="Location Stock Report",
+    urlname="stock_report",
 )
 
 admin_site.register(User)

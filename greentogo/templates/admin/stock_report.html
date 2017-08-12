@@ -1,0 +1,80 @@
+{# -*- engine:django -*- #}
+{% extends "admin/base_site.html" %}
+
+{% load static %}
+
+{% block content_title %}
+<h1>Stock by location</h1>
+{% endblock %}
+{% block content %}
+<h2>Checkout location stock</h2>
+<canvas id="checkoutStockChart" width="500" height="300"></canvas>
+
+<h2>Checkin location boxes</h2>
+<canvas id="checkinStockChart" width="500" height="300"></canvas>
+{% endblock %}
+
+{% block extrahead %}
+<style type="text/css">
+</style>
+<script src="{% static 'jquery/dist/jquery.js' %}"></script>
+<script src="{% static 'chart.js/dist/Chart.bundle.min.js' %}"></script>
+<script>
+$(function () {
+    var data = {{ data_json|safe }};
+    var checkoutCanvas = document.getElementById("checkoutStockChart");
+    var checkoutChart = new Chart(checkoutCanvas, {
+        type: 'bar',
+        data: {
+            labels: data.checkout.names,
+            datasets: [{
+                label: "# of Boxes",
+                data: data.checkout.count,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        autoSkip: false
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    var checkinCanvas = document.getElementById("checkinStockChart");
+    var checkinChart = new Chart(checkinCanvas, {
+        type: 'bar',
+        data: {
+            labels: data.checkin.names,
+            datasets: [{
+                label: "# of Boxes",
+                data: data.checkin.count,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        autoSkip: false
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
