@@ -19,7 +19,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 
-from adminplus.sites import AdminSitePlus
 from wagtail.wagtailadmin import urls as wagtailadmin_urls
 from wagtail.wagtailcore import urls as wagtail_urls
 from wagtail.wagtaildocs import urls as wagtaildocs_urls
@@ -29,8 +28,7 @@ import core.views.subscriptions
 from core import views as core_views
 from core.views.webhook import stripe_webhook
 
-admin.site = AdminSitePlus()
-admin.autodiscover()
+from .adminsite import admin_site
 
 urlpatterns = [
     url(r'^webhook/$', stripe_webhook),
@@ -61,7 +59,7 @@ urlpatterns = [
     url(r'^auth/', include('djoser.urls.authtoken')),
     url(r'^thanks/', TemplateView.as_view(template_name="thanks.html"), name="beta-thanks"),
     url(r'^error/', TemplateView.as_view(template_name="error.html"), name="beta-error"),
-    url(r'^admin/', admin.site.urls),
+    url(r'^admin/', admin_site.urls),
     url(r'^api/v1/', include('apiv1.urls')),
     url(r'^cms/', include(wagtailadmin_urls)),
     url(r'^documents/', include(wagtaildocs_urls)),

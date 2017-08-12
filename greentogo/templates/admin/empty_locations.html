@@ -1,0 +1,59 @@
+{# -*- engine:django -*- #}
+{% extends "admin/base_site.html" %}
+
+{% load static %}
+
+{% block content_title %}
+<h1>Locations to collect and empty</h1>
+{% endblock %}
+{% block content %}
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Code</th>
+            <th>Estimated Boxes</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    {% for location in locations %}
+    <tbody>
+        <tr>
+            <td>{{ location.name }}</td>
+            <td>{{ location.code }}</td>
+            <td>{{ location.get_estimated_stock }}</td>
+            <td>
+                <button class="restock" data-id="{{ location.id }}">Empty</button>
+                <form class="restock-form" data-id="{{ location.id }}" action="{% url "admin:empty_location" location_id=location.id %}" method="POST">
+                    {% csrf_token %}
+                    <input type="number" name="stock_count" class="stock-count-field" value="0" required />
+                    <button type="submit">Empty</button>
+                </form>
+            </td>
+        </tr>
+    </tbody>
+    {% endfor %}
+</table>
+{% endblock %}
+
+{% block extrahead %}
+<style type="text/css">
+.restock-form {
+    display: none;
+}
+
+.stock-count-field {
+    width: 3rem;
+}
+</style>
+<script src="{% static 'jquery/dist/jquery.js' %}"></script>
+<script>
+$(function () {
+    $('.restock').on('click', function (event) {
+        var locationId = this.dataset.id;
+        $(this).css({display: 'none'});
+        $('.restock-form[data-id="' + locationId + '"').css({display: 'block'});
+    });
+})
+</script>
+{% endblock %}

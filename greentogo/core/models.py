@@ -112,6 +112,8 @@ class Plan(models.Model):
 
     def is_changed(self, field_name):
         """Find out if a value has changed since it was pulled from the DB."""
+        if not hasattr(self, '_loaded_values'):
+            return False
         old_value = self._loaded_values[field_name]
         new_value = getattr(self, field_name)
         return not old_value == new_value
@@ -315,7 +317,17 @@ class Subscription(models.Model):
         self.save()
 
 
+class LocationQuerySet(models.QuerySet):
+    def checkin(self):
+        return self.filter(service=Location.CHECKIN)
+
+    def checkout(self):
+        return self.filter(service=Location.CHECKOUT)
+
+
 class Location(models.Model):
+    objects = LocationQuerySet.as_manager()
+
     CHECKIN = 'IN'
     CHECKOUT = 'OUT'
     SERVICE_CHOICES = ((CHECKIN, 'Check in'), (CHECKOUT, 'Check out'), )
@@ -338,6 +350,24 @@ class Location(models.Model):
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse('location', kwargs={"location_code": self.code})
+
+    def set_stock(self, count):
+        return LocationStockCount.objects.create(location=self, count=count)
+
+    def get_estimated_stock(self):
+        try:
+            last_count = LocationStockCount.objects.filter(location=self).order_by('-created_at')[0]
+        except IndexError:
+            last_count = LocationStockCount.objects.create(location=self, count=0)
+
+        boxes_moved = LocationTag.objects.filter(
+            location=self, created_at__gt=last_count.created_at
+        ).count()
+
+        if self.service == self.CHECKOUT:
+            return last_count.count - boxes_moved
+        else:
+            return last_count.count + boxes_moved
 
     def _set_code(self, force=False):
         if force or not self.code:
@@ -385,6 +415,12 @@ class LocationTag(models.Model):
     subscription = models.ForeignKey(Subscription)
     location = models.ForeignKey(Location)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class LocationStockCount(models.Model):
+    location = models.ForeignKey(Location, related_name='stock_counts')
+    created_at = models.DateTimeField(auto_now_add=True)
+    count = models.PositiveIntegerField()
 
 
 class Restaurant(models.Model):

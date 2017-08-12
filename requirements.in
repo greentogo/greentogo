@@ -18,5 +18,5 @@ shortuuid
 qrcode
 pillow
 reportlab
-django-adminplus
 hashids
+django-flat-responsive

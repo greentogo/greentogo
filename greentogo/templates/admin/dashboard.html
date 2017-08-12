@@ -1,0 +1,22 @@
+{% extends "admin/index.html" %}
+
+{% block sidebar %}
+{{ block.super }}
+
+{% if custom_sections %}
+<div class="content-custom" style="float: left; width: 100%;">
+    {% for section, views in custom_sections.items %}
+    <div class="module">
+        <table style="width: 100%">
+            <caption>{{ section }}</caption>
+            <tbody>
+                {% for path, name in views %}
+                <tr><td><a href="{{ path }}">{{ name }}</a></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

@@ -57,6 +57,7 @@ ALLOWED_HOSTS += [__env__('HOSTNAME') + '.ngrok.io']
 INSTALLED_APPS = [
     # core
     #'django.contrib.admin',
+    'flat_responsive',  # third-party, needs to be above django.contrib.admin
     'django.contrib.admin.apps.SimpleAdminConfig',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -72,7 +73,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
-    'adminplus',
 
     # wagtail
     'wagtail.wagtailforms',
@@ -213,8 +213,9 @@ MEDIA_ROOT = str(__root__.path("media/"))
 
 COMPRESS_PRECOMPILERS = (
     (
-        'text/scss', 'node-sass ' +
-        " ".join(["--include-path {}".format(d) for d in STATICFILES_DIRS]) + ' {infile}'
+        'text/scss',
+        'node-sass ' + " ".join(["--include-path {}".format(d)
+                                 for d in STATICFILES_DIRS]) + ' {infile}'
     ),
 )
 
@@ -247,8 +248,6 @@ if len(EMAIL_ADMINS) == 1 and not EMAIL_ADMINS[0]:
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-if DEBUG:
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
