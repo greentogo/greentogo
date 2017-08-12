@@ -1,5 +1,6 @@
 export PYTHONPATH={{ django.root }}
 export DJANGO_SETTINGS_MODULE={{ django.settings }}
+export DJANGO_ENV={{ django.env }}
 export DATABASE_URL=postgresql://{{ secret.db_user }}:{{ secret.db_password }}@{{ secret.db_host }}:{{ secret.db_port }}/{{ secret.db_name }}
 export SECRET_KEY={{ secret.secret_key }}
 export STRIPE_SECRET_KEY={{ stripe.secret_key }}

@@ -16,7 +16,14 @@
         <link rel='stylesheet' id='resonar-fonts-css' href='https://fonts.googleapis.com/css?family=Libre+Baskerville%3A400%2C700%2C400italic%7CLato%3A400%2C700%2C900%2C400italic%2C700italic%2C900italic%7CPlayfair+Display%3A400%2C700%2C400italic%2C700italic%7CInconsolata%3A400&#038;subset=latin%2Clatin-ext'
               type='text/css' media='all' />
     </head>
-    <body>
+    <body data-env="{{ DJANGO_ENV }}">
+        <div class="row">
+            <div class="column">
+                <div class="env-banner env-banner--{{ DJANGO_ENV }}">
+                    Application environment: {{ DJANGO_ENV }}
+                </div>
+            </div>
+        </div>
         <div class="row page-header">
             <div class="column">
                 {% main_menu template="menus/top_menu.html" %}

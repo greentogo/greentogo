@@ -20,6 +20,7 @@ project:
 
 django:
   root: "{{ project.srcroot }}greentogo/"
+  env: staging
   settings: greentogo.settings
 
 repo:

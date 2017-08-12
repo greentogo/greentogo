@@ -5,6 +5,7 @@ After=syslog.target
 [Service]
 Environment=PYTHONPATH={{ django.root }}
 Environment=DJANGO_SETTINGS_MODULE={{ django.settings }}
+Environment=DJANGO_ENV={{ django.env }}
 Environment=DATABASE_URL=postgresql://{{ secret.db_user }}:{{ secret.db_password }}@{{ secret.db_host }}:{{ secret.db_port }}/{{ secret.db_name }}
 Environment=SECRET_KEY={{ secret.secret_key }}
 Environment=STRIPE_SECRET_KEY={{ stripe.secret_key }}

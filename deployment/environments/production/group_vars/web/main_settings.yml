@@ -21,6 +21,7 @@ project:
 django:
   root: "{{ project.srcroot }}greentogo/"
   settings: greentogo.settings
+  env: production
 
 repo:
   branch: master
