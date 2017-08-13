@@ -88,6 +88,8 @@ class G2GAdminSite(admin.AdminSite):
 
 
 admin_site = G2GAdminSite(name='greentogo')
+admin_site.site_header = 'GreenToGo Admin'
+admin_site.site_title = 'GreenToGo Admin'
 
 admin_site.register_view(
     path='core/unclaimed_subscriptions.csv',
