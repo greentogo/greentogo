@@ -118,7 +118,7 @@ admin_site.register_view(
     path='empty_locations/',
     view=empty_locations,
     section="Stock Management",
-    name="Empty checkout locations",
+    name="Empty checkin locations",
     urlname="empty_locations",
 )
 
