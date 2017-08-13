@@ -2,6 +2,7 @@ import json
 import logging
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -11,6 +12,7 @@ from core.stripe import stripe
 
 endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
 logger = logging.getLogger('django')
+User = get_user_model()
 
 handlers = {}
 
