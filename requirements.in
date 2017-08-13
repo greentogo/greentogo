@@ -20,3 +20,4 @@ pillow
 reportlab
 hashids
 django-flat-responsive
+django-postgres-stats

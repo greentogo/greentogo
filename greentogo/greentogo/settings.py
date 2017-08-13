@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
+    'postgres_stats',
 
     # wagtail
     'wagtail.wagtailforms',

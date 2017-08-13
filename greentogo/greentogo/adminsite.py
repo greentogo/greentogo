@@ -6,8 +6,8 @@ from django.views.generic import View
 from core.admin import LocationAdmin
 from core.models import Location, Plan, Restaurant, Subscription, UnclaimedSubscription, User
 from core.views.admin import (
-    empty_location, empty_locations, restock_location, restock_locations, stock_report,
-    unclaimed_subscription_status_csv
+    activity_report, empty_location, empty_locations, restock_location, restock_locations,
+    stock_report, unclaimed_subscription_status_csv
 )
 
 
@@ -134,6 +134,14 @@ admin_site.register_view(
     section="Reports",
     name="Location Stock Report",
     urlname="stock_report",
+)
+
+admin_site.register_view(
+    path='activity_report/',
+    view=activity_report,
+    section="Reports",
+    name="Activity Report",
+    urlname="activity_report",
 )
 
 admin_site.register(User)

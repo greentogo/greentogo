@@ -1,0 +1,70 @@
+{# -*- engine:django -*- #}
+{% extends "admin/base_site.html" %}
+
+{% load static %}
+
+{% block content_title %}
+<h1>Activity for last 30 days</h1>
+{% endblock %}
+{% block content %}
+<div style="max-width: 960px;">
+    <canvas id="activityChart" width="500" height="300"></canvas>
+</div>
+{% endblock %}
+
+{% block extrahead %}
+<style type="text/css">
+</style>
+<script src="{% static 'jquery/dist/jquery.js' %}"></script>
+<script src="{% static 'chart.js/dist/Chart.bundle.min.js' %}"></script>
+<script>
+$(function () {
+    var data = {{ data_json|safe }};
+    window.data = data;
+    var convertToXY = function (data) {
+        return data.map(function (d) {
+            return {x: d.date, y: d.volume};
+        })
+    };
+    window.convertToXY = convertToXY;
+
+    var activityCanvas = document.getElementById("activityChart");
+    var chart = new Chart(activityCanvas, {
+        type: 'line',
+        data: {
+            datasets: [
+                {
+                    label: "Boxes checked in",
+                    data: convertToXY(data.checkin),
+                    fill: false,
+                    backgroundColor: 'rgba(49,130,189, 1)',
+                    borderColor: 'rgba(49,130,189, 0.5)'
+                },
+                {
+                    label: "Boxes checked out",
+                    data: convertToXY(data.checkout),
+                    fill: false,
+                    backgroundColor: 'rgba(221,28,119, 1)',
+                    borderColor: 'rgba(221,28,119, 0.5)'
+                }
+            ]
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        unit: 'day'
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

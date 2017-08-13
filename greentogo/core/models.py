@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
 from django.db import models
-from django.db.models import Case, Q, Sum, When
+from django.db.models import Case, Count, Q, Sum, When
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
@@ -18,9 +18,27 @@ from django.utils.text import slugify
 
 import shortuuid
 from django_geocoder.wrapper import get_cached as geocode
+from postgres_stats import DateTrunc
 
 from core.stripe import stripe
 from core.utils import decode_id, encode_nums
+
+
+def activity_data(days=30):
+    begin_datetime = timezone.now() - timedelta(days=days)
+    begin_datetime_start_of_day = begin_datetime.replace(hour=0, minute=0, second=0)
+
+    def _get_data(qs):
+        data = qs.filter(created_at__gte=begin_datetime_start_of_day) \
+                 .annotate(date=DateTrunc('created_at', precision='day')) \
+                 .values("date") \
+                 .annotate(volume=Count("date")) \
+                 .order_by("date")
+        return [{"date": d['date'].date(), "volume": d['volume']} for d in data]
+
+    checkin_data = _get_data(LocationTag.objects.checkin())
+    checkout_data = _get_data(LocationTag.objects.checkout())
+    return {"checkin": checkin_data, "checkout": checkout_data}
 
 
 class User(AbstractUser):
@@ -411,7 +429,17 @@ class Location(models.Model):
         return pdf
 
 
+class LocationTagQuerySet(models.QuerySet):
+    def checkin(self):
+        return self.filter(location__service=Location.CHECKIN)
+
+    def checkout(self):
+        return self.filter(location__service=Location.CHECKOUT)
+
+
 class LocationTag(models.Model):
+    objects = LocationTagQuerySet.as_manager()
+
     subscription = models.ForeignKey(Subscription)
     location = models.ForeignKey(Location)
     created_at = models.DateTimeField(auto_now_add=True)

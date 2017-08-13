@@ -1,12 +1,15 @@
 import csv
 import json
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
-from core.models import Location, Plan, Restaurant, Subscription, UnclaimedSubscription, User
+from core.models import (
+    Location, Plan, Restaurant, Subscription, UnclaimedSubscription, User, activity_data
+)
 
 
 def unclaimed_subscription_status_csv(request, *args, **kwargs):
@@ -49,6 +52,12 @@ def stock_report(request, *args, **kwargs):
         request, "admin/stock_report.html",
         {"data_json": json.dumps(dict(checkin=checkin_data, checkout=checkout_data))}
     )
+
+
+def activity_report(request, days=30, *args, **kwargs):
+    data = activity_data(days)
+    data_json = json.dumps(data, cls=DjangoJSONEncoder)
+    return render(request, 'admin/activity_report.html', {"data_json": data_json})
 
 
 def restock_locations(request, *args, **kwargs):
