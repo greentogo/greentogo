@@ -38,14 +38,18 @@ $(function () {
                     data: convertToXY(data.checkin),
                     fill: false,
                     backgroundColor: 'rgba(49,130,189, 1)',
-                    borderColor: 'rgba(49,130,189, 0.5)'
+                    borderColor: 'rgba(49,130,189, 0.5)',
+                    cubicInterpolationMode: 'monotone',
+                    spanGaps: true
                 },
                 {
                     label: "Boxes checked out",
                     data: convertToXY(data.checkout),
                     fill: false,
                     backgroundColor: 'rgba(221,28,119, 1)',
-                    borderColor: 'rgba(221,28,119, 0.5)'
+                    borderColor: 'rgba(221,28,119, 0.5)',
+                    cubicInterpolationMode: 'monotone',
+                    spanGaps: true
                 }
             ]
         },

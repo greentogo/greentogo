@@ -102,7 +102,7 @@ admin_site.register_view(
     path='restock_locations/',
     view=restock_locations,
     section="Stock Management",
-    name="Restock checkout locations",
+    name="Restock restaurants",
     urlname="restock_locations",
 )
 
@@ -118,7 +118,7 @@ admin_site.register_view(
     path='empty_locations/',
     view=empty_locations,
     section="Stock Management",
-    name="Empty checkin locations",
+    name="Empty return bins",
     urlname="empty_locations",
 )
 
