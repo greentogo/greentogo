@@ -17,7 +17,3 @@ The files are laid out in accordance with recommendations from Two Scoops of Dja
 1. Run `make requirements`. If that worked, you should be ready for the next part!
 1. Run `make greentogo/greentogo/.env`. This will decrypt a file that contains the API keys you will need. If you need the password, ask Erin or Clinton.
 1. Run `./greentogo/manage.py migrate`.
-
-## Docs for libraries used
-
-* [Wagtail Menus](https://github.com/rkhleics/wagtailmenus)

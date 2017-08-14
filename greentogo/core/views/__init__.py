@@ -20,8 +20,11 @@ from ..forms import UserForm
 from ..models import Restaurant
 
 
+@login_required
 def index(request):
-    return render(request, 'core/index_logged_out.html')
+    if request.user.has_active_subscription():
+        return redirect(reverse('locations'))
+    return redirect(reverse('subscriptions'))
 
 
 @login_required

@@ -1,7 +1,6 @@
 {# -*- engine:django -*- #}
 {% load static %}
 {% load compress %}
-{% load menu_tags %}
 <!DOCTYPE html>
 <html class="no-js" lang="en">
     <head>
@@ -26,7 +25,32 @@
         </div>
         <div class="row page-header">
             <div class="column">
-                {% main_menu template="menus/top_menu.html" %}
+                <div class="title-bar" data-responsive-toggle="example-menu" data-hide-for="medium">
+                    <button class="menu-icon" type="button" data-toggle="example-menu"></button>
+                    <div class="title-bar-title">GreenToGo</div>
+                </div>
+
+                <div class="top-bar">
+                    <div class="top-bar-left">
+                        <ul class="vertical medium-horizontal menu">
+                            <li class="show-for-medium">
+                                <a href="/">
+                                    <img src="{% static 'logo_inverted.png' %}" width="150"/>
+                                </a>
+                            </li>
+
+                            {% if user.is_authenticated %}
+                                <li><a href="{% url 'locations' %}">Check in / check out</a></li>
+                                <li><a href="{% url 'subscriptions' %}">My subscriptions</a></li>
+                                <li><a href="{% url 'account_settings' %}">My settings</a></li>
+                                <li><a href="{% url 'auth_logout' %}">Logout</a></li>
+                            {% else %}
+                                <li><a href="{% url 'auth_login' %}">Login</a></li>
+                                <li><a href="{% url 'registration_register' %}">Register</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
             </div>
             {% if user.is_authenticated and user.has_active_subscription %}
 
@@ -54,7 +78,7 @@
         {% block footer %}
         <footer class="row">
             <div class="medium-12 columns page-footer">
-                {% flat_menu 'social_media' %}
+                <!-- TODO -->
             </div>
         </footer>
         {% endblock %}

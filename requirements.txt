@@ -5,7 +5,6 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 autorepr==0.3.0
-beautifulsoup4==4.5.3     # via wagtail
 click==6.7                # via geocoder
 decorator==4.1.2          # via ratelim
 django-appconf==1.0.2     # via django-compressor, pinax-stripe
@@ -14,36 +13,27 @@ django-environ==0.4.3
 django-extensions==1.7.7
 django-flat-responsive==1.4.1
 django-geocoder==0.2.1
-django-modelcluster==3.0.1  # via wagtail
 django-postgres-stats==1.0.0
-django-registration-redux==1.4
-django-taggit==0.22.1     # via wagtail
-django-treebeard==4.1.2   # via wagtail
+django-registration-redux==1.7
 django==1.10.6
 djangorestframework==3.6.3
 djoser==0.5.4
 geocoder==1.15.1          # via django-geocoder
 hashids==1.2.0
-html5lib==0.999999999     # via wagtail
 jsonfield==2.0.2          # via pinax-stripe
 olefile==0.44             # via pillow
 pillow==4.0.0
 pinax-stripe==3.3.0
 psycopg2==2.7.3
-pytz==2016.10             # via django-modelcluster, pinax-stripe
+pytz==2016.10             # via pinax-stripe
 qrcode==5.3
 ratelim==0.1.6            # via geocoder
 rcssmin==1.0.6            # via django-compressor
 reportlab==3.4.0
-requests==2.13.0          # via geocoder, rollbar, stripe, wagtail
+requests==2.13.0          # via geocoder, rollbar, stripe
 rjsmin==1.0.12            # via django-compressor
 rollbar==0.13.12
 shortuuid==0.5.0
-six==1.10.0               # via django-environ, django-extensions, geocoder, html5lib, pinax-stripe, qrcode, rollbar
+six==1.10.0               # via django-environ, django-extensions, geocoder, pinax-stripe, qrcode, rollbar
 stripe==1.62.0
-unidecode==0.4.21         # via wagtail
-wagtail==1.9
-wagtailmenus==2.2.1
-webencodings==0.5.1       # via html5lib
 werkzeug==0.12.2
-willow==0.4               # via wagtail

@@ -75,27 +75,9 @@ INSTALLED_APPS = [
     'djoser',
     'postgres_stats',
 
-    # wagtail
-    'wagtail.wagtailforms',
-    'wagtail.wagtailredirects',
-    'wagtail.wagtailembeds',
-    'wagtail.wagtailsites',
-    'wagtail.wagtailusers',
-    'wagtail.wagtailsnippets',
-    'wagtail.wagtaildocs',
-    'wagtail.wagtailimages',
-    'wagtail.wagtailsearch',
-    'wagtail.wagtailadmin',
-    'wagtail.wagtailcore',
-    'wagtail.contrib.modeladmin',
-    'wagtailmenus',
-    'modelcluster',
-    'taggit',
-
     # ours
     'core',
     'apiv1',
-    'cms',
 ]
 
 SITE_ID = 1
@@ -108,8 +90,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'wagtail.wagtailcore.middleware.SiteMiddleware',
-    'wagtail.wagtailredirects.middleware.RedirectMiddleware',
 ]
 
 if not DEBUG:
@@ -130,8 +110,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'wagtail.contrib.settings.context_processors.settings',
-                'wagtailmenus.context_processors.wagtailmenus',
                 'greentogo.context_processors.django_env',
             ],
         },
@@ -166,7 +144,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Authentication
 
 AUTH_USER_MODEL = 'core.User'
-LOGIN_REDIRECT_URL = '/locations/'
+LOGIN_REDIRECT_URL = '/'
 
 # API
 
@@ -334,5 +312,3 @@ MESSAGE_TAGS = {
     messages.INFO: 'primary',
     messages.ERROR: 'alert',
 }
-
-WAGTAIL_SITE_NAME = 'GreenToGo'
