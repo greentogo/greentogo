@@ -1,9 +1,13 @@
 {% extends "core/base.html" %}
 {% load i18n %}
+{% load static %}
 
 {% block content %}
 <div class="row">
-    <div class="medium-12 columns">
+    <div class="medium-4 columns">
+        <img src="{% static 'registration.jpg' %}" alt="Fill out the form below and verify your email address to become a member" style="width: 400px;"/>
+    </div>
+    <div class="medium-8 columns">
         <form method="post" action=".">
             {% csrf_token %}
             {{ form.non_field_errors }}
