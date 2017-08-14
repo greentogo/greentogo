@@ -10,8 +10,6 @@ rollbar
 djoser
 djangorestframework
 django-registration-redux
-wagtail
-wagtailmenus
 django-geocoder
 autorepr
 shortuuid

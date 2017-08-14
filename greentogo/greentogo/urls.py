@@ -19,10 +19,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 
-from wagtail.wagtailadmin import urls as wagtailadmin_urls
-from wagtail.wagtailcore import urls as wagtail_urls
-from wagtail.wagtaildocs import urls as wagtaildocs_urls
-
 import core.views.locations
 import core.views.subscriptions
 from core import views as core_views
@@ -61,9 +57,7 @@ urlpatterns = [
     url(r'^error/', TemplateView.as_view(template_name="error.html"), name="beta-error"),
     url(r'^admin/', admin_site.urls),
     url(r'^api/v1/', include('apiv1.urls')),
-    url(r'^cms/', include(wagtailadmin_urls)),
-    url(r'^documents/', include(wagtaildocs_urls)),
-    url(r'', include(wagtail_urls)),
+    url(r'^$', core_views.index),
 ] + static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
 )
