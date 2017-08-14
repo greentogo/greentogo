@@ -116,6 +116,9 @@ class Plan(models.Model):
         instance._loaded_values = dict(zip(field_names, values))
         return instance
 
+    def __str__(self):
+        return "{} - {}".format(self.name, self.stripe_id)
+
     def as_dict(self):
         return {
             'stripe_id': self.stripe_id,
@@ -135,9 +138,6 @@ class Plan(models.Model):
         old_value = self._loaded_values[field_name]
         new_value = getattr(self, field_name)
         return not old_value == new_value
-
-    def __str__(self):
-        return self.name
 
     def _generate_stripe_id(self, force=False):
         if force or not self.stripe_id:
@@ -172,9 +172,12 @@ class Plan(models.Model):
 
 
 class UnclaimedSubscription(models.Model):
-    email = models.EmailField(unique=True)
+    email = models.EmailField()
     plan = models.ForeignKey(Plan)
     claimed = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('email', 'plan', )
 
     def __str__(self):
         return "{} - {}".format(self.email, self.plan)
