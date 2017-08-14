@@ -470,6 +470,10 @@ class Restaurant(models.Model):
         return self.name
 
 
+def one_year_from_now():
+    return date.today() + timedelta(days=365)
+
+
 class CorporateCode(models.Model):
     company_name = models.CharField(max_length=100)
     code = models.CharField(
@@ -477,14 +481,18 @@ class CorporateCode(models.Model):
         unique=True,
         validators=[
             RegexValidator(
-                regex=r"[A-Z0-9]{4,20}",
+                regex=r"^[A-Z0-9]{4,20}$",
                 message="Code can only contain capitol letters and numbers " +
                 "with no spaces. Must be between 4 and 20 characters."
             )
         ]
     )
+
     amount_off = models.DecimalField(max_digits=5, decimal_places=2, default=25.00)
-    redeem_by = models.DateField(default=lambda: date.today() + timedelta(days=365))
+    redeem_by = models.DateField(default=one_year_from_now)
+
+    def __str__(self):
+        return "{} - {}".format(self.company_name, self.code)
 
     def save(self, *args, **kwargs):
         """
@@ -496,7 +504,8 @@ class CorporateCode(models.Model):
         coupon = stripe.Coupon.create(
             id=self.code,
             duration="once",
-            amount_off=self.amount_off * 100,
+            amount_off=int(self.amount_off * 100),
             currency="USD",
             redeem_by=int(datetime.combine(self.redeem_by, datetime.min.time()).timestamp())
         )
+        super().save(*args, **kwargs)
