@@ -1,9 +1,0 @@
-{% extends "cms/base.html" %}
-
-{% load wagtailcore_tags %}
-
-{% block body_class %}template-homepage{% endblock %}
-
-{% block cms_content %}
-{{ page.body|richtext }}
-{% endblock %}
