@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth import hashers
@@ -22,6 +22,10 @@ from postgres_stats import DateTrunc
 
 from core.stripe import stripe
 from core.utils import decode_id, encode_nums
+
+
+def one_year_from_now():
+    return timezone.now() + timedelta(days=365)
 
 
 def activity_data(days=30):
@@ -188,7 +192,9 @@ def claim_subscriptions(sender, instance, created, **kwargs):
     if created:
         unsubs = UnclaimedSubscription.objects.filter(email=instance.email, claimed=False)
         for unsub in unsubs:
-            subscription, _ = Subscription.objects.get_or_create(user=instance, plan=unsub.plan)
+            subscription, _ = Subscription.objects.get_or_create(
+                user=instance, plan=unsub.plan, defaults={"ends_at": one_year_from_now()}
+            )
             unsub.claimed = True
             unsub.save()
 
@@ -197,7 +203,9 @@ def claim_subscriptions(sender, instance, created, **kwargs):
 def claim_subscriptions_on_login(sender, user, request, **kwargs):
     unsubs = UnclaimedSubscription.objects.filter(email=user.email, claimed=False)
     for unsub in unsubs:
-        subscription, _ = Subscription.objects.get_or_create(user=user, plan=unsub.plan)
+        subscription, _ = Subscription.objects.get_or_create(
+            user=user, plan=unsub.plan, defaults={"ends_at": one_year_from_now()}
+        )
         unsub.claimed = True
         unsub.save()
 
