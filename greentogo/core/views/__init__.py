@@ -22,6 +22,8 @@ from ..models import Restaurant
 
 @login_required
 def index(request):
+    if request.user.has_active_subscription():
+        return redirect(reverse('locations'))
     return redirect(reverse('subscriptions'))
 
 

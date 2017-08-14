@@ -144,7 +144,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Authentication
 
 AUTH_USER_MODEL = 'core.User'
-LOGIN_REDIRECT_URL = '/locations/'
+LOGIN_REDIRECT_URL = '/'
 
 # API
 
