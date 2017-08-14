@@ -1,7 +1,11 @@
 from django.contrib import admin
 from django.http import HttpResponse
 
-from .models import Location, Plan, Restaurant, Subscription, UnclaimedSubscription, User
+from .models import Location, UnclaimedSubscription
+
+
+class UnclaimedSubscriptionAdmin(admin.ModelAdmin):
+    list_display = ('email', 'plan', 'claimed', )
 
 
 class LocationAdmin(admin.ModelAdmin):

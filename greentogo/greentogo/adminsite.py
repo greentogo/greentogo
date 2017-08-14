@@ -3,7 +3,7 @@ import inspect
 from django.contrib import admin
 from django.views.generic import View
 
-from core.admin import LocationAdmin
+from core.admin import LocationAdmin, UnclaimedSubscriptionAdmin
 from core.models import Location, Plan, Restaurant, Subscription, UnclaimedSubscription, User
 from core.views.admin import (
     activity_report, empty_location, empty_locations, restock_location, restock_locations,
@@ -151,4 +151,4 @@ admin_site.register(Location, LocationAdmin)
 admin_site.register(Restaurant)
 admin_site.register(Subscription)
 admin_site.register(Plan)
-admin_site.register(UnclaimedSubscription)
+admin_site.register(UnclaimedSubscription, UnclaimedSubscriptionAdmin)
