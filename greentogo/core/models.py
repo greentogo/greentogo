@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth import hashers
@@ -468,3 +468,35 @@ class Restaurant(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class CorporateCode(models.Model):
+    company_name = models.CharField(max_length=100)
+    code = models.CharField(
+        max_length=20,
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex=r"[A-Z0-9]{4,20}",
+                message="Code can only contain capitol letters and numbers " +
+                "with no spaces. Must be between 4 and 20 characters."
+            )
+        ]
+    )
+    amount_off = models.DecimalField(max_digits=5, decimal_places=2, default=25.00)
+    redeem_by = models.DateField(default=lambda: date.today() + timedelta(days=365))
+
+    def save(self, *args, **kwargs):
+        """
+        Disallow editing of codes.
+        Create coupon on Stripe upon creation.
+        """
+        if self.pk is not None:
+            return
+        coupon = stripe.Coupon.create(
+            id=self.code,
+            duration="once",
+            amount_off=self.amount_off * 100,
+            currency="USD",
+            redeem_by=int(datetime.combine(self.redeem_by, datetime.min.time()).timestamp())
+        )

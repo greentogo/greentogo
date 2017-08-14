@@ -42,12 +42,16 @@ def add_subscription(request):
             if not user.stripe_id:
                 user.create_stripe_customer(form.cleaned_data['token'])
 
+            sub_kwargs = {
+                "customer": user.stripe_id,
+                "source": token,
+                "items": [{
+                    "plan": plan_stripe_id
+                }]
+            }
+
             try:
-                stripe_subscription = stripe.Subscription.create(
-                    customer=user.stripe_id, source=token, items=[{
-                        "plan": plan_stripe_id
-                    }]
-                )
+                stripe_subscription = stripe.Subscription.create(**sub_kwargs)
                 subscription = Subscription.create_from_stripe_sub(
                     user=user,
                     plan=plan,
@@ -70,6 +74,15 @@ def add_subscription(request):
             "stripe_key": settings.STRIPE_PUBLISHABLE_KEY
         }
     )
+
+
+@login_required
+def corporate_subscription(request, *args, **kwargs):
+    """Check corporate code to see if valid."""
+    if request.method == "POST":
+        pass
+
+    return render(request, "corporate_subscription.html")
 
 
 @login_required

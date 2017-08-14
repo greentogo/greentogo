@@ -5,13 +5,15 @@
     <div class="medium-12 columns">
         <h2>Add a New Subscription</h2>
 
+        <p>Is your employer a GreenToGo member? <a href="#">Click here to enter your corporate access code and get your free membership.</a>
+
         <form action="." method="POST" id="new-subscription-form">
             {% csrf_token %}
             {{ form.token }}
             <label for="{{ form.plan.id_for_label }}">Choose a subscription plan</label>
             <select id="{{ form.plan.id_for_label }}" name="plan" required>
                 {% for plan in plans %}
-                <option value="{{ plan.stripe_id }}">{{ plan.name }}: {{ plan.display_price}}</option>
+                <option value="{{ plan.stripe_id }}">{{ plan.name }}: {{ plan.display_price }}</option>
                 {% endfor %}
             </select>
             <div>
