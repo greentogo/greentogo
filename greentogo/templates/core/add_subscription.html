@@ -1,9 +1,24 @@
 {% extends "core/base.html" %}
+{# -*- engine:django -*- #}
+
 
 {% block content %}
 <div class="row">
     <div class="medium-12 columns">
         <h2>Add a New Subscription</h2>
+
+        {% if corporate_code %}
+        <p>
+            Your employer, {{ corporate_code.company_name }}, is a member. You receive a ${{ corporate_code.amount_off }} discount on this GreenToGo subscription.
+        </p>
+        {% else %}
+        <p>
+            Is your employer a GreenToGo member?
+            <a href="{% url 'corporate_subscription' %}">
+                Click here to enter your corporate access code and get your free membership.
+            </a>
+        </p>
+        {% endif %}
 
         <form action="." method="POST" id="new-subscription-form">
             {% csrf_token %}
@@ -11,7 +26,7 @@
             <label for="{{ form.plan.id_for_label }}">Choose a subscription plan</label>
             <select id="{{ form.plan.id_for_label }}" name="plan" required>
                 {% for plan in plans %}
-                <option value="{{ plan.stripe_id }}">{{ plan.name }}: {{ plan.display_price}}</option>
+                <option value="{{ plan.stripe_id }}">{{ plan.name }}: {{ plan.display_price }}</option>
                 {% endfor %}
             </select>
             <div>
@@ -25,11 +40,7 @@
 
 {% block javascript %}
 <script>
- var plans = {
-     {% for plan in plans %}
-     '{{ plan.stripe_id }}': {amount: {{ plan.amount }}, name: '{{ plan.name }}'}{% if not forloop.last %},{% endif %}
-     {% endfor %}
- };
+ var plans = {{ plandict_json | safe }};
 
  var handler = StripeCheckout.configure({
      key: '{{ stripe_key }}',
@@ -54,8 +65,7 @@
 
      handler.open({
          name: "Durham GreenToGo",
-         description: plan.name,
-         amount: plan.amount,
+         description: plan.name + " - " + plan.display_price + "/year",
          panelLabel: "Subscribe"
      });
      event.preventDefault();

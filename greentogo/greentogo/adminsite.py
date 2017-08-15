@@ -4,7 +4,9 @@ from django.contrib import admin
 from django.views.generic import View
 
 from core.admin import LocationAdmin, UnclaimedSubscriptionAdmin
-from core.models import Location, Plan, Restaurant, Subscription, UnclaimedSubscription, User
+from core.models import (
+    CorporateCode, Location, Plan, Restaurant, Subscription, UnclaimedSubscription, User
+)
 from core.views.admin import (
     activity_report, empty_location, empty_locations, restock_location, restock_locations,
     stock_report, unclaimed_subscription_status_csv
@@ -102,7 +104,7 @@ admin_site.register_view(
     path='restock_locations/',
     view=restock_locations,
     section="Stock Management",
-    name="Restock restaurants",
+    name="Restock checkout locations",
     urlname="restock_locations",
 )
 
@@ -118,7 +120,7 @@ admin_site.register_view(
     path='empty_locations/',
     view=empty_locations,
     section="Stock Management",
-    name="Empty return bins",
+    name="Empty checkin locations",
     urlname="empty_locations",
 )
 
@@ -151,4 +153,4 @@ admin_site.register(Location, LocationAdmin)
 admin_site.register(Restaurant)
 admin_site.register(Subscription)
 admin_site.register(Plan)
-admin_site.register(UnclaimedSubscription, UnclaimedSubscriptionAdmin)
+admin_site.register(UnclaimedSubscription)

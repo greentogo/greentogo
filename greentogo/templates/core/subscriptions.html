@@ -17,6 +17,9 @@
                 <p>
                     Plan: {{ sub.plan_display }}<br />
                     Number of boxes: {{ sub.available_boxes }} / {{ sub.number_of_boxes }}<br />
+                    {% if sub.corporate_code %}
+                        Corporate code: {{ sub.corporate_code.code }} - ${{ sub.corporate_code.amount_off }} discount<br />
+                    {% endif %}
                     {% if sub.will_auto_renew and sub.ends_at %}
                         Renews automatically on {{ sub.ends_at }}
                     {% elif sub.ends_at %}

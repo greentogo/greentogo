@@ -37,7 +37,17 @@ urlpatterns = [
     url(r'^restaurants/$', core_views.restaurants, name='restaurants'),
     url(r'^subscriptions/$', core.views.subscriptions.subscriptions_view, name='subscriptions'),
     url(
+        r'^subscriptions/corporate/$',
+        core.views.subscriptions.corporate_subscription,
+        name='corporate_subscription'
+    ),
+    url(
         r'^subscriptions/new/$', core.views.subscriptions.add_subscription, name='add_subscription'
+    ),
+    url(
+        r'^subscriptions/new/(?P<code>[A-Z0-9]+)/$',
+        core.views.subscriptions.add_subscription,
+        name='add_corporate_subscription'
     ),
     url(
         r'^subscriptions/(?P<sub_id>[A-Za-z0-9]+)/plan/$',

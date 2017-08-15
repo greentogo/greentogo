@@ -132,8 +132,11 @@ class Plan(models.Model):
             'boxes': self.number_of_boxes
         }
 
-    def display_price(self):
-        return "${:.02f}".format(self.amount / 100)
+    def display_price(self, corporate_code=None):
+        amount = self.amount
+        if corporate_code:
+            amount -= (corporate_code.amount_off * 100)
+        return "${:.02f}".format(amount / 100)
 
     def is_changed(self, field_name):
         """Find out if a value has changed since it was pulled from the DB."""
@@ -228,6 +231,7 @@ class Subscription(models.Model):
     ends_at = models.DateTimeField(null=True, blank=True)
     stripe_id = models.CharField(max_length=100, blank=True, null=True)
     stripe_status = models.CharField(max_length=100, default="active")
+    corporate_code = models.ForeignKey('CorporateCode', null=True, blank=True)
 
     def __str__(self):
         return "{} - {}".format(self.user.name, self.display_name)
@@ -237,15 +241,20 @@ class Subscription(models.Model):
         return reverse('subscription', kwargs={"sub_id": self.id})
 
     @classmethod
-    def create_from_stripe_sub(cls, user, plan, stripe_subscription):
-        subscription = Subscription.objects.create(
+    def create_from_stripe_sub(cls, user, plan, stripe_subscription, corporate_code=None):
+        sub_kwargs = dict(
             user=user,
             stripe_id=stripe_subscription.id,
             plan=plan,
             ends_at=datetime.fromtimestamp(stripe_subscription.current_period_end) +
             timedelta(days=3),
-            stripe_status=stripe_subscription.status
+            stripe_status=stripe_subscription.status,
         )
+
+        if corporate_code:
+            sub_kwargs['corporate_code'] = corporate_code
+
+        subscription = Subscription.objects.create(**sub_kwargs)
         return subscription
 
     @classmethod
@@ -267,7 +276,8 @@ class Subscription(models.Model):
         return "None"
 
     def amount_display(self):
-        return "${:.2f}".format(self.amount() / 100)
+        if self.plan:
+            return self.plan.display_price(self.corporate_code)
 
     @property
     def number_of_boxes(self):
@@ -479,3 +489,44 @@ class Restaurant(models.Model):
 
     def __str__(self):
         return self.name
+
+
+def one_year_from_now():
+    return date.today() + timedelta(days=365)
+
+
+class CorporateCode(models.Model):
+    company_name = models.CharField(max_length=100)
+    code = models.CharField(
+        max_length=20,
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex=r"^[A-Z0-9]{4,20}$",
+                message="Code can only contain capitol letters and numbers " +
+                "with no spaces. Must be between 4 and 20 characters."
+            )
+        ]
+    )
+
+    amount_off = models.DecimalField(max_digits=5, decimal_places=2, default=25.00)
+    redeem_by = models.DateField(default=one_year_from_now)
+
+    def __str__(self):
+        return "{} - {}".format(self.company_name, self.code)
+
+    def save(self, *args, **kwargs):
+        """
+        Disallow editing of codes.
+        Create coupon on Stripe upon creation.
+        """
+        if self.pk is not None:
+            return
+        coupon = stripe.Coupon.create(
+            id=self.code,
+            duration="once",
+            amount_off=int(self.amount_off * 100),
+            currency="USD",
+            redeem_by=int(datetime.combine(self.redeem_by, datetime.min.time()).timestamp())
+        )
+        super().save(*args, **kwargs)

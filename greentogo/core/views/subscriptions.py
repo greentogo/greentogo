@@ -1,8 +1,10 @@
+import json
 from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
@@ -10,7 +12,7 @@ from django.views.decorators.http import require_POST
 import stripe
 
 from core.forms import NewSubscriptionForm, SubscriptionForm, SubscriptionPlanForm
-from core.models import Plan, Subscription
+from core.models import CorporateCode, Plan, Subscription
 from core.utils import decode_id, encode_nums
 
 
@@ -21,7 +23,11 @@ def subscriptions_view(request):
 
 
 @login_required
-def add_subscription(request):
+def add_subscription(request, *args, **kwargs):
+    corporate_code = None
+    if 'code' in kwargs:
+        corporate_code = get_object_or_404(CorporateCode, code=kwargs['code'])
+
     if request.method == "POST":
         form = NewSubscriptionForm(request.POST)
         if form.is_valid():
@@ -42,16 +48,24 @@ def add_subscription(request):
             if not user.stripe_id:
                 user.create_stripe_customer(form.cleaned_data['token'])
 
+            sub_kwargs = {
+                "customer": user.stripe_id,
+                "source": token,
+                "items": [{
+                    "plan": plan_stripe_id
+                }]
+            }
+
+            if corporate_code:
+                sub_kwargs['coupon'] = corporate_code.code
+
             try:
-                stripe_subscription = stripe.Subscription.create(
-                    customer=user.stripe_id, source=token, items=[{
-                        "plan": plan_stripe_id
-                    }]
-                )
+                stripe_subscription = stripe.Subscription.create(**sub_kwargs)
                 subscription = Subscription.create_from_stripe_sub(
                     user=user,
                     plan=plan,
                     stripe_subscription=stripe_subscription,
+                    corporate_code=corporate_code
                 )
                 return redirect(reverse('subscriptions'))
             except stripe.error.CardError as ex:
@@ -62,14 +76,43 @@ def add_subscription(request):
     else:
         form = NewSubscriptionForm()
 
+    plans = [
+        {
+            'stripe_id': plan.stripe_id,
+            'amount': plan.amount,
+            'display_price': plan.display_price(corporate_code),
+            'name': plan.name,
+        } for plan in Plan.objects.available()
+    ]
+
+    plandict = {plan['stripe_id']: plan for plan in plans}
+
     return render(
         request, "core/add_subscription.html", {
             "form": form,
-            "plans": Plan.objects.available(),
+            "corporate_code": corporate_code,
+            "plans": plans,
+            "plandict_json": json.dumps(plandict, cls=DjangoJSONEncoder),
             "email": request.user.email,
             "stripe_key": settings.STRIPE_PUBLISHABLE_KEY
         }
     )
+
+
+@login_required
+def corporate_subscription(request, *args, **kwargs):
+    """Check corporate code to see if valid."""
+    if request.method == "POST":
+        try:
+            code = CorporateCode.objects.get(code=request.POST['code'])
+            if request.user.subscriptions.filter(corporate_code=code).count() == 0:
+                return redirect(reverse('add_corporate_subscription', kwargs={'code': code.code}))
+            else:
+                messages.error(request, "You have already used that corporate access code.")
+        except CorporateCode.DoesNotExist:
+            messages.error(request, "That is not a valid corporate access code.")
+
+    return render(request, "core/corporate_subscription.html")
 
 
 @login_required
@@ -102,7 +145,20 @@ def change_subscription_plan(request, sub_id):
     else:
         form = SubscriptionPlanForm()
 
+    plans = [
+        {
+            'id': plan.pk,
+            'stripe_id': plan.stripe_id,
+            'amount': plan.amount,
+            'display_price': plan.display_price(subscription.corporate_code),
+            'name': plan.name,
+        } for plan in Plan.objects.available()
+    ]
+
     return render(
-        request, "core/subscription_plan.html", {"subscription": subscription,
-                                                 "form": form}
+        request, "core/subscription_plan.html", {
+            "subscription": subscription,
+            "form": form,
+            "plans": plans,
+        }
     )

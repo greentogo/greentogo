@@ -40,6 +40,7 @@ class NewSubscriptionForm(forms.Form):
             for plan in Plan.objects.available()
         ]
     )
+    coupon_code = forms.CharField(max_length=20, required=False, label="Corporate access code")
 
 
 class SubscriptionForm(forms.ModelForm):

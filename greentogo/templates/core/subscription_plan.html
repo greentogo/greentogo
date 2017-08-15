@@ -6,13 +6,17 @@
         <h2>Change Subscription Plan</h2>
 
         <p>
-            <strong>Your current plan</strong>: {{ subscription.plan_display }} @ {{ subscription.amount_display }}
+            <strong>Your current plan</strong>: {{ subscription.plan_display }} @ {{ subscription.amount_display }}/year
         </p>
 
         <form action="." method="POST">
             {% csrf_token %}
             <label for="{{ form.plan.id_for_label }}">Change to plan</label>
-            {{ form.plan }}
+            <select id="{{ form.plan.id_for_label }}" name="plan" required>
+                {% for plan in plans %}
+                <option value="{{ plan.id }}">{{ plan.name }}: {{ plan.display_price }}</option>
+                {% endfor %}
+            </select>
             <div>
                 <button type="submit" class="button">Change plan</button>
                 <a href="{% url 'subscriptions' %}" class="alert button">Go back to subscriptions</a>
