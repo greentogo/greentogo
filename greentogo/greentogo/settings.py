@@ -144,6 +144,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Authentication
 
 AUTH_USER_MODEL = 'core.User'
+AUTHENTICATION_BACKENDS = ['greentogo.auth_backend.AuthBackend']
+
 LOGIN_REDIRECT_URL = '/'
 
 # API

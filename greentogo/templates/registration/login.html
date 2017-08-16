@@ -6,7 +6,17 @@
     <div class="medium-12 columns">
         <form method="post" action=".">
             {% csrf_token %}
-            {{ form.as_p }}
+            {{ form.non_field_errors }}
+            <p>
+                {{ form.username.errors }}
+                <label for="{{ form.username.id_for_label }}">Username or email:</label>
+                {{ form.username }}
+            </p>
+            <p>
+                {{ form.password.errors }}
+                <label for="{{ form.password.id_for_label }}">Password:</label>
+                {{ form.password }}
+            </p>
 
             <input type="submit" class="button" value="{% trans 'Log in' %}" />
             <input type="hidden" name="next" value="{{ next }}" />
