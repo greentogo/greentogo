@@ -73,8 +73,14 @@ def add_subscription(request, *args, **kwargs):
                 messages.error(
                     request, "We had a problem processing your card. {}".format(error['message'])
                 )
-    else:
-        form = NewSubscriptionForm()
+            except:
+                messages.error(
+                    request, (
+                        "We had a problem on our end processing your order. "
+                        "You have not been charged. Our administrators have been notified."
+                    )
+                )
+                rollbar.report_exc_info(sys.exc_info(), request)
 
     plans = [
         {
@@ -89,7 +95,7 @@ def add_subscription(request, *args, **kwargs):
 
     return render(
         request, "core/add_subscription.html", {
-            "form": form,
+            "form": NewSubscriptionForm(),
             "corporate_code": corporate_code,
             "plans": plans,
             "plandict_json": json.dumps(plandict, cls=DjangoJSONEncoder),

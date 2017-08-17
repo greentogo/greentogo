@@ -39,41 +39,43 @@
 {% endblock %}
 
 {% block javascript %}
-<script>
- var plans = {{ plandict_json | safe }};
+    <script>
+    var plans = {{ plandict_json | safe }};
 
- var handler = StripeCheckout.configure({
-     key: '{{ stripe_key }}',
-     email: '{{ email }}',
-     image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
-     locale: 'auto',
-     zipCode: true,
-     token: function (token) {
-         $("#{{ form.token.id_for_label }}").val(token.id);
-         $("#new-subscription-form").submit();
-     },
-     closed: function () {
-         $("#subscribe-button").prop("disabled", false);
-     }
- });
+    var handler = StripeCheckout.configure({
+        key: '{{ stripe_key }}',
+        email: '{{ email }}',
+        image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
+        locale: 'auto',
+        zipCode: true,
+        token: function (token) {
+            $("#{{ form.token.id_for_label }}").val(token.id);
+            $("#new-subscription-form").submit();
+        },
+        closed: function () {
+            if (!$("#{{ form.token.id_for_label }}").val()) {
+                $("#subscribe-button").prop("disabled", false);
+            }
+        }
+    });
 
- $("#subscribe-button").on('click', function (event) {
-     $("#subscribe-button").prop("disabled", true);
+    $("#subscribe-button").on('click', function (event) {
+        $("#subscribe-button").prop("disabled", true);
 
-     var planId = $("#{{ form.plan.id_for_label }}").val();
-     var plan = plans[planId];
+        var planId = $("#{{ form.plan.id_for_label }}").val();
+        var plan = plans[planId];
 
-     handler.open({
-         name: "Durham GreenToGo",
-         description: plan.name + " - " + plan.display_price + "/year",
-         panelLabel: "Subscribe"
-     });
-     event.preventDefault();
- })
+        handler.open({
+            name: "Durham GreenToGo",
+            description: plan.name + " - " + plan.display_price + "/year",
+            panelLabel: "Subscribe"
+        });
+        event.preventDefault();
+    })
 
- // Close Checkout on page navigation:
- window.addEventListener('popstate', function() {
-     handler.close();
- });
-</script>
+    // Close Checkout on page navigation:
+    window.addEventListener('popstate', function() {
+        handler.close();
+    });
+    </script>
 {% endblock %}
