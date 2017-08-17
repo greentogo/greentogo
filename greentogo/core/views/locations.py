@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.defaultfilters import pluralize
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -31,25 +32,47 @@ def location(request, location_code):
 
     if request.method == "POST":
         subscription_id = request.POST.get('subscription_id')
+        number_of_boxes = int(request.POST.get('number_of_boxes', 1))
         try:
             subscription = user.subscriptions.active().get(pk=subscription_id)
         except Subscription.DoesNotExist as ex:
             # TODO: handle this
             raise ex
 
+        box_plural = lambda n: pluralize(n, "box,boxes")
+
         with transaction.atomic():
-            if subscription.can_tag_location(location):
-                subscription.tag_location(location)
+            if subscription.can_tag_location(location, number_of_boxes):
+                subscription.tag_location(location, number_of_boxes)
                 if location.service == location.CHECKIN:
-                    msg = "You have checked in 1 box."
+                    msg = "You have checked in {} {}.".format(
+                        number_of_boxes, box_plural(number_of_boxes)
+                    )
                 else:
-                    msg = "You have checked out 1 box."
+                    msg = "You have checked out {} {}.".format(
+                        number_of_boxes, box_plural(number_of_boxes)
+                    )
                 messages.success(request, msg)
             else:
                 if location.service == location.CHECKIN:
-                    msg = "You have checked in all of your boxes for this subscription."
+                    if number_of_boxes == 1:
+                        msg = "You have checked in all of your boxes for this subscription."
+                    else:
+                        msg = ("You do not have {} {} checked out with this "
+                               "subscription.").format(
+                                   number_of_boxes, box_plural(number_of_boxes)
+                               )
                 else:
-                    msg = "You do not have enough boxes to check out with this subscription."
+                    if number_of_boxes == 1:
+                        msg = (
+                            "You do not have enough boxes to check out with "
+                            "this subscription."
+                        )
+                    else:
+                        msg = (
+                            "You do not have enough boxes to check out {} {} "
+                            "with this subscription."
+                        ).format(number_of_boxes, box_plural(number_of_boxes))
 
                 messages.error(request, msg)
 

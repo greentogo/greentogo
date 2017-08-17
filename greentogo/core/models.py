@@ -310,21 +310,21 @@ class Subscription(models.Model):
     def amount(self):
         return self.plan.amount
 
-    def can_checkout(self):
-        return self.available_boxes > 0
+    def can_checkout(self, number_of_boxes=1):
+        return self.available_boxes >= number_of_boxes
 
-    def can_checkin(self):
-        return self.available_boxes < self.number_of_boxes
+    def can_checkin(self, number_of_boxes=1):
+        return self.available_boxes + number_of_boxes <= self.number_of_boxes
 
-    def can_tag_location(self, location):
+    def can_tag_location(self, location, number_of_boxes=1):
         if location.service == Location.CHECKIN:
-            return self.can_checkin()
+            return self.can_checkin(number_of_boxes)
         else:
-            return self.can_checkout()
+            return self.can_checkout(number_of_boxes)
 
-    def tag_location(self, location):
-        tag = LocationTag.objects.create(subscription=self, location=location)
-        return tag
+    def tag_location(self, location, number_of_boxes=1):
+        for _ in range(number_of_boxes):
+            LocationTag.objects.create(subscription=self, location=location)
 
     def will_auto_renew(self):
         return self.stripe_id and self.stripe_status == "active"
