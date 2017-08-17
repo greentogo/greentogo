@@ -26,7 +26,7 @@
                     {% endwith %}
                 {% else %}
                     <label for="subscription_id">Subscription</label>
-                    <select name="subscription_id" id="subscription_id">                    
+                    <select name="subscription_id" id="subscription_id">
                         {% for sub in subscriptions %}
                             <option value="{{ sub.id }}"
                                     data-available="{{ sub.available_boxes }}"

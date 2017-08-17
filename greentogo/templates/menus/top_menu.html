@@ -1,14 +1,14 @@
 {# -*- engine:django -*- #}
 {% load static %}
 
-<div class="title-bar" data-responsive-toggle="example-menu" data-hide-for="medium">
-    <button class="menu-icon" type="button" data-toggle="example-menu"></button>
+<div class="title-bar" data-responsive-toggle="nav-menu" data-hide-for="medium">
+    <button class="menu-icon" type="button" data-toggle="nav-menu"></button>
     <div class="title-bar-title">GreenToGo</div>
 </div>
 
-<div class="top-bar" id="example-menu">
+<div class="top-bar" id="nav-menu">
     <div class="top-bar-left">
-        <ul class="vertical medium-horizontal menu" data-dropdown-menu>
+        <ul class="vertical medium-horizontal dropdown menu" data-dropdown-menu>
             <li class="show-for-medium">
                 <a href="/">
                     <img src="{% static 'logo_inverted.png' %}" width="150"/>
