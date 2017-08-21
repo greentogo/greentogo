@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
+import rollbar
 import stripe
 
 from core.forms import NewSubscriptionForm, SubscriptionForm, SubscriptionPlanForm
