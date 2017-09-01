@@ -295,9 +295,12 @@ else:
         },
     }
 
+ROLLBAR_KEY = __env__('ROLLBAR_KEY')
+ROLLBAR_ENV = 'development' if DEBUG else 'production'
+
 ROLLBAR = {
-    'access_token': __env__('ROLLBAR_KEY'),
-    'environment': 'development' if DEBUG else 'production',
+    'access_token': ROLLBAR_KEY,
+    'environment': ROLLBAR_ENV,
     'branch': 'master',
     'root': '/opt/greentogo/src',
 }

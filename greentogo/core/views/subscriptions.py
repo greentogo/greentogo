@@ -17,6 +17,8 @@ from core.forms import NewSubscriptionForm, SubscriptionForm, SubscriptionPlanFo
 from core.models import CorporateCode, Plan, Subscription
 from core.utils import decode_id, encode_nums
 
+rollbar.init(settings.ROLLBAR_KEY, settings.ROLLBAR_ENV)
+
 
 @login_required
 def subscriptions_view(request):

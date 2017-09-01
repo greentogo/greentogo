@@ -1,0 +1,9 @@
+{% block subject %}New GreenToGo subscription{% endblock %}
+{% block plain %}
+A new GreenToGo subscription was purchased or created.
+
+Customer: {{ subscription.user.username }}
+Plan: {{ subscription.plan }}
+Stripe id: {% if subscription.has_stripe_subscription %}{{ subscription.stripe_id }}{% else %}Not a Stripe subscription{% endif %}
+Corporate code: {% if subscription.corporate_code %}{{ subscription.corporate_code }}{% else %}No corporate code{% endif %}
+{% endblock %}

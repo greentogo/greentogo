@@ -19,6 +19,7 @@ from django.utils.text import slugify
 import shortuuid
 from django_geocoder.wrapper import get_cached as geocode
 from postgres_stats import DateTrunc
+from templated_email import send_templated_mail
 
 from core.stripe import stripe
 from core.utils import decode_id, encode_nums
@@ -242,12 +243,13 @@ class Subscription(models.Model):
 
     @classmethod
     def create_from_stripe_sub(cls, user, plan, stripe_subscription, corporate_code=None):
+        ends_at = datetime.fromtimestamp(stripe_subscription.current_period_end) + timedelta(days=3)
+        ends_at = timezone.make_aware(ends_at, is_dst=False)
         sub_kwargs = dict(
             user=user,
             stripe_id=stripe_subscription.id,
             plan=plan,
-            ends_at=datetime.fromtimestamp(stripe_subscription.current_period_end) +
-            timedelta(days=3),
+            ends_at=ends_at,
             stripe_status=stripe_subscription.status,
         )
 
@@ -354,6 +356,17 @@ class Subscription(models.Model):
                 datetime.fromtimestamp(stripe_sub.current_period_end) + timedelta(days=3)
             )
         self.save()
+
+
+@receiver(post_save, sender=Subscription)
+def new_subscription_email_to_admins(sender, instance, created, **kwargs):
+    if created:
+        send_templated_mail(
+            template_name='new_subscription',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=settings.EMAIL_ADMINS,
+            context={'subscription': instance}
+        )
 
 
 class LocationQuerySet(models.QuerySet):
