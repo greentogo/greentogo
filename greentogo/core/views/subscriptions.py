@@ -77,6 +77,7 @@ def add_subscription(request, *args, **kwargs):
                 messages.error(
                     request, "We had a problem processing your card. {}".format(error['message'])
                 )
+                rollbar.report_exc_info(sys.exc_info(), request)
             except:
                 messages.error(
                     request, (
