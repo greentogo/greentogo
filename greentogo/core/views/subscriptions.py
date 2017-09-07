@@ -50,7 +50,7 @@ def add_subscription(request, *args, **kwargs):
             user = request.user
 
             if not user.stripe_id:
-                user.create_stripe_customer(form.cleaned_data['token'])
+                user.create_stripe_customer()
 
             sub_kwargs = {
                 "customer": user.stripe_id,
