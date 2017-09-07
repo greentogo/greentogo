@@ -68,13 +68,13 @@ class UserView(APIView):
         serializer = UserSerializer(request.user)
         return jsend_success(serializer.data)
 
-
+# /tag/:number_of_boxes
 class CheckinCheckoutView(APIView):
     """Given a location id, create a location tag."""
 
     permission_classes = (HasSubscription, )
 
-    def post(self, request, format=None):
+    def post(self, request, number_of_boxes, format=None):
         if not request.data.get('action'):
             return jsend_fail({"action": "no_action"})
 
@@ -94,24 +94,43 @@ class CheckinCheckoutView(APIView):
         if location.service != request.data['action']:
             return jsend_fail({"action": "action_and_location_no_match"})
 
+        action = request.data["action"]
+
+        if number_of_boxes > plan.number_of_boxes
+            return jsend_fail({"action": "too_many_boxes"})
+
+        if action == Location.CHECKIN
+            if subscription.boxes_checked_out > number_of_boxes
+                return jsend_fail({"action": "cannot_check_in"})
+
+        if action == Location.CHECKOUT
+            if subscription.available_boxes < number_of_boxes
+                return jsend_fail({"action": "cannot_check_out"})
+
         if location.service == Location.CHECKIN:
-            return self.checkin(subscription, location)
+            return self.checkin(subscription, location, number_of_boxes)
         elif location.service == Location.CHECKOUT:
-            return self.checkout(subscription, location)
+            return self.checkout(subscription, location, number_of_boxes)
 
-    def checkin(self, subscription, location):
-        if subscription.can_checkin():
-            tag = subscription.tag_location(location)
-            return jsend_success(LocationTagSerializer(tag).data)
-        else:
-            return jsend_fail({"subscription": "no_boxes_out"})
+    def checkin(self, subscription, location, number_of_boxes):
+        tags = []
+        for box in range(number_of_boxes):
+            tags.append(subscription.tag_location(location))
 
-    def checkout(self, subscription, location):
-        if subscription.can_checkout():
-            tag = subscription.tag_location(location)
-            return jsend_success(LocationTagSerializer(tag).data)
-        else:
-            return jsend_fail({"subscription": "no_boxes_available"})
+        if tags.len() > 1
+            return jsend_success(LocationTagSerializer(tags, many=True).data)
+
+        return jsend_success(LocationTagSerializer(tags).data)
+
+    def checkout(self, subscription, location, number_of_boxes):
+        tags = []
+        for box in range(number_of_boxes):
+            tags.append(subscription.tag_location(location))
+
+        if tags.len() > 1
+            return jsend_success(LocationTagSerializer(tags, many=True).data)
+
+        return jsend_success(LocationTagSerializer(tags).data)
 
 
 class RestaurantsView(APIView):
