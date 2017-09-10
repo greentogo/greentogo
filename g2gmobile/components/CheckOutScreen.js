@@ -41,8 +41,8 @@ class CheckOutScreen extends React.Component {
     render() {
         return (
             <View style={{ flex: 1 }}>
-                <Button onPress={this.navigateNext} />
-                {/* <BarCodeScannerReader navigateNext={this.navigateNext}/> */}
+                {/* <Button onPress={this.navigateNext} /> */}
+                 <BarCodeScannerReader navigateNext={this.navigateNext}/> 
             </View>
         );
     }
