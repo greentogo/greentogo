@@ -1,10 +1,10 @@
 import React from 'react';
 import {
-  StyleSheet,
-  View,
-  TouchableHighlight
+    StyleSheet,
+    View,
+    TouchableHighlight
 } from 'react-native';
-import {inject, observer} from "mobx-react";
+import { inject, observer } from "mobx-react";
 import styles from "../styles";
 import G2GTitleImage from "./G2GTitleImage";
 import {
@@ -23,11 +23,11 @@ class ListMenuItem extends React.Component {
         const onPress = this.props.onPress || function () { };
         return (
             <TouchableHighlight>
-                <ListItem style={{flex: 1, height: 100, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: styles.primaryColor, backgroundColor: styles.primaryCream }} icon onPress={onPress}>
+                <ListItem style={{ flex: 1, height: 100, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: styles.primaryColor, backgroundColor: styles.primaryCream }} icon onPress={onPress}>
                     <Left>
-                        <Icon style={{color: styles.primaryColor}} name={this.props.icon}/>
+                        <Icon style={{ color: styles.primaryColor }} name={this.props.icon} />
                     </Left>
-                    <Body style={{borderBottomWidth: 0 }}>
+                    <Body style={{ borderBottomWidth: 0 }}>
                         <Text>{this.props.text}</Text>
                     </Body>
                 </ListItem>
@@ -41,7 +41,7 @@ class ListMenuItem extends React.Component {
 class HomeScreen extends React.Component {
     static route = {
         navigationBar: {
-            renderTitle: (route, props) => <G2GTitleImage />, 
+            renderTitle: (route, props) => <G2GTitleImage />,
             backgroundColor: '#628e86'
         }
     }
@@ -58,13 +58,17 @@ class HomeScreen extends React.Component {
         this.props.navigator.push('returnBox');
     }
 
+    goToAccount = () => {
+        this.props.navigator.push('checkOutSuccess')
+    }
+
     logOut = () => {
         this.props.appStore.clearAuthToken()
     }
 
     render() {
         return (
-            <Content style={{flex: 1, backgroundColor: styles.primaryCream}}>
+            <Content style={{ flex: 1, backgroundColor: styles.primaryCream }}>
                 <List>
                     <ListMenuItem
                         icon="log-out"
@@ -82,8 +86,9 @@ class HomeScreen extends React.Component {
                         onPress={this.goToMap}
                     />
                     <ListMenuItem
-                        icon="person" 
+                        icon="person"
                         text="Your account"
+                        onPress={this.goToAccount}
                     />
                     <ListMenuItem
                         icon="unlock"
