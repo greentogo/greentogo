@@ -71,29 +71,29 @@ class LoginScreen extends React.Component {
     attemptSignUp() {
         this.setState({ error: [], loading: true });
 
-        axios({
-            method: 'post',
-            url: this.props.store.makeUrl('/auth/signup/'),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            data: {
-                username: this.state.username,
-                password: this.state.password,
-                passwordConfirmation: this.state.passwordConfirmation
-            }
-        }).then((json) => {
-            console.log(json.data.auth_token);
-            if (json.data.auth_token) {
-                this.setState({ loading: false });
-                return this.props.store.setAuthToken(json.data.auth_token);
-            }
-        }).catch((error) => {
-            console.log(JSON.stringify(error.response.data.non_field_errors[0]))
-            this.setState({ error: error.response.data.non_field_errors, loading: false });
-            // console.log("State error: " + this.state.error)
-        });
+        // axios({
+        //     method: 'post',
+        //     url: this.props.store.makeUrl('/auth/signup/'),
+        //     headers: {
+        //         'Accept': 'application/json',
+        //         'Content-Type': 'application/json',
+        //     },
+        //     data: {
+        //         username: this.state.username,
+        //         password: this.state.password,
+        //         passwordConfirmation: this.state.passwordConfirmation
+        //     }
+        // }).then((json) => {
+        //     console.log(json.data.auth_token);
+        //     if (json.data.auth_token) {
+        //         this.setState({ loading: false });
+        //         return this.props.store.setAuthToken(json.data.auth_token);
+        //     }
+        // }).catch((error) => {
+        //     console.log(JSON.stringify(error.response.data.non_field_errors[0]))
+        //     this.setState({ error: error.response.data.non_field_errors, loading: false });
+        //     // console.log("State error: " + this.state.error)
+        // });
     }
 
     attemptPasswordReset() {
