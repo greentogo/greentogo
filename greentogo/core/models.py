@@ -25,6 +25,26 @@ from core.stripe import stripe
 from core.utils import decode_id, encode_nums
 
 
+def get_one_year_free_coupon_code():
+    """
+    This is not my favorite thing I've ever done, but I'm trying to think of
+    another way to make this happen, and I can't think of anything right now.
+    """
+
+    code = "KICKSTARTER_COUPON_3X9F1M"
+
+    try:
+        coupon = stripe.Coupon.retrieve(code)
+    except stripe.StripeError:
+        coupon = stripe.Coupon.create(
+            id=code,
+            duration="once",
+            percent_off=100,
+        )
+
+    return code
+
+
 def one_year_from_now():
     return timezone.now() + timedelta(days=365)
 
@@ -332,13 +352,29 @@ class Subscription(models.Model):
         return self.stripe_id and self.stripe_status == "active"
 
     def has_stripe_subscription(self):
-        return self.stripe_id is not None
+        return self.stripe_id
 
     def get_stripe_subscription(self):
         if self.stripe_id is None:
             return None
 
         return stripe.Subscription.retrieve(self.stripe_id)
+
+    def update_from_stripe_sub(self, stripe_subscription, force=False):
+        if self.stripe_id and not force:
+            raise SubscriptionUpdateException(
+                message="Subscription already has a Stripe subscription",
+                subscription=self,
+                stripe_subscription=stripe_subscription,
+            )
+
+        ends_at = datetime.fromtimestamp(stripe_subscription.current_period_end) + timedelta(days=3)
+        ends_at = timezone.make_aware(ends_at, is_dst=False)
+
+        self.stripe_id = stripe_subscription.id
+        self.stripe_status = stripe_subscription.status
+        self.ends_at = ends_at
+        self.save()
 
     def sync_with_stripe(self, stripe_sub=None):
         if stripe_sub is None:
@@ -356,6 +392,13 @@ class Subscription(models.Model):
                 datetime.fromtimestamp(stripe_sub.current_period_end) + timedelta(days=3)
             )
         self.save()
+
+
+class SubscriptionUpdateException(Exception):
+    def __init__(self, subscription, stripe_subscription, message):
+        self.subscription = subscription
+        self.stripe_subscription = stripe_subscription
+        self.message = message
 
 
 @receiver(post_save, sender=Subscription)
