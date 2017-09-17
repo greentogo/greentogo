@@ -6,15 +6,17 @@ import {
     Text,
     View,
 } from 'react-native';
+import styles from '../styles';
 import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
 import MapScreen from './MapScreen';
 import CheckOutScreen from './CheckOutScreen';
-import styles from '../styles';
 import ReturnBox from "./ReturnScreen";
 import SubmissionScreen from "./SubmissionScreen";
 import CheckOutSuccessScreen from "./CheckOutSuccessScreen";
 import ReturnSuccessScreen from "./ReturnSuccessScreen";
+import AccountScreen from "./AccountScreen";
+
 import stylesheet from "../styles";
 import {
     createRouter,
@@ -29,7 +31,8 @@ const Router = createRouter(() => ({
     returnBox: () => ReturnBox,
     submission: () => SubmissionScreen,
     checkOutSuccess: () => CheckOutSuccessScreen,
-    returnSuccess: () => ReturnSuccessScreen
+    returnSuccess: () => ReturnSuccessScreen,
+    account: () => AccountScreen
 }));
 
 @observer

@@ -35,6 +35,7 @@ class CheckOutScreen extends React.Component {
     }
 
     navigateNext = () => {
+        console.log(this.props.appStore)
         this.props.navigator.push('submission');
     };
 

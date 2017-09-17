@@ -56,7 +56,7 @@ class LoginScreen extends React.Component {
                 password: this.state.password
             }
         }).then((json) => {
-            console.log(json.data.auth_token);
+            // console.log("Login JSON: ", json.data);
             if (json.data.auth_token) {
                 this.setState({ loading: false });
                 return this.props.store.setAuthToken(json.data.auth_token);

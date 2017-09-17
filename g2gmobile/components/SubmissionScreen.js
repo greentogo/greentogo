@@ -30,6 +30,7 @@ class SubmissionScreen extends React.Component {
         })
             .then((response) => {
                 subscriptions = response.data.data.subscriptions;
+                if (response.data.data.email) this.props.appStore.email = response.data.data.email;
                 console.log(response.data.data)
                 if (subscriptions.length > 0) {
                     this.subscriptionChange(subscriptions[0].id);

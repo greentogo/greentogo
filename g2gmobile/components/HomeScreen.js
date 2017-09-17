@@ -59,7 +59,7 @@ class HomeScreen extends React.Component {
     }
 
     goToAccount = () => {
-        this.props.navigator.push('checkOutSuccess')
+        this.props.navigator.push('account')
     }
 
     logOut = () => {
