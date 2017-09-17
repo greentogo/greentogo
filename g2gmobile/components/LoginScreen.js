@@ -142,6 +142,7 @@ class LoginScreen extends React.Component {
                                 <Input placeholder="Email"
                                     autoCapitalize="none"
                                     autoCorrect={false}
+                                    keyboardType="email-address"
                                     onChangeText={(text) => this.setState({ username: text })}
                                     value={this.state.username}
                                 />
@@ -170,6 +171,7 @@ class LoginScreen extends React.Component {
                                     <Input placeholder="Email"
                                         autoCapitalize="none"
                                         autoCorrect={false}
+                                        keyboardType="email-address"
                                         onChangeText={(text) => this.setState({ username: text })}
                                     />
                                 </Item>
@@ -209,6 +211,7 @@ class LoginScreen extends React.Component {
                                         <Input placeholder="Email"
                                             autoCapitalize="none"
                                             autoCorrect={false}
+                                            keyboardType="email-address"
                                             onChangeText={(text) => this.setState({ username: text })}
                                         />
                                     </Item>
