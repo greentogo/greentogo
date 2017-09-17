@@ -3,7 +3,8 @@ import {
     StyleSheet, 
     TextInput, 
     View,
-    Button
+    Button,
+    Image
 } from 'react-native';
 import { inject, observer } from "mobx-react";
 import { Permissions } from 'expo';
@@ -27,6 +28,8 @@ class AccountScreen extends React.Component {
         }
     }
 
+    
+
     render() {
       return (
         <View style={{ flex: 1, alignItems: 'center', backgroundColor: styles.primaryCream, paddingTop: 30  }}>
@@ -34,8 +37,15 @@ class AccountScreen extends React.Component {
             <Button style={{ backgroundColor: styles.primaryCream }} light full title="Reset Password" onPress={() => { this.setState({ type: 'passwordReset' }) }} />
             <View style={{ flex: 1, alignItems: 'center', backgroundColor: styles.primaryCream, paddingTop: 30  }}>
                 <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>You've saved</Text>
-                <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 40 }}>12</Text>
-                <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>boxes from going into a landfill</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                    <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 40, paddingRight: 10 }}>12</Text>
+                     <Image
+                        source={require('../assets/icons/GTG-Box-App.png')}
+                        style={{ height: 40, width: 40 }}
+                    />
+                    <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 40, paddingLeft: 10 }}>s</Text>
+                </View>
+                <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>from a landfill</Text>
             </View>
         </View>
       )
