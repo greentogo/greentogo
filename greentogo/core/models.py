@@ -25,26 +25,6 @@ from core.stripe import stripe
 from core.utils import decode_id, encode_nums
 
 
-def get_one_year_free_coupon_code():
-    """
-    This is not my favorite thing I've ever done, but I'm trying to think of
-    another way to make this happen, and I can't think of anything right now.
-    """
-
-    code = "KICKSTARTER_COUPON_3X9F1M"
-
-    try:
-        coupon = stripe.Coupon.retrieve(code)
-    except stripe.StripeError:
-        coupon = stripe.Coupon.create(
-            id=code,
-            duration="once",
-            percent_off=100,
-        )
-
-    return code
-
-
 def one_year_from_now():
     return timezone.now() + timedelta(days=365)
 
@@ -332,6 +312,9 @@ class Subscription(models.Model):
     def amount(self):
         return self.plan.amount
 
+    def one_year_from_start(self):
+        return self.starts_at + timedelta(days=365)
+
     def can_checkout(self, number_of_boxes=1):
         return self.available_boxes >= number_of_boxes
 
@@ -349,7 +332,10 @@ class Subscription(models.Model):
             LocationTag.objects.create(subscription=self, location=location)
 
     def will_auto_renew(self):
-        return self.stripe_id and self.stripe_status == "active"
+        return self.has_stripe_subscription() and self.is_stripe_active()
+
+    def is_stripe_active(self):
+        return self.stripe_status in ("active", "trialing", )
 
     def has_stripe_subscription(self):
         return self.stripe_id

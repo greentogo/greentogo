@@ -14,7 +14,7 @@ import rollbar
 import stripe
 
 from core.forms import NewSubscriptionForm, SubscriptionForm, SubscriptionPlanForm
-from core.models import CorporateCode, Plan, Subscription, get_one_year_free_coupon_code
+from core.models import CorporateCode, Plan, Subscription
 from core.utils import decode_id, encode_nums
 
 rollbar.init(settings.ROLLBAR_KEY, settings.ROLLBAR_ENV)
@@ -78,7 +78,7 @@ def add_subscription(request, *args, **kwargs):
                     request, "We had a problem processing your card. {}".format(error['message'])
                 )
                 rollbar.report_exc_info(sys.exc_info(), request)
-            except:
+            except Exception as ex:
                 messages.error(
                     request, (
                         "We had a problem on our end processing your order. "
@@ -194,7 +194,7 @@ def add_credit_card(request, sub_id):
                 "items": [{
                     "plan": plan.stripe_id
                 }],
-                "coupon": get_one_year_free_coupon_code()
+                "trial_end": int(subscription.one_year_from_start().timestamp()),
             }
 
             try:
@@ -211,7 +211,10 @@ def add_credit_card(request, sub_id):
                     request, "We had a problem processing your card. {}".format(error['message'])
                 )
                 rollbar.report_exc_info(sys.exc_info(), request)
-            except:
+            except Exception as ex:
+                if settings.DEBUG:
+                    raise ex
+
                 messages.error(
                     request, (
                         "We had a problem on our end processing your order. "
@@ -228,13 +231,12 @@ def add_credit_card(request, sub_id):
     }
 
     return render(
-        request,
-        "core/add_credit_card.html", {
+        request, "core/add_credit_card.html", {
             "subscription": subscription,
             "plan": plan,
             "plan_json": json.dumps(plan, cls=DjangoJSONEncoder),
             "email": request.user.email,
             "stripe_key": settings.STRIPE_PUBLISHABLE_KEY,
-            "rebill_date": date.today() + timedelta(days=365)
+            "rebill_date": subscription.one_year_from_start().date(),
         }
     )
