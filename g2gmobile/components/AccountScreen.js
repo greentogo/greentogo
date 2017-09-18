@@ -37,11 +37,11 @@ class AccountScreen extends React.Component {
             <Button style={{ backgroundColor: styles.primaryCream }} light full title="Reset Password" onPress={() => { this.setState({ type: 'passwordReset' }) }} />
             <View style={{ flex: 1, alignItems: 'center', backgroundColor: styles.primaryCream, paddingTop: 30  }}>
                 <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>You've saved</Text>
-                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                     <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 40, paddingRight: 10 }}>12</Text>
                      <Image
                         source={require('../assets/icons/GTG-Box-App.png')}
-                        style={{ height: 40, width: 40 }}
+                        style={{ height: 35, width: 35 }}
                     />
                     <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 40, paddingLeft: 10 }}>s</Text>
                 </View>
