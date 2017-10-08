@@ -194,7 +194,7 @@ class UnclaimedSubscription(models.Model):
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def claim_subscriptions(sender, instance, created, **kwargs):
     if created:
-        unsubs = UnclaimedSubscription.objects.filter(email=instance.email, claimed=False)
+        unsubs = UnclaimedSubscription.objects.filter(email__iexact=instance.email, claimed=False)
         for unsub in unsubs:
             subscription, _ = Subscription.objects.get_or_create(
                 user=instance, plan=unsub.plan, defaults={"ends_at": one_year_from_now()}
@@ -205,7 +205,7 @@ def claim_subscriptions(sender, instance, created, **kwargs):
 
 @receiver(user_logged_in)
 def claim_subscriptions_on_login(sender, user, request, **kwargs):
-    unsubs = UnclaimedSubscription.objects.filter(email=user.email, claimed=False)
+    unsubs = UnclaimedSubscription.objects.filter(email__iexact=user.email, claimed=False)
     for unsub in unsubs:
         subscription, _ = Subscription.objects.get_or_create(
             user=user, plan=unsub.plan, defaults={"ends_at": one_year_from_now()}
