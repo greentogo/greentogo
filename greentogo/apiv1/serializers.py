@@ -1,8 +1,27 @@
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
+from rest_framework.serializers import ValidationError
+from rest_framework.validators import UniqueValidator
 
-from core.models import LocationTag, Restaurant, Subscription
+from core.models import Location, LocationTag, Restaurant, Subscription, User
+
+
+class CheckinCheckoutSerializer(serializers.Serializer):
+    action = serializers.ChoiceField(choices=[Location.CHECKIN, Location.CHECKOUT])
+    location = serializers.CharField(max_length=6)
+
+    def validate_location(self, value):
+        try:
+            location = Location.objects.get(code=value)
+        except Location.DoesNotExist:
+            raise ValidationError("Location does not exist.")
+        return location
+
+    def validate(self, data):
+        if data['location'].service != data['action']:
+            raise ValidationError("Not a valid action for this location.")
+        return data
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
