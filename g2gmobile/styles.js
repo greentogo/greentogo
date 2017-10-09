@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 import { Constants } from 'expo';
 
 const styles = {
@@ -26,6 +26,10 @@ const styles = {
     },
     bigText: {
         fontSize: 30
+    },
+    window: {
+       height: Dimensions.get('window').height,
+       width: Dimensions.get('window').width
     }
 }
 

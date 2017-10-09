@@ -16,6 +16,7 @@ import SubmissionScreen from "./SubmissionScreen";
 import CheckOutSuccessScreen from "./CheckOutSuccessScreen";
 import ReturnSuccessScreen from "./ReturnSuccessScreen";
 import AccountScreen from "./AccountScreen";
+import SubscriptionScreen from "./SubscriptionScreen"
 
 import stylesheet from "../styles";
 import {
@@ -32,7 +33,8 @@ const Router = createRouter(() => ({
     submission: () => SubmissionScreen,
     checkOutSuccess: () => CheckOutSuccessScreen,
     returnSuccess: () => ReturnSuccessScreen,
-    account: () => AccountScreen
+    account: () => AccountScreen,
+    subscription: () => SubscriptionScreen
 }));
 
 @observer
