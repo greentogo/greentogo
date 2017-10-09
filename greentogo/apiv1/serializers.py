@@ -37,7 +37,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('name', 'email', 'subscriptions', )
+        fields = ('name', 'email', 'username', 'subscriptions', )
 
     subscriptions = SubscriptionSerializer(many=True)
 
