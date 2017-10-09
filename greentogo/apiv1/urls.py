@@ -3,8 +3,7 @@ from django.conf.urls import url
 import apiv1.views as views
 
 urlpatterns = [
-    # url(r'^register/$', views.RegisterView.as_view(), name="api_v1_register"),
-    # url(r'^tag/$', views.CheckinCheckoutView.as_view(), name="api_v1_tag"),
+    url(r'^tag/$', views.CheckinCheckoutView.as_view(), name="api_v1_tag"),
     # url(r'^me/$', views.UserView.as_view(), name="api_v1_user"),
     # url(
     #     r'^subscriptions/plans/$',

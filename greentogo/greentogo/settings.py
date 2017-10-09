@@ -316,3 +316,10 @@ MESSAGE_TAGS = {
     messages.INFO: 'primary',
     messages.ERROR: 'alert',
 }
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'KEY_FUNCTION': 'greentogo.cache.make_key',
+    }
+}

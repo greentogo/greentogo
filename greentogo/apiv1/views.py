@@ -13,35 +13,25 @@ from core.models import Location, LocationTag, Plan, Restaurant, Subscription
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
-from .serializers import (
-    LocationTagSerializer, RestaurantSerializer, SubscriptionSerializer, UserSerializer
-)
+from .serializers import CheckinCheckoutSerializer, LocationTagSerializer
 
 
 class CheckinCheckoutView(GenericAPIView):
-    """Given a location id, create a location tag."""
+    """
+    Check a box in or out.
+    """
 
     permission_classes = (IsAuthenticated, HasSubscription, )
+    serializer_class = CheckinCheckoutSerializer
 
     def post(self, request, format=None):
-        if not request.data.get('action'):
-            return jsend_fail({"action": "no_action"})
-
-        if request.data['action'] not in [Location.CHECKIN, Location.CHECKOUT]:
-            return jsend_fail({"action": "invalid_action"})
-
-        if not request.data.get('location'):
-            return jsend_fail({"location": "no_location"})
-
+        serializer = self.get_serializer(data=request.data)
         subscription = request.subscription
 
-        try:
-            location = Location.objects.get(code=request.data['location'])
-        except Location.DoesNotExist:
-            return jsend_fail({"action": "invalid_location"})
+        if not serializer.is_valid():
+            return jsend_fail(serializer.errors)
 
-        if location.service != request.data['action']:
-            return jsend_fail({"action": "action_and_location_no_match"})
+        location = Location.objects.get(code=serializer.data['location'])
 
         if location.service == Location.CHECKIN:
             return self.checkin(subscription, location)
@@ -51,16 +41,16 @@ class CheckinCheckoutView(GenericAPIView):
     def checkin(self, subscription, location):
         if subscription.can_checkin():
             tag = subscription.tag_location(location)
-            return jsend_success(LocationTagSerializer(tag).data)
+            return jsend_success(LocationTagSerializer(tag, many=True).data)
         else:
-            return jsend_fail({"subscription": "no_boxes_out"})
+            return jsend_fail({"subscription": "No boxes checked out."})
 
     def checkout(self, subscription, location):
         if subscription.can_checkout():
             tag = subscription.tag_location(location)
-            return jsend_success(LocationTagSerializer(tag).data)
+            return jsend_success(LocationTagSerializer(tag, many=True).data)
         else:
-            return jsend_fail({"subscription": "no_boxes_available"})
+            return jsend_fail({"subscription": "No boxes available for checkout."})
 
 
 # /subscriptions/:id

@@ -10,17 +10,19 @@ from core.models import Location, LocationTag, Restaurant, Subscription, User
 class CheckinCheckoutSerializer(serializers.Serializer):
     action = serializers.ChoiceField(choices=[Location.CHECKIN, Location.CHECKOUT])
     location = serializers.CharField(max_length=6)
+    subscription = serializers.IntegerField()
 
     def validate_location(self, value):
         try:
             location = Location.objects.get(code=value)
         except Location.DoesNotExist:
             raise ValidationError("Location does not exist.")
-        return location
+        return value
 
     def validate(self, data):
-        if data['location'].service != data['action']:
-            raise ValidationError("Not a valid action for this location.")
+        location = Location.objects.get(code=data['location'])
+        if location.service != data['action']:
+            raise ValidationError("Invalid action for this location.")
         return data
 
 

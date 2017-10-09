@@ -328,8 +328,10 @@ class Subscription(models.Model):
             return self.can_checkout(number_of_boxes)
 
     def tag_location(self, location, number_of_boxes=1):
+        tags = []
         for _ in range(number_of_boxes):
-            LocationTag.objects.create(subscription=self, location=location)
+            tags.append(LocationTag.objects.create(subscription=self, location=location))
+        return tags
 
     def will_auto_renew(self):
         return self.has_stripe_subscription() and self.is_stripe_active()
