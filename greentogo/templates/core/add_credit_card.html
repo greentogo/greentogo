@@ -1,0 +1,67 @@
+{% extends "core/base.html" %}
+{# -*- engine:django -*- #}
+
+{% block content %}
+    <div class="row">
+        <div class="medium-12 columns">
+            <h2>Add a Credit Card to Subscription</h2>
+
+            <p>
+                You are adding a credit card to your {{ subscription.plan_display }} subscription.
+                You will not be billed at this time.
+            </p>
+
+            <p>
+                If you add a credit card, your subscription will automatically renew on {{ rebill_date }} at a price of {{ plan.display_price }}.
+            </p>
+
+            <form action="." method="POST" id="add-cc-form">
+                {% csrf_token %}
+                <input type="hidden" name="token" id="add-cc-token" value="" />
+                <div>
+                    <button type="submit" id="add-cc-button" class="button">Add credit card</button>
+                    <a href="{% url 'subscriptions' %}" class="alert button">Go back to subscriptions</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+    var plan = {{ plan_json | safe }};
+
+    var handler = StripeCheckout.configure({
+        key: '{{ stripe_key }}',
+        email: '{{ email }}',
+        image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
+        locale: 'auto',
+        zipCode: true,
+        token: function (token) {
+            $("#add-cc-token").val(token.id);
+            $("#add-cc-form").submit();
+        },
+        closed: function () {
+            if (!$("#add-cc-token").val()) {
+                $("#add-cc-button").prop("disabled", false);
+            }
+        }
+    });
+
+    $("#add-cc-button").on('click', function (event) {
+        $("#add-cc-button").prop("disabled", true);
+
+        handler.open({
+            name: "Durham GreenToGo",
+            description: plan.name + " - " + plan.display_price + "/year",
+            panelLabel: "Add Credit Card"
+        });
+        event.preventDefault();
+    })
+
+    // Close Checkout on page navigation:
+    window.addEventListener('popstate', function() {
+        handler.close();
+    });
+    </script>
+{% endblock %}

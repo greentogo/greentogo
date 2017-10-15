@@ -6,7 +6,7 @@ from core.models import Location
 
 
 def test_no_action(apiclient, subscription1, checkin_location):
-    user = subscription1.customer.user
+    user = subscription1.user
     token, _ = Token.objects.get_or_create(user=user)
     apiclient.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
@@ -16,12 +16,13 @@ def test_no_action(apiclient, subscription1, checkin_location):
         format="json"
     )
 
+    print(response.data)
     assert response.status_code == 400
-    assert response.data['data']['action'] == "no_action"
+    assert "This field is required." in response.data['data']['action']
 
 
 def test_no_location(apiclient, subscription1, checkin_location):
-    user = subscription1.customer.user
+    user = subscription1.user
     token, _ = Token.objects.get_or_create(user=user)
     apiclient.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
@@ -32,11 +33,11 @@ def test_no_location(apiclient, subscription1, checkin_location):
     )
 
     assert response.status_code == 400
-    assert response.data['data']['location'] == "no_location"
+    assert "This field is required." in response.data['data']['location']
 
 
 def test_action_location_no_match(apiclient, subscription1, checkin_location):
-    user = subscription1.customer.user
+    user = subscription1.user
     token, _ = Token.objects.get_or_create(user=user)
     apiclient.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
@@ -50,11 +51,11 @@ def test_action_location_no_match(apiclient, subscription1, checkin_location):
     )
 
     assert response.status_code == 400
-    assert response.data['data']['action'] == "action_and_location_no_match"
+    assert "Invalid action for this location." in response.data['data']['non_field_errors']
 
 
 def test_valid_checkin(apiclient, subscription1, checkin_location, checkout_location):
-    user = subscription1.customer.user
+    user = subscription1.user
     token, _ = Token.objects.get_or_create(user=user)
     apiclient.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
@@ -71,12 +72,12 @@ def test_valid_checkin(apiclient, subscription1, checkin_location, checkout_loca
     )
 
     assert response.status_code == 200
-    assert response.data['data']['service'] == checkin_location.service
-    assert response.data['data']['available_boxes'] == 1
+    assert response.data['data'][0]['service'] == checkin_location.service
+    assert response.data['data'][0]['available_boxes'] == 1
 
 
 def test_invalid_checkin(apiclient, subscription1, checkin_location):
-    user = subscription1.customer.user
+    user = subscription1.user
     token, _ = Token.objects.get_or_create(user=user)
     apiclient.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
@@ -90,11 +91,11 @@ def test_invalid_checkin(apiclient, subscription1, checkin_location):
     )
 
     assert response.status_code == 400
-    assert response.data['data']['subscription'] == 'no_boxes_out'
+    assert response.data['data']['subscription'] == 'No boxes checked out.'
 
 
 def test_valid_checkout(apiclient, subscription1, checkout_location):
-    user = subscription1.customer.user
+    user = subscription1.user
     token, _ = Token.objects.get_or_create(user=user)
     apiclient.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
@@ -108,12 +109,12 @@ def test_valid_checkout(apiclient, subscription1, checkout_location):
     )
 
     assert response.status_code == 200
-    assert response.data['data']['service'] == checkout_location.service
-    assert response.data['data']['available_boxes'] == 0
+    assert response.data['data'][0]['service'] == checkout_location.service
+    assert response.data['data'][0]['available_boxes'] == 0
 
 
 def test_invalid_checkout(apiclient, subscription1, checkout_location):
-    user = subscription1.customer.user
+    user = subscription1.user
     token, _ = Token.objects.get_or_create(user=user)
     apiclient.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
@@ -130,4 +131,4 @@ def test_invalid_checkout(apiclient, subscription1, checkout_location):
     )
 
     assert response.status_code == 400
-    assert response.data['data']['subscription'] == 'no_boxes_available'
+    assert response.data['data']['subscription'] == 'No boxes available for checkout.'

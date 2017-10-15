@@ -32,13 +32,22 @@
             <div class="medium-6 columns">
                 {% if sub.has_stripe_subscription %}
                     <a href="{% url 'subscription_plan' sub_id=sub.hashed_id %}" class="button">Change subscription plan</a>
+                {% else %}
+                    <a href="{% url 'subscription_add_credit_card' sub_id=sub.hashed_id %}" class="button">
+                        Add credit card
+                        <span data-tooltip aria-haspopup="true" class="has-tip top" data-disable-hover="false" tabindex="1" title="Without a credit card, this subscription cannot be renewed or upgraded.">(why?)</span>
+                    </a>
                 {% endif %}
+
             </div>
         </div>
         {% endfor %}
         {% else %}
         <div>
             <p class="lead">You do not have any subscriptions currently.</p>
+            <div class="callout primary">
+                If you are a Kickstarter backer and you think you should have a subscription, please check to make sure the email address you used on Kickstarter is the same as the email address you are using for Green To Go. The emails must match for your subscription to be activated. If you are not sure of what email address you used for Kickstarter or have other questions, <a href="https://durhamgreentogo.com/contact/">contact us</a>.
+            </div>
         </div>
         {% endif %}
         <div>

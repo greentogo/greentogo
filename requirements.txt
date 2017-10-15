@@ -6,6 +6,8 @@
 #
 autorepr==0.3.0
 click==6.7                # via geocoder
+coreapi==2.3.3
+coreschema==0.0.4         # via coreapi
 decorator==4.1.2          # via ratelim
 django-appconf==1.0.2     # via django-compressor, pinax-stripe
 django-compressor==2.1.1
@@ -22,7 +24,10 @@ djangorestframework==3.6.4
 djoser==0.5.4
 geocoder==1.15.1          # via django-geocoder
 hashids==1.2.0
+itypes==1.1.0             # via coreapi
+jinja2==2.9.6             # via coreschema
 jsonfield==2.0.2          # via pinax-stripe
+markupsafe==1.0           # via jinja2
 olefile==0.44             # via pillow
 pillow==4.0.0
 pinax-stripe==3.3.0
@@ -32,10 +37,11 @@ qrcode==5.3
 ratelim==0.1.6            # via geocoder
 rcssmin==1.0.6            # via django-compressor
 reportlab==3.4.0
-requests==2.13.0          # via geocoder, rollbar, stripe
+requests==2.13.0          # via coreapi, geocoder, rollbar, stripe
 rjsmin==1.0.12            # via django-compressor
 rollbar==0.13.12
 shortuuid==0.5.0
 six==1.10.0               # via django-environ, django-extensions, django-templated-email, geocoder, pinax-stripe, qrcode, rollbar
 stripe==1.62.0
+uritemplate==3.0.0        # via coreapi
 werkzeug==0.12.2

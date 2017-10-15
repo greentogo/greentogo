@@ -47,11 +47,12 @@ def checkout_location(db):
     return loc
 
 
-@my_vcr.use_cassette()
 @pytest.fixture
 def user(db, faker):
     User = get_user_model()
-    user = User.objects.create_user(faker.user_name(), password=faker.password(length=10))
+    user = User.objects.create_user(
+        faker.user_name(), email=faker.email(), password=faker.password(length=10)
+    )
     user.save()
     return user
 

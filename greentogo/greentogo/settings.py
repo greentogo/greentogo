@@ -155,7 +155,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
-    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated', ),
 }
 
 # Internationalization
@@ -316,4 +315,11 @@ MESSAGE_TAGS = {
     messages.DEBUG: 'secondary',
     messages.INFO: 'primary',
     messages.ERROR: 'alert',
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'KEY_FUNCTION': 'greentogo.cache.make_key',
+    }
 }

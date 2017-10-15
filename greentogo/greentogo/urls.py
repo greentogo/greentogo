@@ -19,12 +19,39 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 
+from rest_framework.documentation import include_docs_urls
+
 import core.views.locations
 import core.views.subscriptions
 from core import views as core_views
 from core.views.webhook import stripe_webhook
 
 from .adminsite import admin_site
+
+subscriptions_patterns = [
+    url(r'^$', core.views.subscriptions.subscriptions_view, name='subscriptions'),
+    url(
+        r'^corporate/$',
+        core.views.subscriptions.corporate_subscription,
+        name='corporate_subscription'
+    ),
+    url(r'^new/$', core.views.subscriptions.add_subscription, name='add_subscription'),
+    url(
+        r'^new/(?P<code>[A-Z0-9]+)/$',
+        core.views.subscriptions.add_subscription,
+        name='add_corporate_subscription'
+    ),
+    url(
+        r'^(?P<sub_id>[A-Za-z0-9]+)/plan/$',
+        core.views.subscriptions.change_subscription_plan,
+        name='subscription_plan'
+    ),
+    url(
+        r'^(?P<sub_id>[A-Za-z0-9]+)/add_cc/$',
+        core.views.subscriptions.add_credit_card,
+        name='subscription_add_credit_card',
+    ),
+]
 
 urlpatterns = [
     url(r'^webhook/$', stripe_webhook),
@@ -35,25 +62,7 @@ urlpatterns = [
         name='location'
     ),
     url(r'^restaurants/$', core_views.restaurants, name='restaurants'),
-    url(r'^subscriptions/$', core.views.subscriptions.subscriptions_view, name='subscriptions'),
-    url(
-        r'^subscriptions/corporate/$',
-        core.views.subscriptions.corporate_subscription,
-        name='corporate_subscription'
-    ),
-    url(
-        r'^subscriptions/new/$', core.views.subscriptions.add_subscription, name='add_subscription'
-    ),
-    url(
-        r'^subscriptions/new/(?P<code>[A-Z0-9]+)/$',
-        core.views.subscriptions.add_subscription,
-        name='add_corporate_subscription'
-    ),
-    url(
-        r'^subscriptions/(?P<sub_id>[A-Za-z0-9]+)/plan/$',
-        core.views.subscriptions.change_subscription_plan,
-        name='subscription_plan'
-    ),
+    url(r'^subscriptions/', include(subscriptions_patterns)),
     url(r'^account/change_password/$', core_views.change_password, name='change_password'),
     url(
         r'^account/change_payment_method/$',
@@ -62,10 +71,11 @@ urlpatterns = [
     ),
     url(r'^account/$', core_views.account_settings, name='account_settings'),
     url(r'^accounts/', include('registration.backends.default.urls')),
-    url(r'^auth/', include('djoser.urls.authtoken')),
     url(r'^thanks/', TemplateView.as_view(template_name="thanks.html"), name="beta-thanks"),
     url(r'^error/', TemplateView.as_view(template_name="error.html"), name="beta-error"),
     url(r'^admin/', admin_site.urls),
+    url(r'^api/docs/', include_docs_urls(title='GreenToGo API')),
+    url(r'^api/v1/auth/', include('djoser.urls.authtoken')),
     url(r'^api/v1/', include('apiv1.urls')),
     url(r'^$', core_views.index),
 ] + static(

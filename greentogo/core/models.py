@@ -194,7 +194,7 @@ class UnclaimedSubscription(models.Model):
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def claim_subscriptions(sender, instance, created, **kwargs):
     if created:
-        unsubs = UnclaimedSubscription.objects.filter(email=instance.email, claimed=False)
+        unsubs = UnclaimedSubscription.objects.filter(email__iexact=instance.email, claimed=False)
         for unsub in unsubs:
             subscription, _ = Subscription.objects.get_or_create(
                 user=instance, plan=unsub.plan, defaults={"ends_at": one_year_from_now()}
@@ -205,7 +205,7 @@ def claim_subscriptions(sender, instance, created, **kwargs):
 
 @receiver(user_logged_in)
 def claim_subscriptions_on_login(sender, user, request, **kwargs):
-    unsubs = UnclaimedSubscription.objects.filter(email=user.email, claimed=False)
+    unsubs = UnclaimedSubscription.objects.filter(email__iexact=user.email, claimed=False)
     for unsub in unsubs:
         subscription, _ = Subscription.objects.get_or_create(
             user=user, plan=unsub.plan, defaults={"ends_at": one_year_from_now()}
@@ -312,6 +312,9 @@ class Subscription(models.Model):
     def amount(self):
         return self.plan.amount
 
+    def one_year_from_start(self):
+        return self.starts_at + timedelta(days=365)
+
     def can_checkout(self, number_of_boxes=1):
         return self.available_boxes >= number_of_boxes
 
@@ -325,20 +328,41 @@ class Subscription(models.Model):
             return self.can_checkout(number_of_boxes)
 
     def tag_location(self, location, number_of_boxes=1):
+        tags = []
         for _ in range(number_of_boxes):
-            LocationTag.objects.create(subscription=self, location=location)
+            tags.append(LocationTag.objects.create(subscription=self, location=location))
+        return tags
 
     def will_auto_renew(self):
-        return self.stripe_id and self.stripe_status == "active"
+        return self.has_stripe_subscription() and self.is_stripe_active()
+
+    def is_stripe_active(self):
+        return self.stripe_status in ("active", "trialing", )
 
     def has_stripe_subscription(self):
-        return self.stripe_id is not None
+        return self.stripe_id
 
     def get_stripe_subscription(self):
         if self.stripe_id is None:
             return None
 
         return stripe.Subscription.retrieve(self.stripe_id)
+
+    def update_from_stripe_sub(self, stripe_subscription, force=False):
+        if self.stripe_id and not force:
+            raise SubscriptionUpdateException(
+                message="Subscription already has a Stripe subscription",
+                subscription=self,
+                stripe_subscription=stripe_subscription,
+            )
+
+        ends_at = datetime.fromtimestamp(stripe_subscription.current_period_end) + timedelta(days=3)
+        ends_at = timezone.make_aware(ends_at, is_dst=False)
+
+        self.stripe_id = stripe_subscription.id
+        self.stripe_status = stripe_subscription.status
+        self.ends_at = ends_at
+        self.save()
 
     def sync_with_stripe(self, stripe_sub=None):
         if stripe_sub is None:
@@ -356,6 +380,13 @@ class Subscription(models.Model):
                 datetime.fromtimestamp(stripe_sub.current_period_end) + timedelta(days=3)
             )
         self.save()
+
+
+class SubscriptionUpdateException(Exception):
+    def __init__(self, subscription, stripe_subscription, message):
+        self.subscription = subscription
+        self.stripe_subscription = stripe_subscription
+        self.message = message
 
 
 @receiver(post_save, sender=Subscription)
