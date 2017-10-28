@@ -34,23 +34,23 @@ class CheckinCheckoutView(GenericAPIView):
         location = Location.objects.get(code=serializer.data['location'])
 
         if location.service == Location.CHECKIN:
-            return self.checkin(subscription, location)
+            return self.checkin(subscription, location, serializer.data['number_of_boxes'])
         elif location.service == Location.CHECKOUT:
-            return self.checkout(subscription, location)
+            return self.checkout(subscription, location, serializer.data['number_of_boxes'])
 
-    def checkin(self, subscription, location):
-        if subscription.can_checkin():
-            tag = subscription.tag_location(location)
+    def checkin(self, subscription, location, number_of_boxes):
+        if subscription.can_checkin(number_of_boxes):
+            tag = subscription.tag_location(location, number_of_boxes)
             return jsend_success(LocationTagSerializer(tag, many=True).data)
         else:
-            return jsend_fail({"subscription": "No boxes checked out."})
+            return jsend_fail({"subscription": "Not enough boxes checked out."})
 
-    def checkout(self, subscription, location):
-        if subscription.can_checkout():
-            tag = subscription.tag_location(location)
+    def checkout(self, subscription, location, number_of_boxes):
+        if subscription.can_checkout(number_of_boxes):
+            tag = subscription.tag_location(location, number_of_boxes)
             return jsend_success(LocationTagSerializer(tag, many=True).data)
         else:
-            return jsend_fail({"subscription": "No boxes available for checkout."})
+            return jsend_fail({"subscription": "Not enough boxes available for checkout."})
 
 
 class UserView(GenericAPIView):

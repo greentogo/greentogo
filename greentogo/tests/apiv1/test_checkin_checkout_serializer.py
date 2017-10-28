@@ -51,3 +51,27 @@ def test_valid_action(checkin_location, subscription1):
         }
     )
     assert serializer.is_valid()
+
+
+def test_number_of_boxes_works(checkin_location, subscription2):
+    serializer = CheckinCheckoutSerializer(
+        data={
+            "subscription": subscription2.pk,
+            "action": Location.CHECKIN,
+            "location": checkin_location.code,
+            "number_of_boxes": 2
+        }
+    )
+    assert serializer.is_valid()
+
+
+def test_min_number_of_boxes(checkin_location, subscription2):
+    serializer = CheckinCheckoutSerializer(
+        data={
+            "subscription": subscription2.pk,
+            "action": Location.CHECKIN,
+            "location": checkin_location.code,
+            "number_of_boxes": 0
+        }
+    )
+    assert not serializer.is_valid()

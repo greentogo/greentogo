@@ -11,6 +11,7 @@ class CheckinCheckoutSerializer(serializers.Serializer):
     action = serializers.ChoiceField(choices=[Location.CHECKIN, Location.CHECKOUT])
     location = serializers.CharField(max_length=6)
     subscription = serializers.IntegerField()
+    number_of_boxes = serializers.IntegerField(min_value=1, default=1)
 
     def validate_location(self, value):
         try:
