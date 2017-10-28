@@ -45,7 +45,7 @@ def location(request, location_code):
             if subscription.can_tag_location(location, number_of_boxes):
                 subscription.tag_location(location, number_of_boxes)
                 if location.service == location.CHECKIN:
-                    msg = "You have checked in {} {}.".format(
+                    msg = "You have returned {} {}.".format(
                         number_of_boxes, box_plural(number_of_boxes)
                     )
                 else:
@@ -56,7 +56,7 @@ def location(request, location_code):
             else:
                 if location.service == location.CHECKIN:
                     if number_of_boxes == 1:
-                        msg = "You have checked in all of your boxes for this subscription."
+                        msg = "You have returned all of your boxes for this subscription."
                     else:
                         msg = ("You do not have {} {} checked out with this "
                                "subscription.").format(
