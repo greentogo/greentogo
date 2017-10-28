@@ -62,7 +62,7 @@ class User(AbstractUser):
         return self.subscriptions.active().count() > 0
 
     def create_stripe_customer(self, token=None):
-        if self.stripe_id is not None:
+        if self.stripe_id:
             return
 
         if token is None:
@@ -80,7 +80,7 @@ class User(AbstractUser):
         return customer
 
     def get_stripe_customer(self, create=False):
-        if self.stripe_id is None:
+        if not self.stripe_id:
             if create:
                 return self.create_stripe_customer()
             else:

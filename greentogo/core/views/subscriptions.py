@@ -146,8 +146,11 @@ def change_subscription_plan(request, sub_id):
                 stripe_sub.id, items=[{
                     "id": item_id,
                     "plan": plan.stripe_id
-                }]
+                }], prorate=True
             )
+            # Bill the customer immediately for the change
+            stripe.Invoice.create(customer=user.stripe_id)
+
             subscription.plan = plan
             subscription.save()
 
