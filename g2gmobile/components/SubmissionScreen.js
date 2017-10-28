@@ -27,19 +27,17 @@ class SubmissionScreen extends React.Component {
             headers: {
                 'Authorization': `Token ${authToken}`
             }
+        }).then((response) => {
+            subscriptions = response.data.data.subscriptions;
+            if (response.data.data.email) this.props.appStore.email = response.data.data.email;
+            console.log(response.data.data)
+            if (subscriptions.length > 0) {
+                this.subscriptionChange(subscriptions[0].id);
+            }
+        }).catch((error) => {
+            console.log('In the error!');
+            console.log(error);
         })
-            .then((response) => {
-                subscriptions = response.data.data.subscriptions;
-                if (response.data.data.email) this.props.appStore.email = response.data.data.email;
-                console.log(response.data.data)
-                if (subscriptions.length > 0) {
-                    this.subscriptionChange(subscriptions[0].id);
-                }
-            })
-            .catch((error) => {
-                console.log('In the error!');
-                console.log(error);
-            })
     }
 
     static route = {
@@ -120,7 +118,7 @@ class SubmissionScreen extends React.Component {
             action: this.props.appStore.action
         }, config)
             .then((response) => {
-                console.log(response)
+                // console.log(response)
                 // TODO: Route to a success screen
                 if (this.props.appStore.action === 'OUT') {
                     this.props.navigator.push('checkOutSuccess', { boxCount: this.state.boxCount });

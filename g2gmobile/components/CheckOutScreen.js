@@ -35,15 +35,14 @@ class CheckOutScreen extends React.Component {
     }
 
     navigateNext = () => {
-        console.log(this.props.appStore)
         this.props.navigator.push('submission');
     };
 
     render() {
         return (
             <View style={{ flex: 1 }}>
-                 <Button onPress={this.navigateNext} /> 
-                 {/* <BarCodeScannerReader navigateNext={this.navigateNext}/>  */}
+                {/* <Button onPress={this.navigateNext} />  */}
+                <BarCodeScannerReader navigateNext={this.navigateNext} />
             </View>
         );
     }

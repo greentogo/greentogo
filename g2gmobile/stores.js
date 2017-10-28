@@ -11,13 +11,18 @@ enableLogging({
 
 export class AppStore {
     @observable authToken = ''
-    siteUrl = "https://app.durhamgreentogo.com"
+    @observable user = {}
+    siteUrl = "https://app.durhamgreentogo.com/api/v1"
 
     constructor() {
         console.log('appStore constructor')
         simpleStore.get('authToken').then(token => {
             console.log('stored token', token || 'not found')
             this.authToken = token
+        })
+        simpleStore.get('user').then(user => {
+            console.log('successfully got user from store', user)
+            this.user = user
         })
     }
 
@@ -35,5 +40,11 @@ export class AppStore {
         console.log('clearing authToken')
         this.authToken = null
         simpleStore.save('authToken', null)
+    }
+    
+    @action setUserData(data) {
+        console.log('setting user data ', data);
+        this.user = data
+        simpleStore.save('user', data)
     }
 }

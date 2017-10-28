@@ -56,11 +56,22 @@ class LoginScreen extends React.Component {
                 password: this.state.password
             }
         }).then((json) => {
-            // console.log("Login JSON: ", json.data);
             if (json.data.auth_token) {
                 this.setState({ loading: false });
-                return this.props.store.setAuthToken(json.data.auth_token);
+                this.props.store.setAuthToken(json.data.auth_token);
             }
+            
+            // Get the user data after successful login
+            axios.get('/me/', {
+                headers: {
+                    'Authorization': `Token ${json.data.auth_token}`
+                }
+            }).then((response) => {
+                console.log(response.data)
+                this.props.store.setUserData(response.data.data);
+            }).catch((err) => {
+                console.log(err)
+            })
         }).catch((error) => {
             console.log(JSON.stringify(error.response.data.non_field_errors[0]))
             this.setState({ error: error.response.data.non_field_errors, loading: false });
@@ -128,7 +139,6 @@ class LoginScreen extends React.Component {
         let errorMessages = this.state.error.map((error, index) => {
             return <Text key={index} style={{ color: 'red', textAlign: 'center' }}>{error}</Text>;
         });
-        console.log(this.state)
         return (
             <Container style={styles.container}>
                 <Header style={{ backgroundColor: styles.primaryColor, marginTop: Constants.statusBarHeight }}>
