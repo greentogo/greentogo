@@ -38,4 +38,9 @@ deploy-production:
 		-F local_username=$(LOCAL_USERNAME)
 
 greentogo/greentogo/.env:
-	gpg greentogo/greentogo/.env.gpg
+	cp greentogo/greentogo/.env.sample greentogo/greentogo/.env
+	@echo
+	@echo "You will need to add database and API information to"
+	@echo "the greentogo/greentogo/.env file. See README.md for"
+	@echo "more information."
+	@echo
