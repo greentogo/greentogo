@@ -1,0 +1,14 @@
+language: python
+python:
+  - 3.6
+services:
+  - postgresql
+install:
+  - make check
+  - make requirements
+  - make greentogo/greentogo/.env
+before_script:
+  - psql -c 'create database greentogo;' -U postgres
+script:
+  - ./greentogo/manage.py migrate
+  - pytest
