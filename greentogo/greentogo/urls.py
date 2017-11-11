@@ -71,8 +71,6 @@ urlpatterns = [
     ),
     url(r'^account/$', core_views.account_settings, name='account_settings'),
     url(r'^accounts/', include('registration.backends.default.urls')),
-    url(r'^thanks/', TemplateView.as_view(template_name="thanks.html"), name="beta-thanks"),
-    url(r'^error/', TemplateView.as_view(template_name="error.html"), name="beta-error"),
     url(r'^admin/', admin_site.urls),
     url(r'^api/docs/', include_docs_urls(title='GreenToGo API')),
     url(r'^api/v1/auth/', include('djoser.urls.authtoken')),
