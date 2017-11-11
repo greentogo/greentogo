@@ -210,12 +210,6 @@ STRIPE_WEBHOOK_SECRET = __env__('STRIPE_WEBHOOK_SECRET')
 # Email
 REGISTRATION_DEFAULT_FROM_EMAIL = __env__('EMAIL_FROM') or __env__('EMAIL_ADDRESS')
 DEFAULT_FROM_EMAIL = __env__('EMAIL_FROM') or __env__('EMAIL_ADDRESS')
-EMAIL_HOST_USER = __env__('EMAIL_ADDRESS')
-EMAIL_HOST_PASSWORD = __env__('EMAIL_PASSWORD')
-EMAIL_HOST = __env__('EMAIL_SMTP_SERVER')
-EMAIL_PORT = __env__('EMAIL_SMTP_PORT')
-EMAIL_USE_TLS = __env__('EMAIL_SECURE')
-# EMAIL_USE_SSL = __env__('EMAIL_SECURE')
 EMAIL_REPLY_TO = __env__('EMAIL_REPLY_TO')
 EMAIL_ADMINS = __env__('EMAIL_ADMINS')
 if isinstance(EMAIL_ADMINS, str):
@@ -253,6 +247,13 @@ if DEBUG:
         },
     }
 else:
+    EMAIL_HOST_USER = __env__('EMAIL_ADDRESS')
+    EMAIL_HOST_PASSWORD = __env__('EMAIL_PASSWORD')
+    EMAIL_HOST = __env__('EMAIL_SMTP_SERVER')
+    EMAIL_PORT = __env__('EMAIL_SMTP_PORT')
+    EMAIL_USE_TLS = __env__('EMAIL_SECURE')
+    # EMAIL_USE_SSL = __env__('EMAIL_SECURE')
+
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,

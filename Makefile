@@ -68,7 +68,7 @@ deploy-production:
 		-F revision=$(REVISION) \
 		-F local_username=$(LOCAL_USERNAME)
 
-greentogo/greentogo/.env:
+greentogo/greentogo/.env: greentogo/greentogo/.env.sample
 	cp greentogo/greentogo/.env.sample greentogo/greentogo/.env
 	@echo
 	@echo "You will need to add database and API information to"
