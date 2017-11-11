@@ -11,4 +11,4 @@ before_script:
   - psql -c 'create database greentogo;' -U postgres
 script:
   - ./greentogo/manage.py migrate
-  - pytest
+  - "cd ./greentogo && pytest"
