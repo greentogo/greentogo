@@ -115,20 +115,19 @@ class SubmissionScreen extends React.Component {
         axios.post('tag/', {
             subscription: this.state.subscriptionId,
             location: this.props.appStore.locationCode,
-            action: this.props.appStore.action
-        }, config)
-            .then((response) => {
-                // console.log(response)
-                // TODO: Route to a success screen
-                if (this.props.appStore.action === 'OUT') {
-                    this.props.navigator.push('checkOutSuccess', { boxCount: this.state.boxCount });
-                } else {
-                    this.props.navigator.push('returnSuccess', { boxCount: this.state.boxCount });
-                }
-            })
-            .catch((error) => {
-                console.log(error.response);
-            });
+            action: this.props.appStore.action,
+            number_of_boxes: this.state.boxCount
+        }, config).then((response) => {
+            // console.log(response)
+            // TODO: Route to a success screen
+            if (this.props.appStore.action === 'OUT') {
+                this.props.navigator.push('checkOutSuccess', { boxCount: this.state.boxCount });
+            } else {
+                this.props.navigator.push('returnSuccess', { boxCount: this.state.boxCount });
+            }
+        }).catch((error) => {
+            console.log(error.response);
+        });
     }
 
     render() {
@@ -152,21 +151,21 @@ class SubmissionScreen extends React.Component {
         return (
             subscriptions.length > 0 ? (
                 <View>
-                    {/* TODO: Add this back in once the tag/ endpoint accepts # of boxes
-                     <View style={{marginBottom: 10}}><Text style={styles.headerText}>How many boxes to {this.props.appStore.action}?</Text></View>
+                    {/* TODO: Add this back in once the tag/ endpoint accepts # of boxes */}
+                    <View style={{ marginBottom: 10 }}><Text style={styles.headerText}>How many boxes to {this.props.appStore.action}?</Text></View>
                     <View style={styles.centeredRow}>
-                        <Button
-                            success
-                            onPress={this.add} >
-                            <Text style={styles.icon}>+</Text>
-                        </ Button>
-                        <Text style={{marginLeft: 10, marginRight: 10, fontSize: 20}}>{this.state.boxCount}</Text>
                         <Button
                             success
                             onPress={this.subtract} >
                             <Text style={styles.icon}>-</Text>
-                        </ Button>
-                    </View> */}
+                        </Button>
+                        <Text style={{ marginLeft: 10, marginRight: 10, fontSize: 20 }}>{this.state.boxCount}</Text>
+                        <Button
+                            success
+                            onPress={this.add} >
+                            <Text style={styles.icon}>+</Text>
+                        </Button>
+                    </View>
                     <View>
                         <Text style={styles.headerText}>Check {this.props.appStore.action.toLowerCase()} 1 box on which subscription?</Text>
                         <Picker

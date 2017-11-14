@@ -1,6 +1,7 @@
 import { observable, action } from 'mobx';
 import { enableLogging } from 'mobx-logger';
 import simpleStore from 'react-native-simple-store';
+import axios from './apiClient';
 
 enableLogging({
     action: true,
@@ -30,6 +31,10 @@ export class AppStore {
         return this.siteUrl + path;
     }
 
+    reduceBoxes(subscriptions, type) {
+        return subscriptions.reduce((sum, subscription) => sum + subscription[type], 0)
+    }
+
     @action setAuthToken(token) {
         console.log('setting authToken', token)
         this.authToken = token
@@ -41,10 +46,29 @@ export class AppStore {
         this.authToken = null
         simpleStore.save('authToken', null)
     }
+
+    @action getUserData() {
+        // Get the user data after successful login
+        axios.get('/me/', {
+            headers: {
+                'Authorization': `Token ${this.authToken}`
+            }
+        }).then((response) => {
+            console.log("User data success")
+            this.setUserData(response.data.data);
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
     
     @action setUserData(data) {
-        console.log('setting user data ', data);
+        // console.log('setting user data ', data);
         this.user = data
+        if (data.subscriptions) {
+            this.user.maxBoxes = this.reduceBoxes(data.subscriptions, "max_boxes")
+            this.user.availableBoxes = this.reduceBoxes(data.subscriptions, "available_boxes")
+        }
         simpleStore.save('user', data)
+        console.log("User data: ", this.user)
     }
 }

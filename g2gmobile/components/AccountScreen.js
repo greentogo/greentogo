@@ -18,9 +18,7 @@ import styles from "../styles";
 class AccountScreen extends React.Component {
     constructor(props) {
         super(props)
-        this.state = {
-            email: this.props.appStore.email || null
-        }
+        this.state = this.props.appStore.user
     }
 
     static route = {
@@ -30,12 +28,15 @@ class AccountScreen extends React.Component {
     }
 
     render() {
+        console.log("Account State: ", this.state)
+        console.log(this.state.username)
         return (
             <View style={{ flex: 1, alignItems: 'center', backgroundColor: styles.primaryCream, paddingTop: 30 }}>
-                <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>damianhouse@gmail.com</Text>
+                <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>{this.state.email}</Text>
                 <Text style={{ color: '#0000EE', fontSize: 14 }} onPress={() => { this.setState({ type: 'passwordReset' }) }}>Reset Password</Text>
-                <Subscription />
-                <View style={{ flex: 1, justifyContent: 'center', backgroundColor: styles.primaryCream, paddingTop: 30 }}>
+                {/* <Subscription /> */}
+                <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>{this.state.availableBoxes}/ {this.state.maxBoxes} available</Text>
+                {/* <View style={{ flex: 1, justifyContent: 'center', backgroundColor: styles.primaryCream, paddingTop: 30 }}>
                     <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 26 }}>You've saved</Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                         <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 40, paddingRight: 10 }}>12</Text>
@@ -46,7 +47,7 @@ class AccountScreen extends React.Component {
                         <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 40, paddingLeft: 10 }}>s</Text>
                     </View>
                     <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 26 }}>from a landfill</Text>
-                </View>
+                </View> */}
             </View>
         )
     }

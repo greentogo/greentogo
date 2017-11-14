@@ -17,6 +17,7 @@ import {
     Icon,
     Left
 } from "native-base";
+import axios from '../apiClient';
 
 class ListMenuItem extends React.Component {
     render() {
@@ -39,11 +40,34 @@ class ListMenuItem extends React.Component {
 @inject("appStore")
 @observer
 class HomeScreen extends React.Component {
+    constructor(props) {
+        super(props)
+        this.props.appStore.getUserData()
+    }
+
     static route = {
         navigationBar: {
             renderTitle: (route, props) => <G2GTitleImage />,
             backgroundColor: '#628e86'
         }
+    }
+    componentWillMount() {
+        let authToken = this.props.appStore.authToken;
+        axios.get('me/', {
+            headers: {
+                'Authorization': `Token ${authToken}`
+            }
+        }).then((response) => {
+            subscriptions = response.data.data.subscriptions;
+            if (response.data.data.email) this.props.appStore.email = response.data.data.email;
+            console.log(response.data.data)
+            if (subscriptions.length > 0) {
+                this.subscriptionChange(subscriptions[0].id);
+            }
+        }).catch((error) => {
+            console.log('In the error!');
+            console.log(error);
+        })
     }
 
     goToMap = () => {
@@ -96,6 +120,9 @@ class HomeScreen extends React.Component {
                         onPress={this.logOut}
                     />
                 </List>
+                <View style={{ flex: 1, alignItems: 'center' }}>
+                    <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>{this.props.appStore.user.availableBoxes} / {this.props.appStore.user.maxBoxes} available</Text>
+                </View>
             </Content>
         )
     }

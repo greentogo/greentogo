@@ -7,13 +7,19 @@ import {
     TouchableOpacity
 } from 'react-native';
 import { Constants } from 'expo';
+import styles from "../styles";
 
 class CheckOutSuccessScreen extends React.Component {
-   constructor(props) {
+    constructor(props) {
         super(props)
         this.state = {
             boxCount: this.props.route.params.boxCount,
             time: new Date()
+        }
+    }
+    static route = {
+        navigationBar: {
+            title: 'Check out success'
         }
     }
 
@@ -29,14 +35,14 @@ class CheckOutSuccessScreen extends React.Component {
                 flexDirection: 'column'
             },
             statusBar: {
-              paddingTop: Constants.statusBarHeight,
-              backgroundColor: '#ffffff'
+                paddingTop: Constants.statusBarHeight,
+                backgroundColor: '#ffffff'
             },
             goHomeButton: {
-              fontSize: 50,
-              color: 'white',
-              paddingTop: 5,
-              paddingLeft: 5
+                fontSize: 50,
+                color: '#628e86',
+                paddingTop: 5,
+                paddingLeft: 5
             },
             checkOutTextContainer: {
                 flex: 1,
@@ -44,32 +50,32 @@ class CheckOutSuccessScreen extends React.Component {
                 justifyContent: 'center'
             },
             checkOutText: {
-              color: 'white',
-              textAlign: 'center',
-              fontSize: 45
+                color: '#628e86',
+                textAlign: 'center',
+                fontSize: 45
             },
             dateTimeText: {
-              color: 'white',
-              textAlign: 'center',
-              fontSize: 30
+                color: '#628e86',
+                textAlign: 'center',
+                fontSize: 30
             },
             imageContainer: {
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: 50
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: 50
             }
         });
 
         return (
-            <View style={styles.topContainer}>
-            <View style={styles.statusBar}></View>
+            <View>
                 <TouchableOpacity>
                     <Text
-                      style={styles.goHomeButton}
-                      onPress={() => this.goHome()}
+                        style={styles.goHomeButton}
+                        onPress={() => this.goHome()}
                     >X</Text>
                 </TouchableOpacity>
-                <View style={styles.checkOutTextContainer}>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+
                     <Text style={styles.checkOutText}>
                         Checked out
                     </Text>
@@ -78,11 +84,11 @@ class CheckOutSuccessScreen extends React.Component {
                     </Text>
                     {/* TODO: Give location name on successful checkOut and set it to state */
                     }
-                    {/* <Text style={{color: 'white', textAlign: 'center', fontSize: 45}}>
+                    {/* <Text style={{color: '#628e86', textAlign: 'center', fontSize: 45}}>
                     {this.state.location ? "from " + this.state.location : ""}
                     </Text> */}
                     <Text style={styles.dateTimeText}>
-                    {this.state.time ? this.state.time.toLocaleTimeString() : ""}
+                        {this.state.time ? this.state.time.toLocaleTimeString() : ""}
                     </Text>
                     <Text style={styles.dateTimeText}>
                         {this.state.time ? this.state.time.toLocaleDateString() : ""}
@@ -90,7 +96,7 @@ class CheckOutSuccessScreen extends React.Component {
                     <View style={styles.imageContainer}>
                         <Image
                             source={require('../assets/icons/GTG-Box-App.png')}
-                            style={{ height: 140, width: 140}}
+                            style={{ height: 140, width: 140 }}
                         />
                     </View>
                 </View>

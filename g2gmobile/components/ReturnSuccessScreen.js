@@ -62,7 +62,6 @@ class ReturnSuccessScreen extends React.Component {
 
         return (
             <View style={styles.topContainer}>
-            <View style={styles.statusBar}></View>
                 <TouchableOpacity>
                     <Text
                       style={styles.goHomeButton}
