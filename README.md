@@ -10,7 +10,7 @@ The files are laid out in accordance with recommendations from Two Scoops of Dja
 1. Setup PostgreSQL. On a Mac with Homebrew, run `brew install postgresql`. If you are on a Mac without Homebrew, download and install [Postgres.app](https://postgresapp.com/). If you are on Windows, see https://www.postgresql.org/download/windows/. If you are on Linux, you know what to do.
 1. Make sure you are in a virtualenv. Using [direnv](https://direnv.net/) or [pyenv-installer](https://github.com/pyenv/pyenv-installer) is a very easy way to make this happen.
 1. Run `make check` to make sure you have all the required programs installed.
-1. Run `brew install pre-commit` if it is not already on your machine or `brew update pre-commit` if it is. In the greentogo folder run `pre-commit install`. In the dev-requirements.in file add 'pre-commit' if it is not already there. See [documentation](http://pre-commit.com/) for info on usage.
+1. Run `brew install pre-commit` if it is not already on your machine or `brew update pre-commit` if it is. In the greentogo folder run `pre-commit install`. In the dev-requirements.in file add 'pre-commit' if it is not already there. See [documentation](http://pre-commit.com/) for info on usage. It is also recommended that you install a python linter in your text editor.
 1. Run `make requirements`. If that worked, you should be ready for the next part!
 1. Run `make greentogo/greentogo/.env`. This will create a file to hold the database URL and API keys that you will need. (See "Environment Setup" below.)
 1. Run `./greentogo/manage.py migrate`.
