@@ -4,15 +4,21 @@
 #
 #    pip-compile --output-file dev-requirements.txt dev-requirements.in
 #
+appnope==0.1.0            # via ipython
+aspy.yaml==1.0.0          # via pre-commit
+cached-property==1.3.1    # via pre-commit
 decorator==4.1.2          # via ipython, traitlets
 faker==0.7.18
+identify==1.0.7           # via pre-commit
 ipython-genutils==0.2.0   # via traitlets
 ipython==6.1.0
 isort==4.2.15
 jedi==0.10.2
 multidict==3.1.3          # via yarl
+nodeenv==1.2.0            # via pre-commit
 pexpect==4.2.1            # via ipython
 pickleshare==0.7.4        # via ipython
+pre-commit==1.4.1
 prompt-toolkit==1.0.15    # via ipython
 ptyprocess==0.5.2         # via pexpect
 py==1.4.34                # via pytest
@@ -20,11 +26,12 @@ pygments==2.2.0           # via ipython
 pytest-django==3.1.2
 pytest==3.2.0
 python-dateutil==2.6.1    # via faker
-pyyaml==3.12              # via vcrpy
+pyyaml==3.12              # via aspy.yaml, pre-commit, vcrpy
 simplegeneric==0.8.1      # via ipython
-six==1.10.0               # via faker, prompt-toolkit, python-dateutil, traitlets, vcrpy
+six==1.10.0               # via faker, pre-commit, prompt-toolkit, python-dateutil, traitlets, vcrpy
 traitlets==4.3.2          # via ipython
 vcrpy==1.11.1
+virtualenv==15.1.0        # via pre-commit
 wcwidth==0.1.7            # via prompt-toolkit
 wrapt==1.10.10            # via vcrpy
 yapf==0.16.3
