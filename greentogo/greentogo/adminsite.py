@@ -30,7 +30,8 @@ class G2GAdminSite(admin.AdminSite):
         return super().__init__(*args, **kwargs)
 
     def register_view(
-        self, path, name=None, section="Custom Views", urlname=None, visible=True, view=None
+        self, path, name=None, section="Custom Views", urlname=None, \
+        visible=True, view=None, only_superusers=False
     ):
         """Add a custom admin view. Can be used as a function or a decorator.
         * `path` is the path in the admin where the view will live, e.g.
@@ -51,7 +52,7 @@ class G2GAdminSite(admin.AdminSite):
             if section not in self.custom_sections:
                 self.custom_sections[section] = []
 
-            self.custom_sections[section].append((path, fn, name, urlname, visible, ))
+            self.custom_sections[section].append((path, fn, name, urlname, visible, only_superusers))
             return fn
 
         if view is not None:
@@ -64,7 +65,7 @@ class G2GAdminSite(admin.AdminSite):
         urls = super().get_urls()
         from django.conf.urls import url
         for section, views in self.custom_sections.items():
-            for path, view, name, urlname, visible in views:
+            for path, view, name, urlname, visible, only_superusers in views:
                 urls = [
                     url(r'^%s$' % path, self.admin_view(view), name=urlname),
                 ] + urls
@@ -76,9 +77,14 @@ class G2GAdminSite(admin.AdminSite):
             extra_context = {}
         custom_list = {}
 
+
         for section, views in self.custom_sections.items():
             custom_list[section] = []
-            for path, view, name, urlname, visible in views:
+            for path, view, name, urlname, visible, only_superusers in views:
+                if only_superusers and not request.user.is_superuser:
+                    #only add superuser views if the user is a superuser
+                    continue
+
                 if callable(visible):
                     visible = visible(request)
                 if visible:
@@ -87,8 +93,14 @@ class G2GAdminSite(admin.AdminSite):
                     else:
                         custom_list[section].append((path, view.__name__))
 
+            if custom_list[section] == []:
+                #the user has no permissions to edit anything in this section
+                #remove empty section
+                custom_list.pop(section, None)
+
         # Sort views alphabetically.
         # custom_list.sort(key=lambda x: x[1])
+
         extra_context.update({'custom_sections': custom_list})
         return super().index(request, extra_context)
 
@@ -101,7 +113,8 @@ admin_site.register_view(
     path='core/unclaimed_subscriptions.csv',
     view=unclaimed_subscription_status_csv,
     section="Reports",
-    name="Download CSV of claimed subscriptions"
+    name="Download CSV of claimed subscriptions",
+    only_superusers=True,
 )
 
 admin_site.register_view(
@@ -142,6 +155,7 @@ admin_site.register_view(
     section="Reports",
     name="Location Stock Report",
     urlname="stock_report",
+    only_superusers=True,
 )
 
 admin_site.register_view(
@@ -150,6 +164,7 @@ admin_site.register_view(
     section="Reports",
     name="Activity Report",
     urlname="activity_report",
+    only_superusers=True,
 )
 
 admin_site.register(Group, GroupAdmin)
