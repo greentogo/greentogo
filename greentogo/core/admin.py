@@ -4,7 +4,8 @@ from django.http import HttpResponse
 from .models import Location, UnclaimedSubscription, Subscription
 
 class SubscriptionAdmin(admin.ModelAdmin):
-    search_fields = ('name', 'user', 'stripe_id', )
+    list_display = ('name', 'user', 'plan', 'stripe_id', )
+    search_fields = ('name', 'user__name', 'user__username', 'stripe_id', )
 
 class UnclaimedSubscriptionAdmin(admin.ModelAdmin):
     list_display = ('email', 'plan', 'claimed', )
