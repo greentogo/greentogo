@@ -56,3 +56,6 @@ class LocationAdmin(admin.ModelAdmin):
         return response
 
     make_qrcodes.short_description = "Generate QR codes for selected locations"
+
+class GroupAdmin(admin.ModelAdmin):
+    filter_horizontal = ('permissions',)
