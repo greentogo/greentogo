@@ -24,7 +24,9 @@ def checkin_all_boxes(modeladmin, request, queryset):
 checkin_all_boxes.short_description = "Return all boxes for selected users"
 
 class SubscriptionAdmin(admin.ModelAdmin):
-    search_fields = ('name', 'user', 'stripe_id', )
+    list_display = ('name', 'user', 'plan', 'stripe_id', )
+    search_fields = ('name', 'user__name', 'user__username', 'stripe_id', )
+
     actions = [checkin_all_boxes]
 
 class UnclaimedSubscriptionAdmin(admin.ModelAdmin):
