@@ -15,6 +15,7 @@ from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.text import slugify
+from collections import Counter
 
 import shortuuid
 from django_geocoder.wrapper import get_cached as geocode
@@ -39,11 +40,38 @@ def activity_data(days=30):
                  .values("date") \
                  .annotate(volume=Count("date")) \
                  .order_by("date")
-        return [{"date": d['date'].date(), "volume": d['volume']} for d in data]
+        data = [{"date": d['date'].date(), "volume": d['volume']} for d in data]
+        return data
+
+    def _get_user_data():
+        # filter this to only count active subscriptions
+        total_active_subs = Subscription.objects.all().count()
+
+        #1. get locationtag objects similar to _get_data
+        #2. annotate data with subscription id?
+        #3. count unique subscription IDs, and compare to total
+
+        data = list(
+            LocationTag.objects.filter(created_at__gte=begin_datetime_start_of_day) \
+                .annotate(date=DateTrunc('created_at', precision='day')) \
+                .values("date", "subscription") \
+                .distinct()
+            )
+
+        data = dict(Counter(d['date'].date() for d in data))
+
+        data = [{"date": date, "volume": subs/total_active_subs * 100.0} for date, subs in data.items()]
+
+        print("=============")
+        print(data)
+
+        return data
 
     checkin_data = _get_data(LocationTag.objects.checkin())
     checkout_data = _get_data(LocationTag.objects.checkout())
-    return {"checkin": checkin_data, "checkout": checkout_data}
+
+    user_percentage_data = _get_user_data()
+    return {"checkin": checkin_data, "checkout": checkout_data, "user": user_percentage_data}
 
 def total_boxes_returned():
     return LocationTag.objects.checkin().count()
@@ -231,7 +259,7 @@ class Subscription(models.Model):
 
     name = models.CharField(max_length=255, null=True, blank=True)
     user = models.ForeignKey(User, related_name="subscriptions")
-    plan = models.ForeignKey(Plan, null=True)
+    plan = models.ForeignKey(Plan, null=True, blank=True)
     starts_at = models.DateTimeField(default=timezone.now)
     ends_at = models.DateTimeField(null=True, blank=True)
     stripe_id = models.CharField(max_length=100, blank=True, null=True)
@@ -336,6 +364,13 @@ class Subscription(models.Model):
         for _ in range(number_of_boxes):
             tags.append(LocationTag.objects.create(subscription=self, location=location))
         return tags
+
+    def used_today(self):
+        return self.used_on_date(date.today())
+
+    def used_on_date(self, date):
+        tag_count = LocationTag.objects.filter(subscription=self, created_at__date=date).count()
+        return tag_count > 0
 
     def will_auto_renew(self):
         return self.has_stripe_subscription() and self.is_stripe_active()

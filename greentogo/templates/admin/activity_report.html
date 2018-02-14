@@ -15,10 +15,16 @@
 </div>
 
 
-<h2>Activity for last 30 days</h2>
+<h2>Box activity for last 30 days</h2>
 
 <div style="max-width: 960px;">
-    <canvas id="activityChart" width="500" height="300"></canvas>
+    <canvas id="MonthlyBoxesChart" width="500" height="300"></canvas>
+</div>
+
+<h2>User activity for last 30 days</h2>
+
+<div style="max-width: 960px;">
+    <canvas id="MonthlyUsersChart" width="500" height="300"></canvas>
 </div>
 {% endblock %}
 
@@ -38,8 +44,10 @@ $(function () {
     };
     window.convertToXY = convertToXY;
 
-    var activityCanvas = document.getElementById("activityChart");
-    var chart = new Chart(activityCanvas, {
+    //Create chart for boxes
+
+    var monthlyBoxesChart = document.getElementById("MonthlyBoxesChart");
+    var chart = new Chart(monthlyBoxesChart, {
         type: 'line',
         data: {
             datasets: [
@@ -79,6 +87,44 @@ $(function () {
             }
         }
     });
+
+    //Create chart for subscription use
+
+    console.log(data);
+
+    var monthlyUsersChart = document.getElementById("MonthlyUsersChart");
+    var chart = new Chart(monthlyUsersChart, {
+        type: 'line',
+        data: {
+            datasets: [
+                {
+                    label: "Active subscriptions",
+                    data: convertToXY(data.user),
+                    fill: false,
+                    backgroundColor: 'rgba(49,130,189, 1)',
+                    borderColor: 'rgba(49,130,189, 0.5)',
+                    cubicInterpolationMode: 'monotone',
+                    spanGaps: true
+                }
+            ]
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        unit: 'day'
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
 });
 </script>
 {% endblock %}
