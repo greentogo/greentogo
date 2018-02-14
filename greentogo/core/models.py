@@ -45,6 +45,10 @@ def activity_data(days=30):
     checkout_data = _get_data(LocationTag.objects.checkout())
     return {"checkin": checkin_data, "checkout": checkout_data}
 
+def total_boxes_returned():
+    return LocationTag.objects.checkin().count()
+
+
 
 class User(AbstractUser):
     name = models.CharField(max_length=255, blank=True, null=True)

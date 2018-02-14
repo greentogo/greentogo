@@ -8,7 +8,9 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from core.models import (
-    Location, Plan, Restaurant, Subscription, UnclaimedSubscription, User, activity_data
+    Location, Plan, Restaurant, Subscription, \
+    UnclaimedSubscription, User, \
+    activity_data, total_boxes_returned, \
 )
 
 
@@ -57,7 +59,8 @@ def stock_report(request, *args, **kwargs):
 def activity_report(request, days=30, *args, **kwargs):
     data = activity_data(days)
     data_json = json.dumps(data, cls=DjangoJSONEncoder)
-    return render(request, 'admin/activity_report.html', {"data_json": data_json})
+    view_data = {"data_json": data_json, "total_boxes_returned": total_boxes_returned()}
+    return render(request, 'admin/activity_report.html', view_data)
 
 
 def restock_locations(request, *args, **kwargs):

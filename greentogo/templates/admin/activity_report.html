@@ -4,9 +4,19 @@
 {% load static %}
 
 {% block content_title %}
-<h1>Activity for last 30 days</h1>
+<h1>Activity Report</h1>
 {% endblock %}
+
 {% block content %}
+<h2>Box check-ins (running total)</h2>
+
+<div style="font-size:3em; color:#0000ff;">
+    {{ total_boxes_returned }}
+</div>
+
+
+<h2>Activity for last 30 days</h2>
+
 <div style="max-width: 960px;">
     <canvas id="activityChart" width="500" height="300"></canvas>
 </div>
