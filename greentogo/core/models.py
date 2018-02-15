@@ -46,11 +46,7 @@ def activity_data(days=30):
     def _get_user_data():
         # filter this to only count active subscriptions
         total_active_subs = Subscription.objects.all().count()
-
-        #1. get locationtag objects similar to _get_data
-        #2. annotate data with subscription id?
-        #3. count unique subscription IDs, and compare to total
-
+        
         data = list(
             LocationTag.objects.filter(created_at__gte=begin_datetime_start_of_day) \
                 .annotate(date=DateTrunc('created_at', precision='day')) \
@@ -59,12 +55,7 @@ def activity_data(days=30):
             )
 
         data = dict(Counter(d['date'].date() for d in data))
-
         data = [{"date": date, "volume": subs/total_active_subs * 100.0} for date, subs in data.items()]
-
-        print("=============")
-        print(data)
-
         return data
 
     checkin_data = _get_data(LocationTag.objects.checkin())
