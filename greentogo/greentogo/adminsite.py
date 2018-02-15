@@ -16,6 +16,8 @@ from core.views.admin import (
     stock_report, unclaimed_subscription_status_csv
 )
 
+from export_action.admin import export_selected_objects
+
 
 def is_class_based_view(view):
     return inspect.isclass(view) and issubclass(view, View)
@@ -177,3 +179,19 @@ admin_site.register(Plan)
 admin_site.register(UnclaimedSubscription, UnclaimedSubscriptionAdmin)
 admin_site.register(CorporateCode)
 admin_site.register(LocationTag)
+
+
+# export tools
+# all export-able models need to be registered with the default admin.site
+# note: register with admin.site, not admin_site (which is our G2GAdminSite)
+admin.site.register(User)
+admin.site.register(Location)
+admin.site.register(Restaurant)
+admin.site.register(Subscription)
+admin.site.register(Plan)
+admin.site.register(UnclaimedSubscription)
+admin.site.register(CorporateCode)
+admin.site.register(LocationTag)
+
+#Add the export action to the custom admin site
+admin_site.add_action(export_selected_objects)

@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'postgres_stats',
+    'export_action',
 
     # ours
     'core',

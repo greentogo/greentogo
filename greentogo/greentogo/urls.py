@@ -69,6 +69,7 @@ urlpatterns = [
         core_views.change_payment_method,
         name='change_payment_method'
     ),
+    url(r'^export_action/', include("export_action.urls", namespace="export_action")),
     url(r'^account/$', core_views.account_settings, name='account_settings'),
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^admin/', admin_site.urls),
