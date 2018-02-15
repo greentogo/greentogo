@@ -19,7 +19,7 @@ def checkin_all_boxes(modeladmin, request, queryset):
                 # Use the first admin Location, failing that use first location
                 checkin_location = Location.objects.filter(admin_location=True).first() \
                     or Location.objects.checkin().first()
-                LocationTag.objects.create(subscription=sub, location=)
+                LocationTag.objects.create(subscription=sub, location=checkin_location)
 
 
 checkin_all_boxes.short_description = "Return all boxes for selected users"
