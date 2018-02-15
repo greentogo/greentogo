@@ -16,9 +16,10 @@ def checkin_all_boxes(modeladmin, request, queryset):
         if sub.can_checkin():
             #Create checkin tags equal to number of boxes currently checked out
             for i in range(sub.boxes_checked_out()):
-                # Use the first checkin LocationTag
-                # TODO: determine best method for choosing checkin location
-                LocationTag.objects.create(subscription=sub, location=Location.objects.checkin().first())
+                # Use the first admin Location, failing that use first location
+                checkin_location = Location.objects.filter(admin_location=True).first() \
+                    or Location.objects.checkin().first()
+                LocationTag.objects.create(subscription=sub, location=)
 
 
 checkin_all_boxes.short_description = "Return all boxes for selected users"
@@ -35,7 +36,7 @@ class UnclaimedSubscriptionAdmin(admin.ModelAdmin):
 
 
 class LocationAdmin(admin.ModelAdmin):
-    fields = ('name', 'code', 'service', 'address', 'latitude', 'longitude', )
+    fields = ('name', 'code', 'service', 'address', 'latitude', 'longitude', 'admin_location')
     readonly_fields = ('code', 'latitude', 'longitude', )
     list_display = ('name', 'code', 'service', )
     actions = [

@@ -452,6 +452,13 @@ class Location(models.Model):
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
 
+    admin_location = models.BooleanField(
+        blank=True,
+        default=False,
+        help_text="Admin locations are locations where \
+        boxes will be checked in when resetting a \
+        subscriptions box count manually")
+
     def __str__(self):
         return "{} - {}".format(self.name, self.service)
 
