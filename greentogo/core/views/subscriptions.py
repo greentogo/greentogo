@@ -22,8 +22,8 @@ rollbar.init(settings.ROLLBAR_KEY, settings.ROLLBAR_ENV)
 
 @login_required
 def subscriptions_view(request):
-    subscriptions = request.user.subscriptions.active().order_by("starts_at")
-    return render(request, 'core/subscriptions.html', {"subscriptions": subscriptions})
+    #subscriptions = request.user.subscriptions.active().order_by("starts_at")
+    return render(request, 'core/subscriptions.html')
 
 
 @login_required

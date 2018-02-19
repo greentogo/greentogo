@@ -46,7 +46,7 @@ def activity_data(days=30):
     def _get_user_data():
         # filter this to only count active subscriptions
         total_active_subs = Subscription.objects.all().count()
-        
+
         data = list(
             LocationTag.objects.filter(created_at__gte=begin_datetime_start_of_day) \
                 .annotate(date=DateTrunc('created_at', precision='day')) \
@@ -83,6 +83,9 @@ class User(AbstractUser):
 
     def has_active_subscription(self):
         return self.subscriptions.active().count() > 0
+
+    def get_subscriptions(self):
+        return self.subscriptions.active().order_by("starts_at")
 
     def create_stripe_customer(self, token=None):
         if self.stripe_id:
