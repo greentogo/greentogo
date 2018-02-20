@@ -549,6 +549,9 @@ class LocationTag(models.Model):
     location = models.ForeignKey(Location)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return "Location Tag - {} - {}".format(self.subscription.user, self.created_at)
+
 
 class LocationStockCount(models.Model):
     location = models.ForeignKey(Location, related_name='stock_counts')
