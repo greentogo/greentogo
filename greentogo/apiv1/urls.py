@@ -5,6 +5,7 @@ import apiv1.views as views
 urlpatterns = [
     url(r'^tag/$', views.CheckinCheckoutView.as_view(), name="api_v1_tag"),
     url(r'^me/$', views.UserView.as_view(), name="api_v1_user"),
+    url(r'^box_stats/$', views.Statistics.as_view(), name="api_v1_stats"),
     # url(
     #     r'^subscriptions/plans/$',
     #     views.SubscriptionPlansView.as_view(),
