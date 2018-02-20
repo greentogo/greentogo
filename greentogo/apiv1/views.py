@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import Location, LocationTag, Plan, Restaurant, Subscription
+from core.models import User, Location, LocationTag, Plan, Restaurant, Subscription
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
@@ -126,3 +126,21 @@ class RestaurantsView(APIView):
         phases = [1]
         serializer = RestaurantSerializer(Restaurant.objects.filter(phase__in=phases), many=True)
         return jsend_success(serializer.data)
+
+class Statistics(GenericAPIView):
+    """
+    Get stats for box returns, users and subscriptions
+    """
+
+    permission_classes = (IsAuthenticated, )
+    # Tell DRF documentation you are not a list view.
+    action = 'retrieve'
+
+    def get(self, request):
+        data = {
+            "total_boxes_returned": LocationTag.objects.checkin().count(),
+            "total_users": User.objects.count(),
+            "total_subscriptions": Subscription.objects.active().count(),
+
+            }
+        return jsend_success(data)
