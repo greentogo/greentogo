@@ -125,6 +125,30 @@ def corporate_subscription(request, *args, **kwargs):
 
     return render(request, "core/corporate_subscription.html")
 
+@login_required
+def cancel_subscription(request, sub_id):
+    real_id = decode_id(sub_id)[0]
+    user = request.user
+    subscription = user.subscriptions.get(id=real_id)
+    if request.method == "POST":
+        #cancel the subscription
+        stripe_sub = subscription.get_stripe_subscription()
+        print(stripe_sub)
+
+        #delete the stripe sub
+        stripe_sub.delete()
+        #delete the sub in our database
+        subscription.delete()
+
+        messages.success(request, "Your subscription has been cancelled")
+        return redirect(reverse('subscriptions'))
+
+    return render(
+        request, "core/cancel_subscription.html", {
+            "subscription": subscription,
+        }
+    )
+
 
 @login_required
 def change_subscription_plan(request, sub_id):

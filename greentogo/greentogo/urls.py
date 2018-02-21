@@ -51,6 +51,11 @@ subscriptions_patterns = [
         core.views.subscriptions.add_credit_card,
         name='subscription_add_credit_card',
     ),
+    url(
+        r'^(?P<sub_id>[A-Za-z0-9]+)/cancel/$',
+        core.views.subscriptions.cancel_subscription,
+        name='cancel_subscription',
+    ),
 ]
 
 urlpatterns = [
