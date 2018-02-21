@@ -191,15 +191,10 @@ class Plan(models.Model):
                 stripe_plan.save()
         else:
             self.stripe_id = self._generate_stripe_id()
-            #Do not commit this! Using a new API version, which may differ
-            #from production
             plan = stripe.Plan.create(
-                nickname=self.name,
+                name=self.name,
                 id=self.stripe_id,
                 interval="year",
-                product={
-                    "name": self.name
-                },
                 currency="usd",
                 amount=self.amount,
             )
