@@ -26,7 +26,8 @@
             </div>
             <div class="medium-6 columns">
                 {% if sub.has_stripe_subscription %}
-                    <a href="{% url 'subscription_plan' sub_id=sub.hashed_id %}" class="button">Change subscription plan</a>
+                    <a href="{% url 'subscription_plan' sub_id=sub.hashed_id %}" class="button">Change subscription</a>
+                    <a href="{% url 'cancel_subscription' sub_id=sub.hashed_id %}" class="button alert">Cancel subscription</a>
                 {% else %}
                     <a href="{% url 'subscription_add_credit_card' sub_id=sub.hashed_id %}" class="button">
                         Add credit card
