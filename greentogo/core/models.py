@@ -147,8 +147,14 @@ class Plan(models.Model):
         instance._loaded_values = dict(zip(field_names, values))
         return instance
 
+    def g_available(self):
+        if self.available:
+            return ""
+        else:
+            return "(UNAVAILABLE)"
+
     def __str__(self):
-        return "{} - {}".format(self.name, self.stripe_id)
+        return "{} Stripe ID:{} {}".format(self.name, self.stripe_id, self.g_available())
 
     def as_dict(self):
         return {
@@ -259,6 +265,7 @@ class Subscription(models.Model):
     stripe_id = models.CharField(max_length=100, blank=True, null=True)
     stripe_status = models.CharField(max_length=100, default="active")
     corporate_code = models.ForeignKey('CorporateCode', null=True, blank=True)
+    cancelled = models.BooleanField(default=False)
 
     def __str__(self):
         return "{} - {}".format(self.user.name, self.display_name)
@@ -367,7 +374,7 @@ class Subscription(models.Model):
         return tag_count > 0
 
     def will_auto_renew(self):
-        return self.has_stripe_subscription() and self.is_stripe_active()
+        return self.has_stripe_subscription() and self.is_stripe_active() and not self.cancelled
 
     def is_stripe_active(self):
         return self.stripe_status in ("active", "trialing", )

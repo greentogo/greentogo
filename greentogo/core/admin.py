@@ -30,6 +30,9 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
     actions = [checkin_all_boxes]
 
+class PlanAdmin(admin.ModelAdmin):
+    ordering = ('-available',)
+
 class UnclaimedSubscriptionAdmin(admin.ModelAdmin):
     list_display = ('email', 'plan', 'claimed', )
     search_fields = ('email', )

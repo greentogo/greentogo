@@ -5,7 +5,7 @@ from django.views.generic import View
 
 from django.contrib.auth.models import Group;
 
-from core.admin import LocationAdmin, UnclaimedSubscriptionAdmin, GroupAdmin, SubscriptionAdmin
+from core.admin import LocationAdmin, UnclaimedSubscriptionAdmin, GroupAdmin, SubscriptionAdmin, PlanAdmin
 from django.contrib.auth.admin import UserAdmin
 from core.models import (
     CorporateCode, Location, LocationTag, Plan, Restaurant, Subscription, UnclaimedSubscription,
@@ -175,7 +175,7 @@ admin_site.register(User, UserAdmin)
 admin_site.register(Location, LocationAdmin)
 admin_site.register(Restaurant)
 admin_site.register(Subscription, SubscriptionAdmin)
-admin_site.register(Plan)
+admin_site.register(Plan, PlanAdmin)
 admin_site.register(UnclaimedSubscription, UnclaimedSubscriptionAdmin)
 admin_site.register(CorporateCode)
 admin_site.register(LocationTag)

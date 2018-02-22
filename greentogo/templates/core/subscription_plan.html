@@ -9,6 +9,7 @@
             <strong>Your current plan</strong>: {{ subscription.plan_display }} @ {{ subscription.amount_display }}/year
         </p>
 
+        {% if not subscription.cancelled %}
         <form action="." method="POST">
             {% csrf_token %}
             <label for="{{ form.plan.id_for_label }}">Change to plan</label>
@@ -22,6 +23,12 @@
                 <a href="{% url 'subscriptions' %}" class="alert button">Go back to subscriptions</a>
             </div>
         </form>
+        {% else %}
+        <p>
+            <strong>Your subscription is cancelled and will not automatically renew.</strong>
+        </p>
+
+        {% endif %}
     </div>
 </div>
 

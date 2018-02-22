@@ -136,9 +136,10 @@ def cancel_subscription(request, sub_id):
         print(stripe_sub)
 
         #delete the stripe sub
-        stripe_sub.delete()
+        stripe_sub.delete(at_period_end = True)
         #delete the sub in our database
-        subscription.delete()
+        subscription.cancelled = True
+        subscription.save()
 
         messages.success(request, "Your subscription has been cancelled")
         return redirect(reverse('subscriptions'))
