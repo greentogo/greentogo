@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import PasswordResetForm
 
 from .models import Plan, Subscription
 
@@ -53,3 +54,10 @@ class SubscriptionForm(forms.ModelForm):
         fields = [
             'name',
         ]
+
+class EmailValidationOnForgotPassword(PasswordResetForm):
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if not get_user_model().objects.filter(email__iexact=email, is_active=True).exists():
+            self.add_error('email', 'There is no user registered with the specified email address.')
+        return email

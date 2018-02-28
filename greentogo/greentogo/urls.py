@@ -17,6 +17,7 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
 
 from rest_framework.documentation import include_docs_urls
@@ -25,6 +26,8 @@ import core.views.locations
 import core.views.subscriptions
 from core import views as core_views
 from core.views.webhook import stripe_webhook
+
+from core.forms import EmailValidationOnForgotPassword
 
 from .adminsite import admin_site
 
@@ -76,7 +79,16 @@ urlpatterns = [
     ),
     url(r'^export_action/', include("export_action.urls", namespace="export_action")),
     url(r'^account/$', core_views.account_settings, name='account_settings'),
+
+    #catch password reset to use our own form
+    url(r'^accounts/password/reset/$',  auth_views.password_reset,
+    {'post_reset_redirect': '/accounts/password/reset/done/',
+     'html_email_template_name': 'registration/password_reset_email.html',
+     'password_reset_form': EmailValidationOnForgotPassword},
+    name="password_reset"),
+    #route other accounts URLs to defaults
     url(r'^accounts/', include('registration.backends.default.urls')),
+
     url(r'^admin/', admin_site.urls),
     url(r'^api/docs/', include_docs_urls(title='GreenToGo API')),
     url(r'^api/v1/auth/', include('djoser.urls.authtoken')),
