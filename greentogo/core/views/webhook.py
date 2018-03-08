@@ -10,6 +10,8 @@ from django.views.decorators.http import require_POST
 from core.models import Subscription
 from core.stripe import stripe
 
+from templated_email import send_templated_mail
+
 endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
 logger = logging.getLogger('django')
 User = get_user_model()
@@ -128,3 +130,36 @@ def handle_invoice_payment_failed(event):
                     "Subscription {} not found for invoice.payment_failed webhook".format(line.id)
                 )
             subscription.sync_with_stripe()
+
+@handle_event('invoice.upcoming')
+def handle_invoice_upcoming(event):
+    """When an invoice is upcoming, let the customer know by email"""
+
+    invoice = event.data.object
+    customer = User.objects.filter(stripe_id=invoice.customer).first()
+    if not customer:
+        logger.warn(
+            "Customer {} not found for invoice.upcoming webhook".format(invoice.customer)
+        )
+        return
+
+    # Send email to customer if invoice needs payment
+    if customer.email and invoice.next_payment_attempt:
+
+        #convert the date to readable string
+        renew_date = datetime.datetime.fromtimestamp(
+            int(invoice.next_payment_attempt)
+        ).strftime('%B %d')
+
+        site = Site.objects.get_current()
+
+        send_templated_mail(
+            template_name='upcoming_invoice',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=settings.EMAIL_ADMINS, #TODO: put customer email here instead
+            context={
+                    'renew_date': renew_date,
+                    'amount': invoice.amount_due,
+                    'site': site
+                }
+        )

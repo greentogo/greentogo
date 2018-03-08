@@ -1,0 +1,8 @@
+{% block subject %}Upcoming GreenToGo payment{% endblock %}
+{% block plain %}
+Dear GreenToGo customer,
+Your GreenToGo subscription will be automatically renewed on {{ renew_date }} and you will be charged ${{ amount_due }}.
+
+To manage your subscription, please visit https://{{ site.domain }}{% url 'subscriptions' %}
+
+{% endblock %}
