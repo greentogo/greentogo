@@ -156,7 +156,7 @@ def handle_invoice_upcoming(event):
         send_templated_mail(
             template_name='upcoming_invoice',
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=settings.EMAIL_ADMINS, #TODO: put customer email here instead
+            recipient_list=[customer.email,],
             context={
                     'renew_date': renew_date,
                     'amount': invoice.amount_due,
