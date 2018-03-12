@@ -154,7 +154,7 @@ class Plan(models.Model):
             return "(UNAVAILABLE)"
 
     def __str__(self):
-        return "{} Stripe ID:{} {}".format(self.name, self.stripe_id, self.g_available())
+        return "{}, Stripe ID: {} {}".format(self.name, self.stripe_id, self.g_available())
 
     def as_dict(self):
         return {
@@ -268,7 +268,7 @@ class Subscription(models.Model):
     cancelled = models.BooleanField(default=False)
 
     def __str__(self):
-        return "{} - {}".format(self.user.name, self.display_name)
+        return "{} - {}".format(self.user.username, self.display_name)
 
     def get_absolute_url(self):
         from django.urls import reverse
@@ -307,7 +307,7 @@ class Subscription(models.Model):
 
     def plan_display(self):
         if self.plan:
-            return self.plan.name
+            return "Subscription for " + self.plan.name
         return "None"
 
     def amount_display(self):

@@ -1,7 +1,9 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from django.http import HttpResponse
 
-from .models import Location, UnclaimedSubscription, Subscription, LocationTag
+from .models import Location, UnclaimedSubscription, Subscription, LocationTag,\
+        User
 
 def checkin_all_boxes(modeladmin, request, queryset):
     """
@@ -24,11 +26,30 @@ def checkin_all_boxes(modeladmin, request, queryset):
 
 checkin_all_boxes.short_description = "Return all boxes for selected users"
 
+class SubscriptionInline(admin.TabularInline):
+    model = Subscription
+    extra = 0
+    fields = ('inline_display_name','plan', 'stripe_id')
+    readonly_fields = ('inline_display_name', 'plan', 'stripe_id')
+    can_delete = False
+    view_on_site = False
+    show_change_link = True
+    
+    def inline_display_name(self,obj):
+        return obj.display_name
+
+    def has_add_permission(self, request):
+        return False
+
+class CustomUserAdmin(UserAdmin):
+    inlines = [SubscriptionInline,]
+
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('name', 'user', 'plan', 'stripe_id', )
     search_fields = ('name', 'user__name', 'user__username', 'stripe_id', )
 
     actions = [checkin_all_boxes]
+
 
 class PlanAdmin(admin.ModelAdmin):
     ordering = ('-available',)
