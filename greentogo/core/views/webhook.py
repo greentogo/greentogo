@@ -159,7 +159,7 @@ def handle_invoice_upcoming(event):
             recipient_list=[customer.email,],
             context={
                     'renew_date': renew_date,
-                    'amount': invoice.amount_due,
+                    'amount_due': invoice.amount_due,
                     'site': site
                 }
         )
