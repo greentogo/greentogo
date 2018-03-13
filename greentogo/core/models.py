@@ -25,6 +25,10 @@ from templated_email import send_templated_mail
 from core.stripe import stripe
 from core.utils import decode_id, encode_nums
 
+import logging
+
+
+logger = logging.getLogger('django')
 
 def one_year_from_now():
     return timezone.now() + timedelta(days=365)
@@ -337,6 +341,11 @@ class Subscription(models.Model):
                 )
             )
         )['checked_out']
+
+        if boxes_checked_out < 0:
+            logger.warn("User {} has is reporting more boxes available than the"
+                        "maximum".format(self.User))
+
         return self.number_of_boxes - (boxes_checked_out or 0)
 
     def boxes_checked_out(self):
@@ -587,6 +596,55 @@ class Restaurant(models.Model):
 
 def one_year_from_now():
     return date.today() + timedelta(days=365)
+
+
+class CouponCode(models.Model):
+    coupon_name = models.CharField(max_length=100)
+    code = models.CharField(
+        max_length=20,
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex=r"^[A-Z0-9]{4,20}$",
+                message="Code can only contain capitol letters and numbers " +
+                "with no spaces. Must be between 4 and 20 characters."
+            )
+        ]
+    )
+    value = models.DecimalField(max_digits=5, decimal_places=2, default=25.00)
+    #if True, value becomes a % off the price
+    is_percentage = models.BooleanField(default=False)
+    redeem_by = models.DateField(default=one_year_from_now)
+    duration = models.CharField(max_length=100,
+        choices=(("once","once"),("forever","forever")),
+        help_text="This describes if the coupon should be applied once, or"
+                    "every time the subscription is renewed")
+
+
+    def __str__(self):
+        return "{} - {}".format(self.coupon_name, self.code)
+
+    def save(self, *args, **kwargs):
+        """
+        Disallow editing of codes.
+        Create coupon on Stripe upon creation.
+        """
+        if self.pk is not None:
+            return
+
+        if self.is_percentage:
+            amount_or_percent = {"percent_off": int(self.value)}
+        else:
+            amount_or_percent = {"amount_off": int(self.value * 100)}
+
+        coupon = stripe.Coupon.create(
+            id=self.code,
+            duration=self.duration,
+            currency="USD",
+            redeem_by=int(datetime.combine(self.redeem_by, datetime.min.time()).timestamp()),
+            **amount_or_percent
+        )
+        super().save(*args, **kwargs)
 
 
 class CorporateCode(models.Model):
