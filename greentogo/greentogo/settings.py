@@ -311,6 +311,7 @@ ROLLBAR = {
 
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_AUTO_LOGIN = True
+REGISTRATION_FORM = 'registration.forms.RegistrationFormTermsOfService'
 
 ## Message tags
 

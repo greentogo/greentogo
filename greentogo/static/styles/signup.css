@@ -41,3 +41,15 @@ input.error {
 p.error {
 	color: red;
 }
+
+div.tosScrollArea{
+  margin: 2em 0;
+  font-size:0.7em;
+  display: block;
+  background-color:#eee;
+  border: 1px solid #aaa;
+  border-radius:4px;
+  height:150px;
+  overflow-y: scroll;
+  padding:1em;
+}

@@ -32,6 +32,16 @@
                 {{ form.password2 }}
             </p>
 
+            <p>Please read the following GreenToGo membership terms and liability agreement. Check the box below to indicate your understanding of and agreement to these terms. </p>
+            {% include "registration/tos.html" %}
+
+            <p class="required">
+                {{ form.tos.errors }}
+                {{ form.tos }}
+                <label for="{{ form.tos.id_for_label }}">I agree</label>
+            </p>
+
+
             <input type="submit" value="{% trans 'Submit' %}" />
         </form>
     </div>
