@@ -570,10 +570,28 @@ class LocationTag(models.Model):
 
 
 class LocationStockCount(models.Model):
+    """
+    an actual stock count at the given location
+    """
     location = models.ForeignKey(Location, related_name='stock_counts')
     created_at = models.DateTimeField(auto_now_add=True)
     count = models.PositiveIntegerField()
 
+class LocationStockReport(models.Model):
+    """
+    a report object of the actual and estimated box count at the given
+    location
+    """
+    location = models.ForeignKey(Location, related_name='stock_reports')
+    created_at = models.DateTimeField(auto_now_add=True)
+    actual_amount = models.PositiveIntegerField()
+    estimated_amount = models.PositiveIntegerField(blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.location:
+            self.estimated_amount = self.location.get_estimated_stock()
+        super().save(*args, **kwargs)
+        
 
 class Restaurant(models.Model):
     name = models.CharField(max_length=255)
