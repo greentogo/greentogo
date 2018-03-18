@@ -24,6 +24,7 @@ from rest_framework.documentation import include_docs_urls
 
 import core.views.locations
 import core.views.subscriptions
+import core.views.reporting
 from core import views as core_views
 from core.views.webhook import stripe_webhook
 
@@ -90,6 +91,7 @@ urlpatterns = [
     url(r'^accounts/', include('registration.backends.default.urls')),
 
     url(r'^admin/', admin_site.urls),
+    url(r'^stock/$', core_views.reporting.stock_report, name='stock_report'),
     url(r'^api/docs/', include_docs_urls(title='GreenToGo API')),
     url(r'^api/v1/auth/', include('djoser.urls.authtoken')),
     url(r'^api/v1/', include('apiv1.urls')),
