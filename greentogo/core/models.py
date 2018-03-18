@@ -479,7 +479,7 @@ class Location(models.Model):
         subscriptions box count manually")
 
     def __str__(self):
-        return "{} - {}".format(self.name, self.service)
+        return "{} - {} ({})".format(self.name, self.service, self.code)
 
     def save(self, *args, **kwargs):
         self._set_code()
