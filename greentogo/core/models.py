@@ -331,25 +331,24 @@ class Subscription(models.Model):
 
     @property
     def available_boxes(self):
-        boxes_checked_out = LocationTag.objects.filter(subscription=self).aggregate(
-            checked_out=Sum(
-                Case(
-                    When(location__service=Location.CHECKOUT, then=1),
-                    When(location__service=Location.CHECKIN, then=-1),
-                    default=1,
-                    output_field=models.IntegerField()
-                )
-            )
-        )['checked_out']
-
-        if boxes_checked_out < 0:
-            logger.warn("User {} has is reporting more boxes available than the"
-                        "maximum".format(self.User))
-
         return self.number_of_boxes - (boxes_checked_out or 0)
 
+    @property
     def boxes_checked_out(self):
-        return self.number_of_boxes - self.available_boxes
+        checked_out = LocationTag.objects.filter(subscription=self).aggregate(
+                checked_out=Sum(
+                    Case(
+                        When(location__service=Location.CHECKOUT, then=1),
+                        When(location__service=Location.CHECKIN, then=-1),
+                        default=1,
+                        output_field=models.IntegerField()
+                        )
+                    )
+                )['checked_out'] or 0
+        if checked_out < 0:
+            logger.warn("User {} has is reporting more boxes available than the"
+                        "maximum".format(self.User))
+        return checked_out
 
     def amount(self):
         return self.plan.amount

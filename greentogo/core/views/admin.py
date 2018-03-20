@@ -50,9 +50,44 @@ def stock_report(request, *args, **kwargs):
         checkin_data["names"].append(loc.name)
         checkin_data["count"].append(loc.get_estimated_stock())
 
+    def get_estimated_at_checkout():
+        count = sum([l.get_estimated_stock() for l in
+            Location.objects.checkout()])
+        return count
+
+    def get_estimated_at_checkin():
+        count = sum([l.get_estimated_stock() for l in
+            Location.objects.checkin()])
+        return count
+
+    def get_estimated_checkedout():
+        count = sum([s.boxes_checked_out for s in
+            Subscription.objects.active()])
+        return count
+
+    cycle_data = {
+        "labels": [
+            "Clean at restaurants",
+            "Checked out",
+            "Dirty", #this should expand to 3 categories
+        ],
+        "count": [
+            get_estimated_at_checkout(),
+            get_estimated_checkedout(),
+            get_estimated_at_checkin(),
+        ],
+    }
+    for g in cycle_data["count"]:
+        print(g)
+
     return render(
         request, "admin/stock_report.html",
-        {"data_json": json.dumps(dict(checkin=checkin_data, checkout=checkout_data))}
+        {
+            "data_json":json.dumps(dict(
+                checkin=checkin_data, 
+                checkout=checkout_data,
+                cycle=cycle_data,
+        ))}
     )
 
 
