@@ -169,10 +169,16 @@ class Plan(models.Model):
             'boxes': self.number_of_boxes
         }
 
-    def display_price(self, corporate_code=None):
+    def display_price(self, corporate_code=None, coupon_code=None):
+        """apply corporate/coupon code and return formatted price"""
         amount = self.amount
         if corporate_code:
             amount -= (corporate_code.amount_off * 100)
+        elif coupon_code:
+            if coupon_code.is_percentage:
+                amount = amount * ((100 - coupon_code.value)/100)
+            else:
+                amount = amount - (coupon_code.value * 100)
         return "${:.02f}".format(amount / 100)
 
     def is_changed(self, field_name):
@@ -269,6 +275,7 @@ class Subscription(models.Model):
     stripe_id = models.CharField(max_length=100, blank=True, null=True)
     stripe_status = models.CharField(max_length=100, default="active")
     corporate_code = models.ForeignKey('CorporateCode', null=True, blank=True)
+    coupon_code = models.ForeignKey('CouponCode', null=True, blank=True)
     cancelled = models.BooleanField(default=False)
 
     def __str__(self):
@@ -279,7 +286,7 @@ class Subscription(models.Model):
         return reverse('subscription', kwargs={"sub_id": self.id})
 
     @classmethod
-    def create_from_stripe_sub(cls, user, plan, stripe_subscription, corporate_code=None):
+    def create_from_stripe_sub(cls, user, plan, stripe_subscription, corporate_code=None, coupon_code=None):
         ends_at = datetime.fromtimestamp(stripe_subscription.current_period_end) + timedelta(days=3)
         ends_at = timezone.make_aware(ends_at, is_dst=False)
         sub_kwargs = dict(
@@ -316,7 +323,9 @@ class Subscription(models.Model):
 
     def amount_display(self):
         if self.plan:
-            return self.plan.display_price(self.corporate_code)
+            return self.plan.display_price(
+                    corporate_code=self.corporate_code,
+                    coupon_code=self.coupon_code)
 
     @property
     def number_of_boxes(self):
@@ -617,6 +626,10 @@ def one_year_from_now():
 
 class CouponCode(models.Model):
     coupon_name = models.CharField(max_length=100)
+    emails = models.CharField(max_length=1024,
+            help_text="comma separated list of emails to restrict "
+            "coupon access to. Leave this blank otherwise.",
+            blank=True)
     code = models.CharField(
         max_length=20,
         unique=True,

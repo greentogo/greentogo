@@ -11,11 +11,27 @@
         <p>
             Your employer, {{ corporate_code.company_name }}, is a member. You receive a ${{ corporate_code.amount_off }} discount on this GreenToGo subscription.
         </p>
+        {% elif coupon_code %}
+        <p>
+            Your coupon <strong> </strong> has been applied. It's good for
+            {% if coupon_code.is_percentage %}
+            {{ coupon_code.value }}% 
+            {% else %}
+            ${{ coupon_code.value }}
+            {% endif %}
+            off your subscription, {{ coupon_code.duration }}.
+        </p>
         {% else %}
         <p>
             Is your employer a GreenToGo member?
             <a href="{% url 'corporate_subscription' %}">
                 Click here to enter your corporate access code and get your free membership.
+            </a>
+        </p>
+        <p>
+            Do you have a coupon?
+            <a href="{% url 'coupon_subscription' %}">
+                Click here to redeem your coupon.
             </a>
         </p>
         {% endif %}

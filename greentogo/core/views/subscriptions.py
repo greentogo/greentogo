@@ -14,7 +14,7 @@ import rollbar
 import stripe
 
 from core.forms import NewSubscriptionForm, SubscriptionForm, SubscriptionPlanForm
-from core.models import CorporateCode, Plan, Subscription
+from core.models import CorporateCode, CouponCode, Plan, Subscription
 from core.utils import decode_id, encode_nums
 
 rollbar.init(settings.ROLLBAR_KEY, settings.ROLLBAR_ENV)
@@ -29,8 +29,12 @@ def subscriptions_view(request):
 @login_required
 def add_subscription(request, *args, **kwargs):
     corporate_code = None
-    if 'code' in kwargs:
-        corporate_code = get_object_or_404(CorporateCode, code=kwargs['code'])
+    coupon_code = None
+    if 'code' in kwargs and 'coupon_type' in kwargs:
+        if 'coupon_type' == 'corporate':
+            corporate_code = get_object_or_404(CorporateCode, code=kwargs['code'])
+        else:
+            coupon_code = get_object_or_404(CouponCode, code=kwargs['code'])
 
     if request.method == "POST":
         form = NewSubscriptionForm(request.POST)
@@ -62,6 +66,9 @@ def add_subscription(request, *args, **kwargs):
 
             if corporate_code:
                 sub_kwargs['coupon'] = corporate_code.code
+            elif coupon_code:
+                sub_kwargs['coupon'] = coupon_code.code
+                    
 
             try:
                 stripe_subscription = stripe.Subscription.create(**sub_kwargs)
@@ -69,7 +76,8 @@ def add_subscription(request, *args, **kwargs):
                     user=user,
                     plan=plan,
                     stripe_subscription=stripe_subscription,
-                    corporate_code=corporate_code
+                    corporate_code=corporate_code,
+                    coupon_code=coupon_code
                 )
                 return redirect(reverse('subscriptions'))
             except stripe.error.CardError as ex:
@@ -91,7 +99,10 @@ def add_subscription(request, *args, **kwargs):
         {
             'stripe_id': plan.stripe_id,
             'amount': plan.amount,
-            'display_price': plan.display_price(corporate_code),
+            'display_price': plan.display_price(
+                corporate_code = corporate_code,
+                coupon_code = coupon_code
+            ),
             'name': plan.name,
         } for plan in Plan.objects.available()
     ]
@@ -102,6 +113,7 @@ def add_subscription(request, *args, **kwargs):
         request, "core/add_subscription.html", {
             "form": NewSubscriptionForm(),
             "corporate_code": corporate_code,
+            "coupon_code": coupon_code,
             "plans": plans,
             "plandict_json": json.dumps(plandict, cls=DjangoJSONEncoder),
             "email": request.user.email,
@@ -117,13 +129,32 @@ def corporate_subscription(request, *args, **kwargs):
         try:
             code = CorporateCode.objects.get(code=request.POST['code'])
             if request.user.subscriptions.filter(corporate_code=code).count() == 0:
-                return redirect(reverse('add_corporate_subscription', kwargs={'code': code.code}))
+                return redirect(reverse('add_corporate_subscription',
+                    kwargs={'code': code.code,'coupon_type':'corporate'}))
             else:
                 messages.error(request, "You have already used that corporate access code.")
         except CorporateCode.DoesNotExist:
             messages.error(request, "That is not a valid corporate access code.")
 
     return render(request, "core/corporate_subscription.html")
+
+
+@login_required
+def coupon_subscription(request, *args, **kwargs):
+    """Check coupon code to see if valid."""
+    if request.method == "POST":
+        try:
+            code = CouponCode.objects.get(code=request.POST['code'])
+            if request.user.subscriptions.filter(coupon_code=code).count() == 0:
+                return redirect(reverse('add_coupon_subscription',
+                    kwargs={'code': code.code, 'coupon_type':'coupon'}))
+            else:
+                messages.error(request, "You have already used that coupon.")
+        except CouponCode.DoesNotExist:
+            messages.error(request, "That is not a valid coupon.")
+
+    return render(request, "core/coupon_subscription.html")
+
 
 @login_required
 def cancel_subscription(request, sub_id):

@@ -1,0 +1,19 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="medium-12 columns">
+        <h2>Enter your coupon code</h2>
+
+        <form action="." method="POST">
+            {% csrf_token %}
+            <label for="coupon-code-field">Corporate code</label>
+            <input type="text" id="coupon-code-field" name="code" required />
+            <div>
+                <button type="submit" id="subscribe-button" class="button">Redeem your coupon</button>
+                <a href="{% url 'subscriptions' %}" class="alert button">Go back to subscriptions</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

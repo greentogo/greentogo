@@ -39,11 +39,21 @@ subscriptions_patterns = [
         core.views.subscriptions.corporate_subscription,
         name='corporate_subscription'
     ),
+    url(
+        r'^coupon/$',
+        core.views.subscriptions.coupon_subscription,
+        name='coupon_subscription'
+    ),
     url(r'^new/$', core.views.subscriptions.add_subscription, name='add_subscription'),
     url(
-        r'^new/(?P<code>[A-Z0-9]+)/$',
+        r'^new/(?P<coupon_type>corporate)/(?P<code>[A-Z0-9]+)/$',
         core.views.subscriptions.add_subscription,
         name='add_corporate_subscription'
+    ),
+    url(
+        r'^new/(?P<coupon_type>coupon)/(?P<code>[A-Z0-9]+)/$',
+        core.views.subscriptions.add_subscription,
+        name='add_coupon_subscription'
     ),
     url(
         r'^(?P<sub_id>[A-Za-z0-9]+)/plan/$',
