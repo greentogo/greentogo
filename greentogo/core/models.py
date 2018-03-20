@@ -342,7 +342,7 @@ class Subscription(models.Model):
 
     @property
     def available_boxes(self):
-        return self.number_of_boxes - (boxes_checked_out or 0)
+        return self.number_of_boxes - (self.boxes_checked_out or 0)
 
     @property
     def boxes_checked_out(self):
