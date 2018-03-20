@@ -299,11 +299,13 @@ class Subscription(models.Model):
 
         if corporate_code:
             sub_kwargs['corporate_code'] = corporate_code
+        elif coupon_code:
+            sub_kwargs['coupon_code'] = coupon_code
 
         subscription = Subscription.objects.create(**sub_kwargs)
         return subscription
 
-    @classmethod
+    @classmethod 
     def get_from_hashed_id(cls, hashed_id):
         real_id = decode_id(hashed_id)[0]
         return cls.objects.get(id=real_id)
