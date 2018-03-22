@@ -12,8 +12,8 @@
                     <strong>Plan:</strong>
                     {{ subscription.plan_display }}
                     <br/>
-                    <a href="{% url 'subscription_plan' sub_id=subscription.stripe_id %}"
-                       class="button small">Change plan</a>
+                    <a href="{% url 'subscription_plan' sub_id=subscription.stripe_id %}" class="button small">Change plan</a>
+                    <a href="{% url 'cancel_subscription' sub_id=sub.hashed_id %}" class="button alert">Cancel subscription</a>
                 </div>
                 <div class="medium-4 columns">
                     <strong>Number of boxes:</strong>

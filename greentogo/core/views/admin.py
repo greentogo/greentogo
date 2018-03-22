@@ -77,8 +77,6 @@ def stock_report(request, *args, **kwargs):
             get_estimated_at_checkin(),
         ],
     }
-    for g in cycle_data["count"]:
-        print(g)
 
     return render(
         request, "admin/stock_report.html",

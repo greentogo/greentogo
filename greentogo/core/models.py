@@ -649,7 +649,8 @@ class CouponCode(models.Model):
     redeem_by = models.DateField(default=one_year_from_now)
     duration = models.CharField(max_length=100,
         choices=(("once","once"),("forever","forever")),
-        help_text="This describes if the coupon should be applied once, or"
+        default='once',
+        help_text="This describes if the coupon should be applied once, or "
                     "every time the subscription is renewed")
 
 

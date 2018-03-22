@@ -18,6 +18,7 @@
                     {% if sub.will_auto_renew and sub.ends_at %}
                         Renews automatically on {{ sub.ends_at }}
                     {% elif sub.ends_at %}
+                        {% if sub.cancelled %}Cancelled - {% endif %}
                         Ends on {{ sub.ends_at }}
                     {% else %}
                         No end date
@@ -25,16 +26,16 @@
                 </p>
             </div>
             <div class="medium-6 columns">
+              {% if not sub.cancelled %}
                 {% if sub.has_stripe_subscription %}
                     <a href="{% url 'subscription_plan' sub_id=sub.hashed_id %}" class="button">Change subscription</a>
-                    <a href="{% url 'cancel_subscription' sub_id=sub.hashed_id %}" class="button alert">Cancel subscription</a>
                 {% else %}
                     <a href="{% url 'subscription_add_credit_card' sub_id=sub.hashed_id %}" class="button">
                         Add credit card
                         <span data-tooltip aria-haspopup="true" class="has-tip top" data-disable-hover="false" tabindex="1" title="Without a credit card, this subscription cannot be renewed or upgraded.">(why?)</span>
                     </a>
                 {% endif %}
-
+              {% endif %}
             </div>
         </div>
         {% endfor %}

@@ -144,12 +144,15 @@ def coupon_subscription(request, *args, **kwargs):
     """Check coupon code to see if valid."""
     if request.method == "POST":
         try:
-            code = CouponCode.objects.get(code=request.POST['code'])
-            if request.user.subscriptions.filter(coupon_code=code).count() == 0:
-                return redirect(reverse('add_coupon_subscription',
-                    kwargs={'code': code.code, 'coupon_type':'coupon'}))
-            else:
-                messages.error(request, "You have already used that coupon.")
+            coupon = CouponCode.objects.get(code=request.POST['code'])
+            if coupon.emails and request.user.email not in coupon.emails:
+                    messages.error(request, "That is not a valid coupon")
+            else:        
+                if request.user.subscriptions.filter(coupon_code=coupon).count() == 0:
+                    return redirect(reverse('add_coupon_subscription',
+                        kwargs={'code': coupon.code, 'coupon_type':'coupon'}))
+                else:
+                    messages.error(request, "You have already used that coupon.")
         except CouponCode.DoesNotExist:
             messages.error(request, "That is not a valid coupon.")
 
