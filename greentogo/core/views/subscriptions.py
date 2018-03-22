@@ -95,6 +95,10 @@ def add_subscription(request, *args, **kwargs):
                 )
                 rollbar.report_exc_info(sys.exc_info(), request)
 
+    available_plans = Plan.objects.available()
+    if coupon_code and coupon_code.plans.count() > 0:
+        available_plans = coupon_code.plans.all()
+
     plans = [
         {
             'stripe_id': plan.stripe_id,
@@ -104,7 +108,7 @@ def add_subscription(request, *args, **kwargs):
                 coupon_code = coupon_code
             ),
             'name': plan.name,
-        } for plan in Plan.objects.available()
+        } for plan in available_plans 
     ]
 
     plandict = {plan['stripe_id']: plan for plan in plans}
@@ -145,15 +149,23 @@ def coupon_subscription(request, *args, **kwargs):
     if request.method == "POST":
         try:
             coupon = CouponCode.objects.get(code=request.POST['code'])
+            #fail if the users email is not allowed by the coupon
             if coupon.emails and request.user.email not in coupon.emails:
-                    messages.error(request, "That is not a valid coupon")
-            else:        
-                if request.user.subscriptions.filter(coupon_code=coupon).count() == 0:
-                    return redirect(reverse('add_coupon_subscription',
-                        kwargs={'code': coupon.code, 'coupon_type':'coupon'}))
-                else:
-                    messages.error(request, "You have already used that coupon.")
+                raise Exception
+            #fail if none of the coupons plans are available
+            if coupon.plans.count() > 0 and not any([p.available for p in
+                coupon.plans.all()]):
+                raise Exception
+            #fail if there is a subscription with this coupon already attached
+            #to the user 
+            if request.user.subscriptions.filter(coupon_code=coupon).count() == 0:
+                return redirect(reverse('add_coupon_subscription',
+                    kwargs={'code': coupon.code, 'coupon_type':'coupon'}))
+            else:
+                messages.error(request, "You have already used that coupon.")
         except CouponCode.DoesNotExist:
+            messages.error(request, "That is not a valid coupon.")
+        except:
             messages.error(request, "That is not a valid coupon.")
 
     return render(request, "core/coupon_subscription.html")

@@ -652,6 +652,9 @@ class CouponCode(models.Model):
         default='once',
         help_text="This describes if the coupon should be applied once, or "
                     "every time the subscription is renewed")
+    plans = models.ManyToManyField(Plan, blank=True, related_name="coupons",
+            help_text="Selecting no plans to make this coupon available for all "
+            "plans. ")
 
 
     def __str__(self):
