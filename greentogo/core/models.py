@@ -358,7 +358,7 @@ class Subscription(models.Model):
                 )['checked_out'] or 0
         if checked_out < 0:
             logger.warn("User {} has is reporting more boxes available than the"
-                        "maximum".format(self.User))
+                        "maximum".format(self.user))
         return checked_out
 
     def amount(self):
