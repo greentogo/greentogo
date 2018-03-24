@@ -56,10 +56,11 @@ def activity_data(days=30):
                 .annotate(date=DateTrunc('created_at', precision='day')) \
                 .values("date", "subscription") \
                 .distinct()
+                .order_by("date")
             )
 
         data = dict(Counter(d['date'].date() for d in data))
-        data = [{"date": date, "volume": subs/total_active_subs * 100.0} for date, subs in data.items()]
+        data = [{"date": date, "volume": "{0:.2f}%".format(subs/total_active_subs * 100.0)} for date, subs in data.items()]
         return data
 
     checkin_data = _get_data(LocationTag.objects.checkin())
@@ -655,8 +656,7 @@ class CouponCode(models.Model):
     plans = models.ManyToManyField(Plan, blank=True, related_name="coupons",
             help_text="Selecting no plans to make this coupon available for all "
             "plans. ")
-
-
+    
     def __str__(self):
         return "{} - {}".format(self.coupon_name, self.code)
 
