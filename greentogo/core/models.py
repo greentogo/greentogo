@@ -605,10 +605,15 @@ class LocationStockReport(models.Model):
     estimated_amount = models.PositiveIntegerField(blank=True)
 
     def save(self, *args, **kwargs):
+        """
+        Disallow editing of codes.
+        Create coupon on Stripe upon creation.
+        """
+        if self.pk is not None:
+            return
         if self.location:
             self.estimated_amount = self.location.get_estimated_stock()
         super().save(*args, **kwargs)
-        
 
 class Restaurant(models.Model):
     name = models.CharField(max_length=255)
