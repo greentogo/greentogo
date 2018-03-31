@@ -489,6 +489,12 @@ class Location(models.Model):
         boxes will be checked in when resetting a \
         subscriptions box count manually")
 
+    retired = models.BooleanField(
+        blank=True,
+        default=False,
+        help_text="Retired locations will not show up in reporting \
+        but their data will remain in history.")
+
     def __str__(self):
         return "{} - {} ({})".format(self.name, self.service, self.code)
 

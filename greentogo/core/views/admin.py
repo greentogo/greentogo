@@ -29,8 +29,8 @@ def unclaimed_subscription_status_csv(request, *args, **kwargs):
 
 def stock_report(request, *args, **kwargs):
     """Show a report of current stock at each location."""
-    checkout_locations = Location.objects.checkout().order_by('name')
-    checkin_locations = Location.objects.checkin().order_by('name')
+    checkout_locations = Location.objects.checkout().order_by('name').filter(retired=False)
+    checkin_locations = Location.objects.checkin().order_by('name').filter(retired=False)
 
     checkout_data = {
         "names": [],
