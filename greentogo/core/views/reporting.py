@@ -15,7 +15,12 @@ from django.http import HttpResponse
 from core.models import LocationStockCount, LocationStockReport, Location
 
 @staff_member_required()
-def stock_report(request, *args, **kwargs):
+def stock_landing_page(request):
+    return render(request,'reporting/stock_landing_page.html')
+
+@staff_member_required()
+def stock_report(request, stock_action):
+    print(stock_action)
     if request.method == 'POST':
         location = Location.objects.get(pk=request.POST.get('location'))
         actual_count = request.POST.get('actual_count')
@@ -25,7 +30,11 @@ def stock_report(request, *args, **kwargs):
         location.stock_counts.create(count=stock_count)
         messages.success(request,"Successfully stocked and submitted a report for {}".format(location))
 
-    locations = Location.objects.filter(admin_location=False)
+    if stock_action == 'restock':
+        locations = Location.objects.checkout().filter(admin_location=False)
+    else:
+        locations = Location.objects.checkin().filter(admin_location=False)
     return render(request,'reporting/stock.html',{
-        "locations":locations,
+        "locations": locations,
+        "stock_action": stock_action,
     })

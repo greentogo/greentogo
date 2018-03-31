@@ -3,7 +3,7 @@
 {% block content %}
 <div class="row">
     <div class="medium-12 columns">
-        <h2>Restock location</h2>
+        <h2>{{ stock_action|capfirst }} location</h2>
         <form action="." method="POST">
             {% csrf_token %}
             <!-- <p> {{ form.non_field_errors }} </p> -->
@@ -23,17 +23,24 @@
               <input class="reportinput" name="actual_count" id="sliderActualText">
             </div>
 
-            <div class="reportrow">
-              <h5>Update stock count:</h5>
-              <div id="sliderStock"></div>
-            </div>
-            <div>
-              <input class="reportinput" name="stock_count" id="sliderStockText">
-            </div>
+            {% if stock_action == "restock" %}
+              <div class="reportrow">
+                <h5>Update stock count:</h5>
+                <div id="sliderStock"></div>
+              </div>
+              <div>
+                <input class="reportinput" name="stock_count" id="sliderStockText">
+              </div>
 
-            <div class="reportrow">
-              <button type="submit" class="button">Submit</button>
-            </div>
+              <div class="reportrow">
+                <button type="submit" class="button">Submit</button>
+              </div>
+            {% else %}
+              <input class="reportinput" type="hidden" value="0" name="stock_count" id="sliderStockText">
+              <div class="reportrow">
+                <button type="submit" class="button">Empty</button>
+              </div>
+            {% endif %}
         </form>
     </div>
 </div>
