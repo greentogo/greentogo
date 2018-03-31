@@ -109,6 +109,18 @@ $(function () {
             ]
         },
         options: {
+            tooltips:{
+              callbacks:{
+                label: function(tooltipItem, data){
+                  var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  label += tooltipItem.yLabel + "%";
+                  return label;
+                }
+              }
+            },
             scales: {
                 xAxes: [{
                     type: 'time',
@@ -118,7 +130,10 @@ $(function () {
                 }],
                 yAxes: [{
                     ticks: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        callback: function(value, index, values){
+                          return value + "%";
+                        }
                     }
                 }]
             }
