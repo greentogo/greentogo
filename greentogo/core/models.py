@@ -56,7 +56,7 @@ def activity_data(days=30):
                 .annotate(date=DateTrunc('created_at', precision='day')) \
                 .values("date", "subscription") \
                 .distinct()
-            )
+            ) \
             .order_by("date")
 
         data = dict(Counter(d['date'].date() for d in data))
