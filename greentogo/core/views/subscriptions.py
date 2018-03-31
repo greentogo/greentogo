@@ -187,7 +187,11 @@ def cancel_subscription(request, sub_id):
         subscription.cancelled = True
         subscription.save()
 
-        messages.success(request, "Your subscription has been cancelled")
+        cancel_message = """
+We’re sorry to see you go! If you have feedback for our team that could help us improve this service (and keep you enrolled!), please don’t hesitate to contact us at info@durhamgreentogo.com. We always read our customer emails and will respond to your concerns! 
+        """
+
+        messages.success(request, cancel_message)
         return redirect(reverse('subscriptions'))
 
     return render(
