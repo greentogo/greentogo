@@ -51,13 +51,11 @@ def activity_data(days=30):
         # filter this to only count active subscriptions
         total_active_subs = Subscription.objects.all().count()
 
-        data = list(
-            LocationTag.objects.filter(created_at__gte=begin_datetime_start_of_day) \
+        data = LocationTag.objects.filter(created_at__gte=begin_datetime_start_of_day) \
                 .annotate(date=DateTrunc('created_at', precision='day')) \
                 .values("date", "subscription") \
                 .distinct() \
                 .order_by("date")
-            )
 
         data = dict(Counter(d['date'].date() for d in data))
         data = [{"date": date, "volume": "{0:.2f}".format(subs/total_active_subs * 100.0)} for date, subs in data.items()]
