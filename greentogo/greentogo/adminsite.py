@@ -119,37 +119,37 @@ admin_site.register_view(
     only_superusers=True,
 )
 
-admin_site.register_view(
-    path='restock_locations/',
-    view=restock_locations,
-    section="Stock Management",
-    name="Restock checkout locations",
-    urlname="restock_locations",
-)
-
-admin_site.register_view(
-    path='restock_locations/(?P<location_id>[0-9]+)/',
-    view=restock_location,
-    section="Stock Management",
-    visible=False,
-    urlname="restock_location",
-)
-
-admin_site.register_view(
-    path='empty_locations/',
-    view=empty_locations,
-    section="Stock Management",
-    name="Empty checkin locations",
-    urlname="empty_locations",
-)
-
-admin_site.register_view(
-    path='empty_locations/(?P<location_id>[0-9]+)/',
-    view=empty_location,
-    section="Stock Management",
-    visible=False,
-    urlname="empty_location",
-)
+# admin_site.register_view(
+#     path='restock_locations/',
+#     view=restock_locations,
+#     section="Stock Management",
+#     name="Restock checkout locations",
+#     urlname="restock_locations",
+# )
+#
+# admin_site.register_view(
+#     path='restock_locations/(?P<location_id>[0-9]+)/',
+#     view=restock_location,
+#     section="Stock Management",
+#     visible=False,
+#     urlname="restock_location",
+# )
+#
+# admin_site.register_view(
+#     path='empty_locations/',
+#     view=empty_locations,
+#     section="Stock Management",
+#     name="Empty checkin locations",
+#     urlname="empty_locations",
+# )
+#
+# admin_site.register_view(
+#     path='empty_locations/(?P<location_id>[0-9]+)/',
+#     view=empty_location,
+#     section="Stock Management",
+#     visible=False,
+#     urlname="empty_location",
+# )
 
 admin_site.register_view(
     path='stock_report/',
