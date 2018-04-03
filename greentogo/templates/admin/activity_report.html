@@ -21,11 +21,6 @@
     <canvas id="MonthlyBoxesChart" width="500" height="300"></canvas>
 </div>
 
-<h2>User activity for last 30 days</h2>
-
-<div style="max-width: 960px;">
-    <canvas id="MonthlyUsersChart" width="500" height="300"></canvas>
-</div>
 {% endblock %}
 
 {% block extrahead %}
@@ -82,58 +77,6 @@ $(function () {
                 yAxes: [{
                     ticks: {
                         beginAtZero: true
-                    }
-                }]
-            }
-        }
-    });
-
-    //Create chart for subscription use
-
-    console.log(data);
-
-    var monthlyUsersChart = document.getElementById("MonthlyUsersChart");
-    var chart = new Chart(monthlyUsersChart, {
-        type: 'bar',
-        data: {
-            datasets: [
-                {
-                    label: "Active subscriptions",
-                    data: convertToXY(data.user),
-                    fill: false,
-                    backgroundColor: 'rgba(49,130,189, 1)',
-                    borderColor: 'rgba(49,130,189, 0.5)',
-                    cubicInterpolationMode: 'monotone',
-                    spanGaps: true
-                }
-            ]
-        },
-        options: {
-            tooltips:{
-              callbacks:{
-                label: function(tooltipItem, data){
-                  var label = data.datasets[tooltipItem.datasetIndex].label || '';
-                  if (label) {
-                    label += ': ';
-                  }
-                  label += tooltipItem.yLabel + "%";
-                  return label;
-                }
-              }
-            },
-            scales: {
-                xAxes: [{
-                    type: 'time',
-                    time: {
-                        unit: 'day'
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true,
-                        callback: function(value, index, values){
-                          return value + "%";
-                        }
                     }
                 }]
             }
