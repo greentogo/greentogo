@@ -1,0 +1,16 @@
+{% extends "core/base.html" %}
+{% load staticfiles %}
+{% block content %}
+<div class="row">
+  <div class="medium-12 columns">
+    <h1>
+      Choose a stocking action
+    </h1>
+    <ul>
+      <li> <a href="/restock/">Restock checkout locations</a> </li>
+      <li> <a href="/empty/">Empty checking locations</a> </li>
+      <li> <a href="/shelve/">Stock the shelves at GreenToGo HQ</a> </li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

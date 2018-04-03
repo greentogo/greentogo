@@ -16,11 +16,35 @@ from core.models import LocationStockCount, LocationStockReport, Location
 
 @staff_member_required()
 def stock_landing_page(request):
+    """
+    This view is for figuring out which view you should use!
+    """
     return render(request,'reporting/stock_landing_page.html')
 
 @staff_member_required()
+def stock_shelve(request):
+    """
+    This view is for returning clean boxes to g2g headquarters
+    """
+    if request.method == 'POST':
+        try:
+            location = Location.objects.checkin().get(admin_location=True)
+            stock_count = request.POST.get('stock_count')
+            estimated_amount = location.get_estimated_stock()
+            new_count = estimated_amount + int(stock_count)
+            location.stock_counts.create(count=new_count)
+            messages.info(request,"{} clean boxes successfully shelved at GreenToGo HQ!".format(stock_count))
+        except:
+            messages.error(request,"There are no headquarter locations! Add one by assigning an admin location")
+
+    return render(request,'reporting/shelve.html',{ })
+
+
+@staff_member_required()
 def stock_report(request, stock_action):
-    print(stock_action)
+    """
+    This view is for restocking/emptying locations
+    """
     if request.method == 'POST':
         location = Location.objects.get(pk=request.POST.get('location'))
         actual_count = request.POST.get('actual_count')
@@ -28,6 +52,14 @@ def stock_report(request, stock_action):
         #create a stock report and a stock count for the location
         location.stock_reports.create(actual_amount=actual_count)
         location.stock_counts.create(count=stock_count)
+        try:
+            if stock_action == 'restock':
+                #subtract restocked boxes from the admin total
+                admin_location = Location.objects.checkin().get(admin_location=True)
+                new_count = admin_location.get_estimated_stock() - int(stock_count)
+                admin_location.stock_counts.create(count=new_count)
+        except:
+            pass
         messages.success(request,"Successfully stocked and submitted a report for {}".format(location))
 
     if stock_action == 'restock':
