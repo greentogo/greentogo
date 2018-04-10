@@ -6,6 +6,17 @@
 {% block content %}
     <div class="row">
         <div class="medium-12 columns">
+
+            {% if complete %}
+                <div class="location-confirmation">
+                {% if location.service == location.CHECKIN %}
+                    <img class="location-confirmation-img" src="{% static 'img/return_confirmation.png' %}" alt="Return a box" />
+                {% else %}
+                    <img class="location-confirmation-img" src="{% static 'img/checkout_confirmation.png' %}" alt="Check out a box" />
+                {% endif %}
+                </div>
+            {% endif %}
+
             <h2>
                 {% if location.service == location.CHECKIN %}
                     Return a box
@@ -14,15 +25,6 @@
                 {% endif %}
                 at {{ location.name }}
             </h2>
-
-            <div class="location-confirmation">
-            {% if location.service == location.CHECKIN %}
-                <img class="location-confirmation-img" src="{% static 'img/return_confirmation.png' %}" alt="Return a box" />
-            {% else %}
-                <img class="location-confirmation-img" src="{% static 'img/checkout_confirmation.png' %}" alt="Check out a box" />
-            {% endif %}
-            </div>
-
 
             {% if subscriptions %}
             <form action="." method="POST" id="checkin-checkout-form">

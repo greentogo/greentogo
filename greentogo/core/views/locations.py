@@ -29,6 +29,7 @@ def locations(request):
 def location(request, location_code):
     user = request.user
     location = get_object_or_404(Location, code=location_code.upper())
+    complete = False
 
     if request.method == "POST":
         subscription_id = request.POST.get('subscription_id')
@@ -52,6 +53,7 @@ def location(request, location_code):
                     msg = "You have checked out {} {}.".format(
                         number_of_boxes, box_plural(number_of_boxes)
                     )
+                complete = True
                 messages.success(request, msg)
             else:
                 if location.service == location.CHECKIN:
@@ -89,5 +91,6 @@ def location(request, location_code):
         request, "core/location.djhtml", {
             "location": location,
             "subscriptions": subscriptions,
+            "complete": complete,
         }
     )
