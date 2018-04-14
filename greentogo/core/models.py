@@ -79,6 +79,7 @@ class User(AbstractUser):
         max_length=255,
         unique=True,
     )
+    referred_by = models.CharField(max_length=255, blank=True, null=True)
     stripe_id = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):

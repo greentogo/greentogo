@@ -2,8 +2,17 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
 
+from registration.forms import RegistrationFormTermsOfService
 from .models import Plan, Subscription
 
+class UserSignupForm(RegistrationFormTermsOfService):
+    class Meta:
+        model = get_user_model()
+        fields = [
+            'username',
+            'email',
+            'referred_by',
+        ]
 
 class UserForm(forms.ModelForm):
     class Meta:

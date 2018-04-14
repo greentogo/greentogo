@@ -31,6 +31,11 @@
                 <label for="{{ form.password2.id_for_label }}">Password confirmation:</label>
                 {{ form.password2 }}
             </p>
+            <p class="required">
+                {{ form.referred_by.errors }}
+                <label for="{{ form.referred_by.id_for_label }}">Referral email address</label>
+                {{ form.referred_by }}
+            </p>
 
             <p>Please read the following GreenToGo membership terms and liability agreement. Check the box below to indicate your understanding of and agreement to these terms. </p>
             {% include "registration/tos.html" %}
