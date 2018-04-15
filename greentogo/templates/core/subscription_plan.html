@@ -20,8 +20,10 @@
             </select>
             <div>
                 <button type="submit" class="button">Change plan</button>
-                <a href="{% url 'cancel_subscription' sub_id=subscription.hashed_id %}" class="button alert">Cancel subscription</a>
                 <a href="{% url 'subscriptions' %}" class="secondary button">Go back to subscriptions</a>
+            </div>
+            <div>
+                <sub> <a href="{% url 'cancel_subscription' sub_id=subscription.hashed_id %}">Cancel subscription</a> </sub>
             </div>
         </form>
         {% else %}
