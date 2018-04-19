@@ -31,7 +31,7 @@ def add_subscription(request, *args, **kwargs):
     corporate_code = None
     coupon_code = None
     if 'code' in kwargs and 'coupon_type' in kwargs:
-        if 'coupon_type' == 'corporate':
+        if kwargs['coupon_type'] == 'corporate':
             corporate_code = get_object_or_404(CorporateCode, code=kwargs['code'])
         else:
             coupon_code = get_object_or_404(CouponCode, code=kwargs['code'])
