@@ -11,6 +11,12 @@
                 <div class="location-confirmation">
                 {% if location.service == location.CHECKIN %}
                     <img class="location-confirmation-img" src="{% static 'img/return_confirmation.png' %}" alt="Return a box" />
+                    {% if boxesCheckedIn %}
+                    <p>
+                      Thank you! Your lifetime total GreenToGo box returns is: {{ boxesCheckedIn }}!
+                      Our GreenToGo community has diverted {{ communityBoxesCheckedIn }} boxes from the landfill since our program began in July 2017! 
+                    </p>
+                    {% endif %}
                 {% else %}
                     <img class="location-confirmation-img" src="{% static 'img/checkout_confirmation.png' %}" alt="Check out a box" />
                 {% endif %}
