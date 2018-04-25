@@ -305,7 +305,7 @@ class Subscription(models.Model):
         subscription = Subscription.objects.create(**sub_kwargs)
         return subscription
 
-    @classmethod 
+    @classmethod
     def get_from_hashed_id(cls, hashed_id):
         real_id = decode_id(hashed_id)[0]
         return cls.objects.get(id=real_id)
@@ -666,7 +666,7 @@ class CouponCode(models.Model):
     plans = models.ManyToManyField(Plan, blank=True, related_name="coupons",
             help_text="Selecting no plans to make this coupon available for all "
             "plans. ")
-    
+
     def __str__(self):
         return "{} - {}".format(self.coupon_name, self.code)
 

@@ -10,7 +10,8 @@
             <form action="." method="POST">
                 {% csrf_token %}
                 <label for="location_code">Location code</label>
-                <input type="text" id="location_code" name="location_code" autofocus maxlength="6" miinlength="6" pattern="[A-Za-z1-9]{6}" />
+                <input type="text" id="location_code" name="location_code"
+                autofocus maxlength="6" miinlength="6" pattern="[A-Za-z1-9]{6}" />
 
                 <button type="submit" class="button">
                     Continue

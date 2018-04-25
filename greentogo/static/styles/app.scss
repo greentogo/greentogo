@@ -136,6 +136,23 @@ form {
   font-size:2em;
 }
 
+.check-in-thankyou{
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 1.2rem;
+  margin: 0.5rem 0.5rem;
+}
+
+.check-in-background{
+  max-width: 740px;
+  color: white;
+  display: inline-block;
+  background-color: rgb(72, 148, 133);
+  border-radius: 10px 10px 10px 10px;
+  -moz-border-radius: 10px 10px 10px 10px;
+  -webkit-border-radius: 10px 10px 10px 10px;
+  border: 0px solid #000000;
+}
+
 #restaurant-map {
     height: 600px;
     width: "100%";
