@@ -10,7 +10,7 @@
             {% if complete %}
                 <div class="location-confirmation">
                 {% if location.service == location.CHECKIN %}
-                    {% if boxesCheckedIn %}
+                    {% if boxesCheckedIn and communityBoxesCheckedIn %}
                       <div class="check-in-background">
                           <img class="location-confirmation-img" src="{% static 'img/return_confirmation.png' %}" alt="Return a box" />
                           <p class="check-in-thankyou">
