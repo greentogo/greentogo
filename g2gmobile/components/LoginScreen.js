@@ -60,7 +60,7 @@ class LoginScreen extends React.Component {
                 this.setState({ loading: false });
                 this.props.store.setAuthToken(json.data.auth_token);
             }
-            
+
             // Get the user data after successful login
             axios.get('/me/', {
                 headers: {
@@ -149,7 +149,7 @@ class LoginScreen extends React.Component {
                         // Login form
                         <Form>
                             <Item>
-                                <Input placeholder="Email"
+                                <Input placeholder="Username or Email"
                                     autoCapitalize="none"
                                     autoCorrect={false}
                                     keyboardType="email-address"
@@ -215,7 +215,7 @@ class LoginScreen extends React.Component {
                                     </Button>
                                 </View>
 
-                                // Password reset form 
+                                // Password reset form
                                 : <Form>
                                     <Item>
                                         <Input placeholder="Email"
