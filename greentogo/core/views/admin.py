@@ -8,7 +8,9 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from core.models import (
-    Location, Plan, Restaurant, Subscription, UnclaimedSubscription, User, activity_data
+    Location, Plan, Restaurant, Subscription, \
+    UnclaimedSubscription, User, \
+    activity_data, total_boxes_returned, \
 )
 
 
@@ -27,8 +29,8 @@ def unclaimed_subscription_status_csv(request, *args, **kwargs):
 
 def stock_report(request, *args, **kwargs):
     """Show a report of current stock at each location."""
-    checkout_locations = Location.objects.checkout().order_by('name')
-    checkin_locations = Location.objects.checkin().order_by('name')
+    checkout_locations = Location.objects.checkout().order_by('name').filter(retired=False)
+    checkin_locations = Location.objects.checkin().order_by('name').filter(retired=False)
 
     checkout_data = {
         "names": [],
@@ -48,16 +50,50 @@ def stock_report(request, *args, **kwargs):
         checkin_data["names"].append(loc.name)
         checkin_data["count"].append(loc.get_estimated_stock())
 
+    def get_estimated_at_checkout():
+        count = sum([l.get_estimated_stock() for l in
+            Location.objects.checkout()])
+        return count
+
+    def get_estimated_at_checkin():
+        count = sum([l.get_estimated_stock() for l in
+            Location.objects.checkin()])
+        return count
+
+    def get_estimated_checkedout():
+        count = sum([s.boxes_checked_out for s in
+            Subscription.objects.active()])
+        return count
+
+    cycle_data = {
+        "labels": [
+            "Clean at restaurants",
+            "Checked out",
+            "Dirty", #this should expand to 3 categories
+        ],
+        "count": [
+            get_estimated_at_checkout(),
+            get_estimated_checkedout(),
+            get_estimated_at_checkin(),
+        ],
+    }
+
     return render(
         request, "admin/stock_report.html",
-        {"data_json": json.dumps(dict(checkin=checkin_data, checkout=checkout_data))}
+        {
+            "data_json":json.dumps(dict(
+                checkin=checkin_data, 
+                checkout=checkout_data,
+                cycle=cycle_data,
+        ))}
     )
 
 
 def activity_report(request, days=30, *args, **kwargs):
     data = activity_data(days)
     data_json = json.dumps(data, cls=DjangoJSONEncoder)
-    return render(request, 'admin/activity_report.html', {"data_json": data_json})
+    view_data = {"data_json": data_json, "total_boxes_returned": total_boxes_returned()}
+    return render(request, 'admin/activity_report.html', view_data)
 
 
 def restock_locations(request, *args, **kwargs):

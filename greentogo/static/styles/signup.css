@@ -13,7 +13,7 @@ input,
 select,
 textarea {
 	color: #232323;
-	font-family: "Libre Baskerville", georgia, serif;
+	font-family: "Lato", georgia, serif;
 }
 
 h1,
@@ -22,7 +22,7 @@ h3,
 h4,
 h5,
 h6 {
-	font-family: "Playfair Display", georgia, serif;
+	font-family: "Arvo", georgia, serif;
 	font-weight: 700;
 	-webkit-font-variant-ligatures: common-ligatures;
 	font-variant-ligatures: common-ligatures;
@@ -30,7 +30,7 @@ h6 {
 }
 
 .site-title {
-    font-family: Lato, sans-serif;
+    font-family: "Lato", sans-serif;
 }
 
 input.error {
@@ -40,4 +40,20 @@ input.error {
 
 p.error {
 	color: red;
+}
+
+div.tosScrollArea{
+  background-color:#eee;
+  border-radius:4px;
+  border: 1px solid #aaa;
+  display: block;
+  font-size:0.9em;
+  height:150px;
+  margin: 2em 0;
+  overflow-y: scroll;
+  padding:1em;
+}
+
+div.tosScrollArea h5{
+  font-size: 1.1em;
 }

@@ -6,14 +6,31 @@
         <h2>Cancel Subscription Plan</h2>
 
         <p>
-            <strong>Your current plan</strong>: {{ subscription.plan_display }} @ ${{ subscription.total_amount }}
+            <strong>Your current plan</strong>: Subscription for
+            {{ subscription.plan_display }} @ {{ subscription.amount_display }}/year 
+            {% if subscription.ends_at %}
+            is set to renew automatically on {{ subscription.ends_at|date:"M d, Y" }}.
+            {% endif %}
         </p>
-
+        <p>
+          By clicking “Turn Off Auto-Renewal” below, your subscription will still be active until your expiration date,
+          but will not renew automatically.  We do not offer any refunds for cancelled subscriptions. 
+        </p>
+        <p>
+          Please keep in mind that GreenToGo is a program of 
+          <a href="http://www.dontwastedurham.org">Don’t Waste Durham</a>, a 501c3 non-profit organization! If
+          you’d like to continue to support our work without a GreenToGo membership, please consider becoming a donor!
+          We use donor funds to implement creative solutions to Durham’s trash problem and would be honored to have your
+          support in that way.
+          <a href="https://secure.squarespace.com/commerce/donate?donatePageId=594d0761414fb5311daba751">
+            CLICK HERE TO MAKE A TAX-DEDUCTIBLE DONATION!
+          </a>
+        </p>
         <form action="." method="POST">
             {% csrf_token %}
             <div>
-                <button type="submit" class="button">Cancel this subscription</button>
-                <a href="{% url 'subscriptions' %}" class="alert button">Go back to subscriptions</a>
+                <button type="submit" class="alert button">Turn Off Auto-Renewal</button>
+                <a href="{% url 'subscriptions' %}" class="secondary button">Go back to subscriptions</a>
             </div>
         </form>
     </div>

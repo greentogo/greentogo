@@ -1,0 +1,16 @@
+{% extends "core/base.html" %}
+{% load staticfiles %}
+{% block content %}
+<div class="row">
+  <div class="medium-12 columns">
+    <h1>
+      Inventory Management  
+    </h1>
+    <ul>
+      <li> <a href="/restock/">Restock Restaurant Locations</a> </li>
+      <li> <a href="/empty/">Empty Return Stations</a> </li>
+      <li> <a href="/shelve/">Add to Clean Inventory</a> </li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

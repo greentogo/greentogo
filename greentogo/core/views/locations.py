@@ -6,7 +6,7 @@ from django.template.defaultfilters import pluralize
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from core.models import Location, Subscription
+from core.models import Location, Subscription, LocationTag
 
 
 @login_required
@@ -27,11 +27,16 @@ def locations(request):
 
 @login_required
 def location(request, location_code):
+    boxesCheckedIn = 0
+    communityBoxesCheckedIn = 0
     user = request.user
     location = get_object_or_404(Location, code=location_code.upper())
+    complete = False
 
     if request.method == "POST":
         subscription_id = request.POST.get('subscription_id')
+        boxesCheckedIn = int((LocationTag.objects.filter(subscription_id=subscription_id)).count()/2)
+        communityBoxesCheckedIn = int((LocationTag.objects.all()).count()/2)
         number_of_boxes = int(request.POST.get('number_of_boxes', 1))
         try:
             subscription = user.subscriptions.active().get(pk=subscription_id)
@@ -45,18 +50,19 @@ def location(request, location_code):
             if subscription.can_tag_location(location, number_of_boxes):
                 subscription.tag_location(location, number_of_boxes)
                 if location.service == location.CHECKIN:
-                    msg = "You have checked in {} {}.".format(
+                    msg = "You have returned {} {}.".format(
                         number_of_boxes, box_plural(number_of_boxes)
                     )
                 else:
                     msg = "You have checked out {} {}.".format(
                         number_of_boxes, box_plural(number_of_boxes)
                     )
+                complete = True
                 messages.success(request, msg)
             else:
                 if location.service == location.CHECKIN:
                     if number_of_boxes == 1:
-                        msg = "You have checked in all of your boxes for this subscription."
+                        msg = "You have returned all of your boxes for this subscription."
                     else:
                         msg = ("You do not have {} {} checked out with this "
                                "subscription.").format(
@@ -89,5 +95,8 @@ def location(request, location_code):
         request, "core/location.djhtml", {
             "location": location,
             "subscriptions": subscriptions,
+            "boxesCheckedIn": boxesCheckedIn,
+            "communityBoxesCheckedIn": communityBoxesCheckedIn,
+            "complete": complete,
         }
     )

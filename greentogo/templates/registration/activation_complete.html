@@ -2,14 +2,17 @@
 {% load i18n %}
 
 {% block content %}
+
 <div class="row">
     <div class="medium-12 columns">
         <p>
             Your account is now activated!
-            <a href="{% url 'subscriptions' %}">Go to your subscriptions.</a>
         </p>
     </div>
 </div>
+
+{% include 'core/list_subscriptions.html' %}
+
 {% endblock %}
 
 {% block footer %}{% endblock %}

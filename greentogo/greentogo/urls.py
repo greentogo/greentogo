@@ -17,14 +17,18 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
 
 from rest_framework.documentation import include_docs_urls
 
 import core.views.locations
 import core.views.subscriptions
+import core.views.reporting
 from core import views as core_views
 from core.views.webhook import stripe_webhook
+
+from core.forms import EmailValidationOnForgotPassword
 
 from .adminsite import admin_site
 
@@ -35,11 +39,21 @@ subscriptions_patterns = [
         core.views.subscriptions.corporate_subscription,
         name='corporate_subscription'
     ),
+    url(
+        r'^coupon/$',
+        core.views.subscriptions.coupon_subscription,
+        name='coupon_subscription'
+    ),
     url(r'^new/$', core.views.subscriptions.add_subscription, name='add_subscription'),
     url(
-        r'^new/(?P<code>[A-Z0-9]+)/$',
+        r'^new/(?P<coupon_type>corporate)/(?P<code>[A-Z0-9]+)/$',
         core.views.subscriptions.add_subscription,
         name='add_corporate_subscription'
+    ),
+    url(
+        r'^new/(?P<coupon_type>coupon)/(?P<code>[A-Z0-9]+)/$',
+        core.views.subscriptions.add_subscription,
+        name='add_coupon_subscription'
     ),
     url(
         r'^(?P<sub_id>[A-Za-z0-9]+)/plan/$',
@@ -50,6 +64,11 @@ subscriptions_patterns = [
         r'^(?P<sub_id>[A-Za-z0-9]+)/add_cc/$',
         core.views.subscriptions.add_credit_card,
         name='subscription_add_credit_card',
+    ),
+    url(
+        r'^(?P<sub_id>[A-Za-z0-9]+)/cancel/$',
+        core.views.subscriptions.cancel_subscription,
+        name='cancel_subscription',
     ),
 ]
 
@@ -69,11 +88,23 @@ urlpatterns = [
         core_views.change_payment_method,
         name='change_payment_method'
     ),
+    url(r'^export_action/', include("export_action.urls", namespace="export_action")),
     url(r'^account/$', core_views.account_settings, name='account_settings'),
+
+    #catch password reset to use our own form
+    url(r'^accounts/password/reset/$',  auth_views.password_reset,
+    {'post_reset_redirect': '/accounts/password/reset/done/',
+     'html_email_template_name': 'registration/password_reset_email.html',
+     'password_reset_form': EmailValidationOnForgotPassword},
+    name="password_reset"),
+    #route other accounts URLs to defaults
     url(r'^accounts/', include('registration.backends.default.urls')),
-    url(r'^thanks/', TemplateView.as_view(template_name="thanks.html"), name="beta-thanks"),
-    url(r'^error/', TemplateView.as_view(template_name="error.html"), name="beta-error"),
+
     url(r'^admin/', admin_site.urls),
+    url(r'^stock/$', core_views.reporting.stock_landing_page, name='stock_report'),
+    url(r'^shelve/$', core_views.reporting.stock_shelve, name='stock_shelve'),
+    url(r'^(?P<stock_action>restock)/$', core_views.reporting.stock_report, name='stock_report_restock'),
+    url(r'^(?P<stock_action>empty)/$', core_views.reporting.stock_report, name='stock_report_empty'),
     url(r'^api/docs/', include_docs_urls(title='GreenToGo API')),
     url(r'^api/v1/auth/', include('djoser.urls.authtoken')),
     url(r'^api/v1/', include('apiv1.urls')),

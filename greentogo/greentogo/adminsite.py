@@ -3,15 +3,20 @@ import inspect
 from django.contrib import admin
 from django.views.generic import View
 
-from core.admin import LocationAdmin, UnclaimedSubscriptionAdmin
+from django.contrib.auth.models import Group;
+
+from core.admin import LocationAdmin, UnclaimedSubscriptionAdmin, GroupAdmin,\
+                        SubscriptionAdmin, PlanAdmin, CustomUserAdmin
 from core.models import (
     CorporateCode, Location, LocationTag, Plan, Restaurant, Subscription, UnclaimedSubscription,
-    User
+    User, CouponCode, LocationStockReport
 )
 from core.views.admin import (
     activity_report, empty_location, empty_locations, restock_location, restock_locations,
     stock_report, unclaimed_subscription_status_csv
 )
+
+from export_action.admin import export_selected_objects
 
 
 def is_class_based_view(view):
@@ -27,7 +32,8 @@ class G2GAdminSite(admin.AdminSite):
         return super().__init__(*args, **kwargs)
 
     def register_view(
-        self, path, name=None, section="Custom Views", urlname=None, visible=True, view=None
+        self, path, name=None, section="Custom Views", urlname=None, \
+        visible=True, view=None, only_superusers=False
     ):
         """Add a custom admin view. Can be used as a function or a decorator.
         * `path` is the path in the admin where the view will live, e.g.
@@ -48,7 +54,7 @@ class G2GAdminSite(admin.AdminSite):
             if section not in self.custom_sections:
                 self.custom_sections[section] = []
 
-            self.custom_sections[section].append((path, fn, name, urlname, visible, ))
+            self.custom_sections[section].append((path, fn, name, urlname, visible, only_superusers))
             return fn
 
         if view is not None:
@@ -61,7 +67,7 @@ class G2GAdminSite(admin.AdminSite):
         urls = super().get_urls()
         from django.conf.urls import url
         for section, views in self.custom_sections.items():
-            for path, view, name, urlname, visible in views:
+            for path, view, name, urlname, visible, only_superusers in views:
                 urls = [
                     url(r'^%s$' % path, self.admin_view(view), name=urlname),
                 ] + urls
@@ -73,9 +79,14 @@ class G2GAdminSite(admin.AdminSite):
             extra_context = {}
         custom_list = {}
 
+
         for section, views in self.custom_sections.items():
             custom_list[section] = []
-            for path, view, name, urlname, visible in views:
+            for path, view, name, urlname, visible, only_superusers in views:
+                if only_superusers and not request.user.is_superuser:
+                    #only add superuser views if the user is a superuser
+                    continue
+
                 if callable(visible):
                     visible = visible(request)
                 if visible:
@@ -84,8 +95,14 @@ class G2GAdminSite(admin.AdminSite):
                     else:
                         custom_list[section].append((path, view.__name__))
 
+            if custom_list[section] == []:
+                #the user has no permissions to edit anything in this section
+                #remove empty section
+                custom_list.pop(section, None)
+
         # Sort views alphabetically.
         # custom_list.sort(key=lambda x: x[1])
+
         extra_context.update({'custom_sections': custom_list})
         return super().index(request, extra_context)
 
@@ -98,40 +115,41 @@ admin_site.register_view(
     path='core/unclaimed_subscriptions.csv',
     view=unclaimed_subscription_status_csv,
     section="Reports",
-    name="Download CSV of claimed subscriptions"
+    name="Download CSV of claimed subscriptions",
+    only_superusers=True,
 )
 
-admin_site.register_view(
-    path='restock_locations/',
-    view=restock_locations,
-    section="Stock Management",
-    name="Restock checkout locations",
-    urlname="restock_locations",
-)
-
-admin_site.register_view(
-    path='restock_locations/(?P<location_id>[0-9]+)/',
-    view=restock_location,
-    section="Stock Management",
-    visible=False,
-    urlname="restock_location",
-)
-
-admin_site.register_view(
-    path='empty_locations/',
-    view=empty_locations,
-    section="Stock Management",
-    name="Empty checkin locations",
-    urlname="empty_locations",
-)
-
-admin_site.register_view(
-    path='empty_locations/(?P<location_id>[0-9]+)/',
-    view=empty_location,
-    section="Stock Management",
-    visible=False,
-    urlname="empty_location",
-)
+# admin_site.register_view(
+#     path='restock_locations/',
+#     view=restock_locations,
+#     section="Stock Management",
+#     name="Restock checkout locations",
+#     urlname="restock_locations",
+# )
+#
+# admin_site.register_view(
+#     path='restock_locations/(?P<location_id>[0-9]+)/',
+#     view=restock_location,
+#     section="Stock Management",
+#     visible=False,
+#     urlname="restock_location",
+# )
+#
+# admin_site.register_view(
+#     path='empty_locations/',
+#     view=empty_locations,
+#     section="Stock Management",
+#     name="Empty checkin locations",
+#     urlname="empty_locations",
+# )
+#
+# admin_site.register_view(
+#     path='empty_locations/(?P<location_id>[0-9]+)/',
+#     view=empty_location,
+#     section="Stock Management",
+#     visible=False,
+#     urlname="empty_location",
+# )
 
 admin_site.register_view(
     path='stock_report/',
@@ -139,6 +157,7 @@ admin_site.register_view(
     section="Reports",
     name="Location Stock Report",
     urlname="stock_report",
+    only_superusers=True,
 )
 
 admin_site.register_view(
@@ -147,13 +166,36 @@ admin_site.register_view(
     section="Reports",
     name="Activity Report",
     urlname="activity_report",
+    only_superusers=True,
 )
 
-admin_site.register(User)
+admin_site.register(Group, GroupAdmin)
+
+admin_site.register(User, CustomUserAdmin)
 admin_site.register(Location, LocationAdmin)
 admin_site.register(Restaurant)
-admin_site.register(Subscription)
-admin_site.register(Plan)
+admin_site.register(Subscription, SubscriptionAdmin)
+admin_site.register(Plan, PlanAdmin)
 admin_site.register(UnclaimedSubscription, UnclaimedSubscriptionAdmin)
 admin_site.register(CorporateCode)
+admin_site.register(CouponCode)
 admin_site.register(LocationTag)
+admin_site.register(LocationStockReport)
+
+
+# export tools
+# all export-able models need to be registered with the default admin.site
+# note: register with admin.site, not admin_site (which is our G2GAdminSite)
+admin.site.register(User)
+admin.site.register(Location)
+admin.site.register(Restaurant)
+admin.site.register(Subscription)
+admin.site.register(Plan)
+admin.site.register(UnclaimedSubscription)
+admin.site.register(CorporateCode)
+admin.site.register(CouponCode)
+admin.site.register(LocationTag)
+admin.site.register(LocationStockReport)
+
+#Add the export action to the custom admin site
+admin_site.add_action(export_selected_objects)

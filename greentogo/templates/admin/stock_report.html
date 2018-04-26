@@ -7,8 +7,12 @@
 <h1>Stock by location</h1>
 {% endblock %}
 {% block content %}
-<h2>Checkout location stock</h2>
 <div style="max-width: 960px;">
+<h2>Box lifecycle</h2>
+<canvas id="cycleChart" width="500" height="300"></canvas>
+</div>
+
+<h2>Checkout location stock</h2>
 <canvas id="checkoutStockChart" width="500" height="300"></canvas>
 
 <h2>Checkin location boxes</h2>
@@ -109,6 +113,22 @@ $(function () {
                     }
                 }]
             }
+        }
+    });
+  
+    var cycleCanvas = document.getElementById("cycleChart");
+    var cycleChart = new Chart(cycleCanvas, {
+        type: 'pie',
+        data: {
+            labels: data.cycle.labels,
+            datasets: [{
+                label: "# of Boxes",
+                data: data.cycle.count,
+                borderWidth: 1,
+                backgroundColor:['#88df67','#c576e3','#e06528','#']
+            }],
+        },
+        options: {
         }
     });
 });

@@ -15,6 +15,7 @@ from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.text import slugify
+from collections import Counter
 
 import shortuuid
 from django_geocoder.wrapper import get_cached as geocode
@@ -24,6 +25,10 @@ from templated_email import send_templated_mail
 from core.stripe import stripe
 from core.utils import decode_id, encode_nums
 
+import logging
+
+
+logger = logging.getLogger('django')
 
 def one_year_from_now():
     return timezone.now() + timedelta(days=365)
@@ -39,11 +44,32 @@ def activity_data(days=30):
                  .values("date") \
                  .annotate(volume=Count("date")) \
                  .order_by("date")
-        return [{"date": d['date'].date(), "volume": d['volume']} for d in data]
+        data = [{"date": d['date'].date(), "volume": d['volume']} for d in data]
+        return data
+
+    def _get_user_data():
+        # filter this to only count active subscriptions
+        total_active_subs = Subscription.objects.all().count()
+
+        data = LocationTag.objects.filter(created_at__gte=begin_datetime_start_of_day) \
+                .annotate(date=DateTrunc('created_at', precision='day')) \
+                .values("date", "subscription") \
+                .distinct() \
+                .order_by("date")
+
+        data = dict(Counter(d['date'].date() for d in data))
+        data = [{"date": date, "volume": "{0:.2f}".format(subs/total_active_subs * 100.0)} for date, subs in data.items()]
+        return data
 
     checkin_data = _get_data(LocationTag.objects.checkin())
     checkout_data = _get_data(LocationTag.objects.checkout())
-    return {"checkin": checkin_data, "checkout": checkout_data}
+
+    user_percentage_data = _get_user_data()
+    return {"checkin": checkin_data, "checkout": checkout_data, "user": user_percentage_data}
+
+def total_boxes_returned():
+    return LocationTag.objects.checkin().count()
+
 
 
 class User(AbstractUser):
@@ -53,6 +79,7 @@ class User(AbstractUser):
         max_length=255,
         unique=True,
     )
+    referred_by = models.CharField(max_length=255, blank=True, null=True)
     stripe_id = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
@@ -61,8 +88,11 @@ class User(AbstractUser):
     def has_active_subscription(self):
         return self.subscriptions.active().count() > 0
 
+    def get_subscriptions(self):
+        return self.subscriptions.active().order_by("starts_at")
+
     def create_stripe_customer(self, token=None):
-        if self.stripe_id is not None:
+        if self.stripe_id:
             return
 
         if token is None:
@@ -80,7 +110,7 @@ class User(AbstractUser):
         return customer
 
     def get_stripe_customer(self, create=False):
-        if self.stripe_id is None:
+        if not self.stripe_id:
             if create:
                 return self.create_stripe_customer()
             else:
@@ -121,8 +151,14 @@ class Plan(models.Model):
         instance._loaded_values = dict(zip(field_names, values))
         return instance
 
+    def g_available(self):
+        if self.available:
+            return ""
+        else:
+            return "(UNAVAILABLE)"
+
     def __str__(self):
-        return "{} - {}".format(self.name, self.stripe_id)
+        return "{}, Stripe ID: {} {}".format(self.name, self.stripe_id, self.g_available())
 
     def as_dict(self):
         return {
@@ -133,10 +169,16 @@ class Plan(models.Model):
             'boxes': self.number_of_boxes
         }
 
-    def display_price(self, corporate_code=None):
+    def display_price(self, corporate_code=None, coupon_code=None):
+        """apply corporate/coupon code and return formatted price"""
         amount = self.amount
         if corporate_code:
             amount -= (corporate_code.amount_off * 100)
+        elif coupon_code:
+            if coupon_code.is_percentage:
+                amount = amount * ((100 - coupon_code.value)/100)
+            else:
+                amount = amount - (coupon_code.value * 100)
         return "${:.02f}".format(amount / 100)
 
     def is_changed(self, field_name):
@@ -227,22 +269,24 @@ class Subscription(models.Model):
 
     name = models.CharField(max_length=255, null=True, blank=True)
     user = models.ForeignKey(User, related_name="subscriptions")
-    plan = models.ForeignKey(Plan, null=True)
+    plan = models.ForeignKey(Plan, null=True, blank=True)
     starts_at = models.DateTimeField(default=timezone.now)
     ends_at = models.DateTimeField(null=True, blank=True)
     stripe_id = models.CharField(max_length=100, blank=True, null=True)
     stripe_status = models.CharField(max_length=100, default="active")
     corporate_code = models.ForeignKey('CorporateCode', null=True, blank=True)
+    coupon_code = models.ForeignKey('CouponCode', null=True, blank=True)
+    cancelled = models.BooleanField(default=False)
 
     def __str__(self):
-        return "{} - {}".format(self.user.name, self.display_name)
+        return "{} - {}".format(self.user.username, self.display_name)
 
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse('subscription', kwargs={"sub_id": self.id})
 
     @classmethod
-    def create_from_stripe_sub(cls, user, plan, stripe_subscription, corporate_code=None):
+    def create_from_stripe_sub(cls, user, plan, stripe_subscription, corporate_code=None, coupon_code=None):
         ends_at = datetime.fromtimestamp(stripe_subscription.current_period_end) + timedelta(days=3)
         ends_at = timezone.make_aware(ends_at, is_dst=False)
         sub_kwargs = dict(
@@ -255,6 +299,8 @@ class Subscription(models.Model):
 
         if corporate_code:
             sub_kwargs['corporate_code'] = corporate_code
+        elif coupon_code:
+            sub_kwargs['coupon_code'] = coupon_code
 
         subscription = Subscription.objects.create(**sub_kwargs)
         return subscription
@@ -274,12 +320,14 @@ class Subscription(models.Model):
 
     def plan_display(self):
         if self.plan:
-            return self.plan.name
+            return "Subscription for " + self.plan.name
         return "None"
 
     def amount_display(self):
         if self.plan:
-            return self.plan.display_price(self.corporate_code)
+            return self.plan.display_price(
+                    corporate_code=self.corporate_code,
+                    coupon_code=self.coupon_code)
 
     @property
     def number_of_boxes(self):
@@ -294,20 +342,24 @@ class Subscription(models.Model):
 
     @property
     def available_boxes(self):
-        boxes_checked_out = LocationTag.objects.filter(subscription=self).aggregate(
-            checked_out=Sum(
-                Case(
-                    When(location__service=Location.CHECKOUT, then=1),
-                    When(location__service=Location.CHECKIN, then=-1),
-                    default=1,
-                    output_field=models.IntegerField()
-                )
-            )
-        )['checked_out']
-        return self.number_of_boxes - (boxes_checked_out or 0)
+        return self.number_of_boxes - (self.boxes_checked_out or 0)
 
+    @property
     def boxes_checked_out(self):
-        return self.number_of_boxes - self.available_boxes
+        checked_out = LocationTag.objects.filter(subscription=self).aggregate(
+                checked_out=Sum(
+                    Case(
+                        When(location__service=Location.CHECKOUT, then=1),
+                        When(location__service=Location.CHECKIN, then=-1),
+                        default=1,
+                        output_field=models.IntegerField()
+                        )
+                    )
+                )['checked_out'] or 0
+        if checked_out < 0:
+            logger.warn("User {} has is reporting more boxes available than the"
+                        "maximum".format(self.user))
+        return checked_out
 
     def amount(self):
         return self.plan.amount
@@ -333,8 +385,15 @@ class Subscription(models.Model):
             tags.append(LocationTag.objects.create(subscription=self, location=location))
         return tags
 
+    def used_today(self):
+        return self.used_on_date(date.today())
+
+    def used_on_date(self, date):
+        tag_count = LocationTag.objects.filter(subscription=self, created_at__date=date).count()
+        return tag_count > 0
+
     def will_auto_renew(self):
-        return self.has_stripe_subscription() and self.is_stripe_active()
+        return self.has_stripe_subscription() and self.is_stripe_active() and not self.cancelled
 
     def is_stripe_active(self):
         return self.stripe_status in ("active", "trialing", )
@@ -422,8 +481,21 @@ class Location(models.Model):
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
 
+    admin_location = models.BooleanField(
+        blank=True,
+        default=False,
+        help_text="Admin locations are locations where \
+        boxes will be checked in when resetting a \
+        subscriptions box count manually")
+
+    retired = models.BooleanField(
+        blank=True,
+        default=False,
+        help_text="Retired locations will not show up in reporting \
+        but their data will remain in history.")
+
     def __str__(self):
-        return "{} - {}".format(self.name, self.service)
+        return "{} - {} ({})".format(self.name, self.service, self.code)
 
     def save(self, *args, **kwargs):
         self._set_code()
@@ -509,12 +581,38 @@ class LocationTag(models.Model):
     location = models.ForeignKey(Location)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return "Location Tag - {} - {}".format(self.subscription.user, self.created_at)
+
 
 class LocationStockCount(models.Model):
+    """
+    an actual stock count at the given location
+    """
     location = models.ForeignKey(Location, related_name='stock_counts')
     created_at = models.DateTimeField(auto_now_add=True)
     count = models.PositiveIntegerField()
 
+class LocationStockReport(models.Model):
+    """
+    a report object of the actual and estimated box count at the given
+    location
+    """
+    location = models.ForeignKey(Location, related_name='stock_reports')
+    created_at = models.DateTimeField(auto_now_add=True)
+    actual_amount = models.PositiveIntegerField()
+    estimated_amount = models.PositiveIntegerField(blank=True)
+
+    def save(self, *args, **kwargs):
+        """
+        Disallow editing of codes.
+        Create coupon on Stripe upon creation.
+        """
+        if self.pk is not None:
+            return
+        if self.location:
+            self.estimated_amount = self.location.get_estimated_stock()
+        super().save(*args, **kwargs)
 
 class Restaurant(models.Model):
     name = models.CharField(max_length=255)
@@ -537,6 +635,62 @@ class Restaurant(models.Model):
 
 def one_year_from_now():
     return date.today() + timedelta(days=365)
+
+
+class CouponCode(models.Model):
+    coupon_name = models.CharField(max_length=100)
+    emails = models.CharField(max_length=1024,
+            help_text="comma separated list of emails to restrict "
+            "coupon access to. Leave this blank otherwise.",
+            blank=True)
+    code = models.CharField(
+        max_length=20,
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex=r"^[A-Z0-9]{4,20}$",
+                message="Code can only contain capitol letters and numbers " +
+                "with no spaces. Must be between 4 and 20 characters."
+            )
+        ]
+    )
+    value = models.DecimalField(max_digits=5, decimal_places=2, default=25.00)
+    #if True, value becomes a % off the price
+    is_percentage = models.BooleanField(default=False)
+    redeem_by = models.DateField(default=one_year_from_now)
+    duration = models.CharField(max_length=100,
+        choices=(("once","once"),("forever","forever")),
+        default='once',
+        help_text="This describes if the coupon should be applied once, or "
+                    "every time the subscription is renewed")
+    plans = models.ManyToManyField(Plan, blank=True, related_name="coupons",
+            help_text="Selecting no plans to make this coupon available for all "
+            "plans. ")
+
+    def __str__(self):
+        return "{} - {}".format(self.coupon_name, self.code)
+
+    def save(self, *args, **kwargs):
+        """
+        Disallow editing of codes.
+        Create coupon on Stripe upon creation.
+        """
+        if self.pk is not None:
+            return
+
+        if self.is_percentage:
+            amount_or_percent = {"percent_off": int(self.value)}
+        else:
+            amount_or_percent = {"amount_off": int(self.value * 100)}
+
+        coupon = stripe.Coupon.create(
+            id=self.code,
+            duration=self.duration,
+            currency="USD",
+            redeem_by=int(datetime.combine(self.redeem_by, datetime.min.time()).timestamp()),
+            **amount_or_percent
+        )
+        super().save(*args, **kwargs)
 
 
 class CorporateCode(models.Model):
