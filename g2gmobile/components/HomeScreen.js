@@ -91,6 +91,12 @@ class HomeScreen extends React.Component {
     }
 
     render() {
+      let availableBoxes = this.props.appStore.user.availableBoxes + "";
+      let maxBoxes = this.props.appStore.user.maxBoxes + "";
+      let boxesAvailableBanner = "You do not have a Subscription."
+      if (this.props.appStore.user.subscriptions.length > 0){
+          boxesAvailableBanner = `${availableBoxes} / ${maxBoxes} boxes available`;
+      }
         return (
             <Content style={{ flex: 1, backgroundColor: styles.primaryCream }}>
                 <List>
@@ -121,7 +127,9 @@ class HomeScreen extends React.Component {
                     />
                 </List>
                 <View style={{ flex: 1, alignItems: 'center' }}>
-                    <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>{this.props.appStore.user.availableBoxes} / {this.props.appStore.user.maxBoxes} available</Text>
+                    <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>
+                    {boxesAvailableBanner}
+                    </Text>
                 </View>
             </Content>
         )
