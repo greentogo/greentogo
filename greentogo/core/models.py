@@ -35,7 +35,11 @@ def one_year_from_now():
 
 
 def activity_data(days=30):
+    # TODO Allow Variable Days
+    # TODO Allow Variable Start and End Times
     begin_datetime = timezone.now() - timedelta(days=days)
+    print(timedelta(days=days))
+    print(begin_datetime)
     begin_datetime_start_of_day = begin_datetime.replace(hour=0, minute=0, second=0)
 
     def _get_data(qs):

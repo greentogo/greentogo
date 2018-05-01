@@ -7,6 +7,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
+from core.forms import ExportForm
+
 from core.models import (
     Location, Plan, Restaurant, Subscription, \
     UnclaimedSubscription, User, \
@@ -90,10 +92,27 @@ def stock_report(request, *args, **kwargs):
 
 
 def activity_report(request, days=30, *args, **kwargs):
+    # TODO Allow Variable Days
+    # TODO Allow Variable Start and End Times
     data = activity_data(days)
     data_json = json.dumps(data, cls=DjangoJSONEncoder)
     view_data = {"data_json": data_json, "total_boxes_returned": total_boxes_returned()}
     return render(request, 'admin/activity_report.html', view_data)
+
+
+def export_data(request, days=1800, *args, **kwargs):
+    # TODO Allow Variable Days
+    # TODO Allow Variable Start and End Times
+    data = activity_data(days)
+    data_json = json.dumps(data, cls=DjangoJSONEncoder)
+    view_data = {"data_json": data_json, "total_boxes_returned": total_boxes_returned()}
+    if request.method == "POST":
+        print("POSTED")
+        form = ExportForm(request.POST)
+    else:
+        form = ExportForm()
+    view_data = {"data_json": data_json, "total_boxes_returned": total_boxes_returned(), 'form': form}
+    return render(request, 'admin/export_data.html', view_data)
 
 
 def restock_locations(request, *args, **kwargs):
