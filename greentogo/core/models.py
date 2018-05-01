@@ -127,7 +127,8 @@ class User(AbstractUser):
             for x in stripCust.data:
                 stripeSub = stripe.Subscription.list(customer=x.id)
                 for y in stripeSub.data:
-                    subscriptionSet[0].sync_with_stripe(y)
+                    if y.id:
+                        subscriptionSet[0].sync_with_stripe(y)
 
 
 class CannotChangeException(Exception):
