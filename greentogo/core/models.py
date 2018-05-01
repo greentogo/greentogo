@@ -10,7 +10,7 @@ from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import Case, Count, Q, Sum, When
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -649,6 +649,7 @@ def one_year_from_now():
 
 
 class CouponCode(models.Model):
+    # TODO MAKE SURE THAT CORP CODES AND CUP CODES CANT MATCH
     coupon_name = models.CharField(max_length=100)
     emails = models.CharField(max_length=1024,
             help_text="comma separated list of emails to restrict "
@@ -703,8 +704,14 @@ class CouponCode(models.Model):
         )
         super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        coupon = stripe.Coupon.retrieve(id=self.code)
+        coupon.delete()
+        super().delete(*args, **kwargs)
+
 
 class CorporateCode(models.Model):
+    # TODO MAKE SURE THAT CORP CODES AND CUP CODES CANT MATCH
     company_name = models.CharField(max_length=100)
     code = models.CharField(
         max_length=20,
@@ -739,3 +746,8 @@ class CorporateCode(models.Model):
             redeem_by=int(datetime.combine(self.redeem_by, datetime.min.time()).timestamp())
         )
         super().save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        coupon = stripe.Coupon.retrieve(id=self.code)
+        coupon.delete()
+        super().delete(*args, **kwargs)
