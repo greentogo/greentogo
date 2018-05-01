@@ -118,6 +118,17 @@ class User(AbstractUser):
 
         customer = stripe.Customer.retrieve(self.stripe_id)
         return customer
+        
+    def checkForMissingStripeID(self, user):
+        user_id = User.objects.get(username=user)
+        subscriptionSet = Subscription.objects.filter(user_id=user_id)
+        if len(subscriptionSet) == 1 and len(subscriptionSet[0].stripe_id) < 2:
+            stripCust = stripe.Customer.list(email=user_id.email)
+            for x in stripCust.data:
+                stripeSub = stripe.Subscription.list(customer=x.id)
+                for y in stripeSub.data:
+                    if y.id:
+                        subscriptionSet[0].sync_with_stripe(y)
 
 
 class CannotChangeException(Exception):

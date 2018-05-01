@@ -14,7 +14,7 @@ import rollbar
 import stripe
 
 from core.forms import NewSubscriptionForm, SubscriptionForm, SubscriptionPlanForm
-from core.models import CorporateCode, CouponCode, Plan, Subscription
+from core.models import CorporateCode, CouponCode, Plan, Subscription, User
 from core.utils import decode_id, encode_nums
 
 rollbar.init(settings.ROLLBAR_KEY, settings.ROLLBAR_ENV)
@@ -22,6 +22,10 @@ rollbar.init(settings.ROLLBAR_KEY, settings.ROLLBAR_ENV)
 
 @login_required
 def subscriptions_view(request):
+    user = request.user
+    if not user.stripe_id:
+        user.create_stripe_customer()
+    User.checkForMissingStripeID(user, user)
     #subscriptions = request.user.subscriptions.active().order_by("starts_at")
     return render(request, 'core/subscriptions.html')
 

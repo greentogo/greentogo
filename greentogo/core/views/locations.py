@@ -6,11 +6,15 @@ from django.template.defaultfilters import pluralize
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from core.models import Location, Subscription, LocationTag
+from core.models import Location, Subscription, LocationTag, User
 
 
 @login_required
 def locations(request):
+    user = request.user
+    if not user.stripe_id:
+        user.create_stripe_customer()
+    User.checkForMissingStripeID(user, user)
     if request.method == "POST":
         location_code = request.POST.get('location_code').upper()
         try:
@@ -35,7 +39,8 @@ def location(request, location_code):
 
     if request.method == "POST":
         subscription_id = request.POST.get('subscription_id')
-        boxesCheckedIn = int((LocationTag.objects.filter(subscription_id=subscription_id)).count()/2)
+        for sub in user.get_subscriptions():
+            boxesCheckedIn = boxesCheckedIn + int((LocationTag.objects.filter(subscription_id=sub.id)).count()/2)
         communityBoxesCheckedIn = int((LocationTag.objects.all()).count()/2)
         number_of_boxes = int(request.POST.get('number_of_boxes', 1))
         try:
