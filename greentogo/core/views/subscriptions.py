@@ -14,7 +14,7 @@ import rollbar
 import stripe
 
 from core.forms import NewSubscriptionForm, SubscriptionForm, SubscriptionPlanForm
-from core.models import CorporateCode, CouponCode, Plan, Subscription
+from core.models import CorporateCode, CouponCode, Plan, Subscription, User
 from core.utils import decode_id, encode_nums
 
 rollbar.init(settings.ROLLBAR_KEY, settings.ROLLBAR_ENV)
