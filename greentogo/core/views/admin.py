@@ -115,7 +115,7 @@ def export_data(request, days=30, *args, **kwargs):
     view_data = {"data_json": data_json, "total_boxes_returned": total_boxes_returned(), 'form': form}
     return render(request, 'admin/export_data.html', view_data)
 
-def export_check_out(request, *args, **kwargs):
+def export_total_check_out(request, *args, **kwargs):
     from_date = request.POST.get("from_date")
     to_date = request.POST.get("to_date")
     begin_datetime_start_of_day = datetime.combine(datetime.strptime(from_date, '%Y-%m-%d'), datetime.min.time())
@@ -131,6 +131,31 @@ def export_check_out(request, *args, **kwargs):
 
     for tags in tagquery:
         if tags.location.service == "OUT":
+            filteredTagQuery.append(tags)
+
+    writer.writerow(['Username and Subscription', 'Timestamp', 'Location'])
+    writer.writerow([len(filteredTagQuery)])    
+
+    for tags in filteredTagQuery:
+        writer.writerow([tags.subscription, tags.created_at, tags.location])
+    return response
+
+def export_total_check_in(request, *args, **kwargs):
+    from_date = request.POST.get("from_date")
+    to_date = request.POST.get("to_date")
+    begin_datetime_start_of_day = datetime.combine(datetime.strptime(from_date, '%Y-%m-%d'), datetime.min.time())
+    end_datetime_start_of_day = datetime.combine(datetime.strptime(to_date, '%Y-%m-%d'), datetime.min.time())
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="check_out.csv"'
+
+    writer = csv.writer(response)
+    tagquery = LocationTag.objects.filter(created_at__gte=begin_datetime_start_of_day, created_at__lte=end_datetime_start_of_day) \
+                .annotate(date=DateTrunc('created_at', precision='day'))
+
+    filteredTagQuery = []
+
+    for tags in tagquery:
+        if tags.location.service == "IN":
             filteredTagQuery.append(tags)
 
     writer.writerow(['Username and Subscription', 'Timestamp', 'Location'])

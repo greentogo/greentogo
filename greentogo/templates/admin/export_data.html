@@ -29,13 +29,21 @@
 </div>
 
 
-<h2>Export Check Out Data to CSV</h2>
-<form method="post" action="core/export_check_out.csv">
+<form method="post" action="core/export_total_check_out.csv">
     {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Export to CSV" />
+    <div style="visibility: hidden;">
+        {{ form }}
+    </div>
+    <input type="submit" value="Export All Check Outs to CSV" />
 </form>
 
+<form method="post" action="core/export_total_check_in.csv">
+    {% csrf_token %}
+    <div style="visibility: hidden;">
+        {{ form }}
+    </div>
+    <input type="submit" value="Export All Check Ins to CSV" />
+</form>
 
 {% endblock %}
 

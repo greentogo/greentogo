@@ -13,7 +13,8 @@ from core.models import (
 )
 from core.views.admin import (
     activity_report, empty_location, empty_locations, restock_location, restock_locations,
-    stock_report, export_data, unclaimed_subscription_status_csv, export_check_out
+    stock_report, export_data, unclaimed_subscription_status_csv, export_total_check_out, 
+    export_total_check_in, 
 )
 
 from export_action.admin import export_selected_objects
@@ -120,8 +121,8 @@ admin_site.register_view(
 )
 
 admin_site.register_view(
-    path='export_data/core/export_check_out.csv',
-    view=export_check_out,
+    path='export_data/core/export_total_check_out.csv',
+    view=export_total_check_out,
     section="Reports",
     name="Download CSV",
     only_superusers=True,
