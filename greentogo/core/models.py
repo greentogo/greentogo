@@ -73,7 +73,7 @@ def total_boxes_returned():
 def export_chart_data(start_date=False, end_date=False):
     begin_datetime_start_of_day = datetime.combine(datetime.strptime(start_date, '%Y-%m-%d'), datetime.min.time())
     end_datetime_start_of_day = datetime.combine(datetime.strptime(end_date, '%Y-%m-%d'), datetime.min.time())
-    
+
     def _get_data(qs):
         data = qs.filter(created_at__gte=begin_datetime_start_of_day, created_at__lte=end_datetime_start_of_day) \
                  .annotate(date=DateTrunc('created_at', precision='day')) \
@@ -96,6 +96,10 @@ def export_chart_data(start_date=False, end_date=False):
         data = dict(Counter(d['date'].date() for d in data))
         data = [{"date": date, "volume": "{0:.2f}".format(subs/total_active_subs * 100.0)} for date, subs in data.items()]
         return data
+
+    stuff = LocationTag.objects.filter(created_at__gte=begin_datetime_start_of_day, created_at__lte=end_datetime_start_of_day) \
+                 .annotate(date=DateTrunc('created_at', precision='day'))
+    print(stuff[0].subscription)
 
     checkin_data = _get_data(LocationTag.objects.checkin())
     checkout_data = _get_data(LocationTag.objects.checkout())

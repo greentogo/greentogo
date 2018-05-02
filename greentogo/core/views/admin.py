@@ -9,10 +9,13 @@ from django.views.decorators.http import require_POST
 
 from core.forms import ExportForm
 
+from datetime import date, timedelta, datetime
+from postgres_stats import DateTrunc
+
 from core.models import (
     Location, Plan, Restaurant, Subscription, \
     UnclaimedSubscription, User, \
-    activity_data, export_chart_data, total_boxes_returned, \
+    activity_data, export_chart_data, total_boxes_returned, LocationTag \
 )
 
 
@@ -112,6 +115,22 @@ def export_data(request, days=30, *args, **kwargs):
     view_data = {"data_json": data_json, "total_boxes_returned": total_boxes_returned(), 'form': form}
     return render(request, 'admin/export_data.html', view_data)
 
+def export_check_out(request, *args, **kwargs):
+    # Create the HttpResponse object with the appropriate CSV header.
+    from_date = request.POST.get("from_date")
+    to_date = request.POST.get("to_date")
+    begin_datetime_start_of_day = datetime.combine(datetime.strptime(from_date, '%Y-%m-%d'), datetime.min.time())
+    end_datetime_start_of_day = datetime.combine(datetime.strptime(to_date, '%Y-%m-%d'), datetime.min.time())
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="check_out.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Username and Subscription', 'Timestamp', 'Location'])
+    tagquery = LocationTag.objects.filter(created_at__gte=begin_datetime_start_of_day, created_at__lte=end_datetime_start_of_day) \
+                .annotate(date=DateTrunc('created_at', precision='day'))
+    for tags in tagquery:
+        writer.writerow([tags.subscription, tags.created_at, tags.location])
+    return response
 
 def restock_locations(request, *args, **kwargs):
     """Present all locations for restock"""

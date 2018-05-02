@@ -21,12 +21,21 @@
 <form method="post" action=".">
     {% csrf_token %}
     {{ form }}
-    <input type="submit" value="Submit" />
+    <input type="submit" value="Change View Dates" />
 </form>
 
 <div style="max-width: 960px;">
     <canvas id="MonthlyBoxesChart" width="500" height="300"></canvas>
 </div>
+
+
+<h2>Export Check Out Data to CSV</h2>
+<form method="post" action="core/export_check_out.csv">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Export to CSV" />
+</form>
+
 
 {% endblock %}
 
