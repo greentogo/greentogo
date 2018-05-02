@@ -105,10 +105,11 @@ def export_data(request, days=1800, *args, **kwargs):
     # TODO Allow Variable Start and End Times
     data = activity_data(days)
     data_json = json.dumps(data, cls=DjangoJSONEncoder)
-    view_data = {"data_json": data_json, "total_boxes_returned": total_boxes_returned()}
     if request.method == "POST":
         print("POSTED")
         form = ExportForm(request.POST)
+        from_date = request.POST.get("from_date")
+        to_date = request.POST.get("to_date")
     else:
         form = ExportForm()
     view_data = {"data_json": data_json, "total_boxes_returned": total_boxes_returned(), 'form': form}

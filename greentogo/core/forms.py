@@ -5,7 +5,8 @@ from django.contrib.auth.forms import PasswordResetForm
 from registration.forms import RegistrationFormTermsOfService
 from .models import Plan, Subscription
 
-import datetime
+# import datetime
+from datetime import date, timedelta, datetime
 
 class UserSignupForm(RegistrationFormTermsOfService):
     class Meta:
@@ -17,8 +18,13 @@ class UserSignupForm(RegistrationFormTermsOfService):
         ]
 
 class ExportForm(forms.Form):
-    from_date = forms.DateField(label='From Date', initial=datetime.date.today, input_formats=['%Y-%m-%d'])
-    to_date = forms.DateField(label='To Date', initial=datetime.date.today, input_formats=['%Y-%m-%d'])
+    from_date = forms.DateField(label='From Date', initial=datetime.now() - timedelta(days=30), input_formats=['%Y-%m-%d'])
+    to_date = forms.DateField(label='To Date', initial=datetime.now(), input_formats=['%Y-%m-%d'])
+    class Meta:
+        fields = [
+                'from_date',
+                'to_date',
+            ]
 
 class UserForm(forms.ModelForm):
     class Meta:
