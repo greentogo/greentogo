@@ -45,6 +45,14 @@
     <input type="submit" value="Export All Check Ins to CSV" />
 </form>
 
+<form method="post" action="core/export_check_out_by_user.csv">
+    {% csrf_token %}
+    <div style="visibility: hidden;">
+        {{ form }}
+    </div>
+    <input type="submit" value="Export Check Outs by User to CSV" />
+</form>
+
 {% endblock %}
 
 {% block extrahead %}
