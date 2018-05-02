@@ -12,7 +12,7 @@ from core.forms import ExportForm
 from core.models import (
     Location, Plan, Restaurant, Subscription, \
     UnclaimedSubscription, User, \
-    activity_data, total_boxes_returned, \
+    activity_data, export_chart_data, total_boxes_returned, \
 )
 
 
@@ -92,26 +92,23 @@ def stock_report(request, *args, **kwargs):
 
 
 def activity_report(request, days=30, *args, **kwargs):
-    # TODO Allow Variable Days
-    # TODO Allow Variable Start and End Times
     data = activity_data(days)
     data_json = json.dumps(data, cls=DjangoJSONEncoder)
     view_data = {"data_json": data_json, "total_boxes_returned": total_boxes_returned()}
     return render(request, 'admin/activity_report.html', view_data)
 
 
-def export_data(request, days=1800, *args, **kwargs):
-    # TODO Allow Variable Days
-    # TODO Allow Variable Start and End Times
-    data = activity_data(days)
-    data_json = json.dumps(data, cls=DjangoJSONEncoder)
+def export_data(request, days=30, *args, **kwargs):
+    data = activity_data(30)
     if request.method == "POST":
-        print("POSTED")
         form = ExportForm(request.POST)
-        from_date = request.POST.get("from_date")
-        to_date = request.POST.get("to_date")
+        if form.is_valid():
+            from_date = request.POST.get("from_date")
+            to_date = request.POST.get("to_date")
+            data = export_chart_data(from_date, to_date)
     else:
         form = ExportForm()
+    data_json = json.dumps(data, cls=DjangoJSONEncoder)
     view_data = {"data_json": data_json, "total_boxes_returned": total_boxes_returned(), 'form': form}
     return render(request, 'admin/export_data.html', view_data)
 

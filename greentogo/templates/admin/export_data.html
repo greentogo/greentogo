@@ -15,20 +15,12 @@
 </div>
 
 
-<h2>Choose Data</h2>
+<h2>Choose Dates</h2>
+<p>Format: YYYY-MM-DD</p>
 
 <form method="post" action=".">
     {% csrf_token %}
     {{ form }}
-    {% comment %} <p class="required">
-        <label for="{{ form.username.id_for_label }}">Date</label>
-        <input id="date" type="date">
-    </p>
-    <p class="required">
-        <label for="{{ form.email.id_for_label }}">Email address:</label>
-        {{ form.email }}
-    </p> {% endcomment %}
-    {% comment %} <input type="submit" value="{% trans 'Submit' %}" /> {% endcomment %}
     <input type="submit" value="Submit" />
 </form>
 
