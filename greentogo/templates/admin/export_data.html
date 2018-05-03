@@ -1,0 +1,170 @@
+{# -*- engine:django -*- #}
+{% extends "admin/base_site.html" %}
+
+{% load static %}
+
+{% block content_title %}
+<h1>Activity Report</h1>
+{% endblock %}
+
+{% block content %}
+
+
+<h2>Choose Dates</h2>
+<p>Format: YYYY-MM-DD</p>
+
+<form method="post" action=".">
+    {% csrf_token %}
+    {{ form }}
+    {% if chartData %} 
+        <input type="submit" value="Change Dates" />
+    {% else %} 
+        <input type="submit" value="Set Dates" />
+    {% endif %}
+</form>
+
+{% if not chartData %} 
+    <h2>Dates need to be set before data can be exported</h2>
+{% endif %}
+
+<div style="max-width: 960px;">
+    <canvas id="MonthlyBoxesChart" width="500" height="300"></canvas>
+</div>
+
+<form method="post" action="core/export_total_check_out.csv">
+    {% csrf_token %}
+    <div style="visibility: hidden;">
+        {{ form }}
+    </div>
+    {% if form.is_valid %} 
+        <input type="submit" value="Export All Check Outs to CSV" />
+    {% else %}         
+        <input type="submit" value="Export All Check Outs to CSV" disabled/>
+    {% endif %}
+</form>
+
+<form method="post" action="core/export_total_check_in.csv">
+    {% csrf_token %}
+    <div style="visibility: hidden;">
+        {{ form }}
+    </div>
+    {% if form.is_valid %} 
+        <input type="submit" value="Export All Check Ins to CSV" />
+    {% else %}         
+        <input type="submit" value="Export All Check Ins to CSV" disabled/>
+    {% endif %}
+</form>
+
+<form method="post" action="core/export_check_out_by_user.csv">
+    {% csrf_token %}
+    <div style="visibility: hidden;">
+        {{ form }}
+    </div>
+    {% if form.is_valid %} 
+        <input type="submit" value="Export Check Outs by User to CSV" />
+    {% else %}         
+        <input type="submit" value="Export Check Outs by User to CSV" disabled/>
+    {% endif %}
+</form>
+
+<form method="post" action="core/export_check_in_by_user.csv">
+    {% csrf_token %}
+    <div style="visibility: hidden;">
+        {{ form }}
+    </div>
+    {% if form.is_valid %} 
+        <input type="submit" value="Export Check Ins by User to CSV" />
+    {% else %}         
+        <input type="submit" value="Export Check Ins by User to CSV" disabled/>
+    {% endif %}
+</form>
+
+<form method="post" action="core/export_check_in_by_location.csv">
+    {% csrf_token %}
+    <div style="visibility: hidden;">
+        {{ form }}
+    </div>
+    {% if form.is_valid %} 
+        <input type="submit" value="Export Check Ins by Location to CSV" />
+    {% else %}         
+        <input type="submit" value="Export Check Ins by Location to CSV" disabled/>
+    {% endif %}
+</form>
+
+<form method="post" action="core/export_check_out_by_location.csv">
+    {% csrf_token %}
+    <div style="visibility: hidden;">
+        {{ form }}
+    </div>
+    {% if form.is_valid %} 
+        <input type="submit" value="Export Check Outs by Location to CSV" />
+    {% else %}         
+        <input type="submit" value="Export Check Outs by Location to CSV" disabled/>
+    {% endif %}
+</form>
+
+{% endblock %}
+
+{% block extrahead %}
+<style type="text/css">
+</style>
+<script src="{% static 'jquery/dist/jquery.js' %}"></script>
+<script src="{% static 'chart.js/dist/Chart.bundle.min.js' %}"></script>
+<script>
+$(function () {
+    var data = {{ data_json|safe }};
+    window.data = data;
+    var convertToXY = function (data) {
+        return data.map(function (d) {
+            return {x: d.date, y: d.volume};
+        })
+    };
+    window.convertToXY = convertToXY;
+
+    //Create chart for boxes
+
+    var monthlyBoxesChart = document.getElementById("MonthlyBoxesChart");
+    var chart = new Chart(monthlyBoxesChart, {
+        type: 'line',
+        data: {
+            datasets: [
+                {
+                    label: "Boxes checked in",
+                    data: convertToXY(data.checkin),
+                    fill: false,
+                    backgroundColor: 'rgba(49,130,189, 1)',
+                    borderColor: 'rgba(49,130,189, 0.5)',
+                    cubicInterpolationMode: 'monotone',
+                    spanGaps: true
+                },
+                {
+                    label: "Boxes checked out",
+                    data: convertToXY(data.checkout),
+                    fill: false,
+                    backgroundColor: 'rgba(221,28,119, 1)',
+                    borderColor: 'rgba(221,28,119, 0.5)',
+                    cubicInterpolationMode: 'monotone',
+                    spanGaps: true
+                }
+            ]
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        unit: 'day'
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+});
+</script>
+{% endblock %}

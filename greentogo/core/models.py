@@ -70,7 +70,41 @@ def activity_data(days=30):
 def total_boxes_returned():
     return LocationTag.objects.checkin().count()
 
+def export_chart_data(start_date=False, end_date=False):
+    begin_datetime_start_of_day = datetime.combine(datetime.strptime(start_date, '%Y-%m-%d'), datetime.min.time())
+    end_datetime_start_of_day = datetime.combine(datetime.strptime(end_date, '%Y-%m-%d'), datetime.min.time())
 
+    def _get_data(qs):
+        data = qs.filter(created_at__gte=begin_datetime_start_of_day, created_at__lte=end_datetime_start_of_day) \
+                 .annotate(date=DateTrunc('created_at', precision='day')) \
+                 .values("date") \
+                 .annotate(volume=Count("date")) \
+                 .order_by("date")
+        data = [{"date": d['date'].date(), "volume": d['volume']} for d in data]
+        return data
+
+    def _get_user_data():
+        # filter this to only count active subscriptions
+        total_active_subs = Subscription.objects.all().count()
+
+        data = LocationTag.objects.filter(created_at__gte=begin_datetime_start_of_day, created_at__lte=end_datetime_start_of_day) \
+                .annotate(date=DateTrunc('created_at', precision='day')) \
+                .values("date", "subscription") \
+                .distinct() \
+                .order_by("date")
+
+        data = dict(Counter(d['date'].date() for d in data))
+        data = [{"date": date, "volume": "{0:.2f}".format(subs/total_active_subs * 100.0)} for date, subs in data.items()]
+        return data
+
+    checkin_data = _get_data(LocationTag.objects.checkin())
+    checkout_data = _get_data(LocationTag.objects.checkout())
+
+    user_percentage_data = _get_user_data()
+    return {"checkin": checkin_data, "checkout": checkout_data, "user": user_percentage_data}
+
+def total_boxes_returned():
+    return LocationTag.objects.checkin().count()
 
 class User(AbstractUser):
     name = models.CharField(max_length=255, blank=True, null=True)
