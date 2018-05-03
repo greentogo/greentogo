@@ -3,7 +3,7 @@ import inspect
 from django.contrib import admin
 from django.views.generic import View
 
-from django.contrib.auth.models import Group;
+from django.contrib.auth.models import Group
 
 from core.admin import LocationAdmin, UnclaimedSubscriptionAdmin, GroupAdmin,\
                         SubscriptionAdmin, PlanAdmin, CustomUserAdmin
@@ -13,7 +13,9 @@ from core.models import (
 )
 from core.views.admin import (
     activity_report, empty_location, empty_locations, restock_location, restock_locations,
-    stock_report, unclaimed_subscription_status_csv
+    stock_report, export_data, unclaimed_subscription_status_csv, export_total_check_out, 
+    export_total_check_in, export_check_out_by_user, export_check_in_by_user, 
+    export_check_out_by_location, export_check_in_by_location
 )
 
 from export_action.admin import export_selected_objects
@@ -119,6 +121,55 @@ admin_site.register_view(
     only_superusers=True,
 )
 
+admin_site.register_view(
+    path='export_data/core/export_total_check_out.csv',
+    view=export_total_check_out,
+    name="Download CSV",
+    only_superusers=True,
+    visible=False,
+)
+
+admin_site.register_view(
+    path='export_data/core/export_total_check_in.csv',
+    view=export_total_check_in,
+    name="Download CSV",
+    only_superusers=True,
+    visible=False,
+)
+
+admin_site.register_view(
+    path='export_data/core/export_check_out_by_user.csv',
+    view=export_check_out_by_user,
+    name="Download CSV",
+    only_superusers=True,
+    visible=False,
+)
+
+admin_site.register_view(
+    path='export_data/core/export_check_in_by_user.csv',
+    view=export_check_in_by_user,
+    name="Download CSV",
+    only_superusers=True,
+    visible=False,
+)
+
+admin_site.register_view(
+    path='export_data/core/export_check_out_by_location.csv',
+    view=export_check_out_by_location,
+    name="Download CSV",
+    only_superusers=True,
+    visible=False,
+)
+
+admin_site.register_view(
+    path='export_data/core/export_check_in_by_location.csv',
+    view=export_check_in_by_location,
+    name="Download CSV",
+    only_superusers=True,
+    visible=False,
+)
+
+
 # admin_site.register_view(
 #     path='restock_locations/',
 #     view=restock_locations,
@@ -166,6 +217,15 @@ admin_site.register_view(
     section="Reports",
     name="Activity Report",
     urlname="activity_report",
+    only_superusers=True,
+)
+
+admin_site.register_view(
+    path='export_data/',
+    view=export_data,
+    section="Reports",
+    name="Export Data",
+    urlname="export_data",
     only_superusers=True,
 )
 
