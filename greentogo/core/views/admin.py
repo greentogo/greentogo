@@ -186,7 +186,7 @@ def export_check_out_by_user(request, *args, **kwargs):
             filteredTagQuery.append(tags)
 
     userObjects = []
-    for tags in tagquery:
+    for tags in filteredTagQuery:
         newUserObj = User.objects.filter(id=tags.subscription.user_id)
         if not any(elem in userObjects  for elem in newUserObj):
                 userObjects.append(newUserObj[0])
@@ -220,7 +220,7 @@ def export_check_in_by_user(request, *args, **kwargs):
             filteredTagQuery.append(tags)
 
     userObjects = []
-    for tags in tagquery:
+    for tags in filteredTagQuery:
         newUserObj = User.objects.filter(id=tags.subscription.user_id)
         if not any(elem in userObjects  for elem in newUserObj):
                 userObjects.append(newUserObj[0])
@@ -253,21 +253,21 @@ def export_check_in_by_location(request, *args, **kwargs):
         if tags.location.service == 'IN':
             filteredTagQuery.append(tags)
 
-    userObjects = []
-    for tags in tagquery:
-        newUserObj = User.objects.filter(id=tags.subscription.user_id)
-        if not any(elem in userObjects  for elem in newUserObj):
-                userObjects.append(newUserObj[0])
+    locationObjects = []
+    for tags in filteredTagQuery:
+        newLocationObj = Location.objects.filter(id=tags.location.id)
+        if not any(elem in locationObjects  for elem in newLocationObj):
+            locationObjects.append(newLocationObj[0])
 
-    writer.writerow(['Username', 'Email', 'First Name', 'Last Name', 'Total Checked In'])
-    writer.writerow([len(userObjects)])
+    writer.writerow(['Name', 'Service', 'Total Checked In'])
+    writer.writerow([len(locationObjects)])
     
-    for users in userObjects:
+    for location in locationObjects:
         total = 0
         for tag in filteredTagQuery:
-            if tag.subscription.user.username == users.username:
+            if tag.location.id == location.id:
                 total = total + 1
-        writer.writerow([users.username, users.email, users.first_name, users.last_name, total])
+        writer.writerow([location.name, location.service, total])
     return response
 
 def export_check_out_by_location(request, *args, **kwargs):
@@ -287,21 +287,21 @@ def export_check_out_by_location(request, *args, **kwargs):
         if tags.location.service == 'OUT':
             filteredTagQuery.append(tags)
 
-    userObjects = []
-    for tags in tagquery:
-        newUserObj = User.objects.filter(id=tags.subscription.user_id)
-        if not any(elem in userObjects  for elem in newUserObj):
-                userObjects.append(newUserObj[0])
+    locationObjects = []
+    for tags in filteredTagQuery:
+        newLocationObj = Location.objects.filter(id=tags.location.id)
+        if not any(elem in locationObjects  for elem in newLocationObj):
+            locationObjects.append(newLocationObj[0])
 
-    writer.writerow(['Username', 'Email', 'First Name', 'Last Name', 'Total Checked In'])
-    writer.writerow([len(userObjects)])
+    writer.writerow(['Name', 'Service', 'Total Checked Out'])
+    writer.writerow([len(locationObjects)])
     
-    for users in userObjects:
+    for location in locationObjects:
         total = 0
         for tag in filteredTagQuery:
-            if tag.subscription.user.username == users.username:
+            if tag.location.id == location.id:
                 total = total + 1
-        writer.writerow([users.username, users.email, users.first_name, users.last_name, total])
+        writer.writerow([location.name, location.service, total])
     return response
 
 def restock_locations(request, *args, **kwargs):
