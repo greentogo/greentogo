@@ -115,7 +115,7 @@ def export_data(request, days=30, *args, **kwargs):
     print(form)
     data_json = json.dumps(chartData, cls=DjangoJSONEncoder)
     print(type(data_json))
-    view_data = {"data_json": data_json, "total_boxes_returned": total_boxes_returned(), 'form': form, 'chartData': chartData}
+    view_data = {"data_json": data_json, 'form': form, 'chartData': chartData}
     return render(request, 'admin/export_data.html', view_data)
 
 def export_total_check_out(request, *args, **kwargs):

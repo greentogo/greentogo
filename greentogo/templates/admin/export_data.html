@@ -8,11 +8,6 @@
 {% endblock %}
 
 {% block content %}
-<h2>Box check-ins (running total)</h2>
-
-<div style="font-size:3em; color:#0000ff;">
-    {{ total_boxes_returned }}
-</div>
 
 
 <h2>Choose Dates</h2>
@@ -28,10 +23,13 @@
     {% endif %}
 </form>
 
+{% if not chartData %} 
+    <h2>Dates need to be set before data can be exported</h2>
+{% endif %}
+
 <div style="max-width: 960px;">
     <canvas id="MonthlyBoxesChart" width="500" height="300"></canvas>
 </div>
-
 
 <form method="post" action="core/export_total_check_out.csv">
     {% csrf_token %}

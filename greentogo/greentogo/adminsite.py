@@ -126,6 +126,7 @@ admin_site.register_view(
     view=export_total_check_out,
     name="Download CSV",
     only_superusers=True,
+    visible=False,
 )
 
 admin_site.register_view(
@@ -133,6 +134,7 @@ admin_site.register_view(
     view=export_total_check_in,
     name="Download CSV",
     only_superusers=True,
+    visible=False,
 )
 
 admin_site.register_view(
@@ -140,6 +142,7 @@ admin_site.register_view(
     view=export_check_out_by_user,
     name="Download CSV",
     only_superusers=True,
+    visible=False,
 )
 
 admin_site.register_view(
@@ -147,6 +150,7 @@ admin_site.register_view(
     view=export_check_in_by_user,
     name="Download CSV",
     only_superusers=True,
+    visible=False,
 )
 
 admin_site.register_view(
@@ -154,6 +158,7 @@ admin_site.register_view(
     view=export_check_out_by_location,
     name="Download CSV",
     only_superusers=True,
+    visible=False,
 )
 
 admin_site.register_view(
@@ -161,6 +166,7 @@ admin_site.register_view(
     view=export_check_in_by_location,
     name="Download CSV",
     only_superusers=True,
+    visible=False,
 )
 
 
