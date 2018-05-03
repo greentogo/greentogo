@@ -21,7 +21,11 @@
 <form method="post" action=".">
     {% csrf_token %}
     {{ form }}
-    <input type="submit" value="Change Dates" />
+    {% if chartData %} 
+        <input type="submit" value="Change Dates" />
+    {% else %} 
+        <input type="submit" value="Set Dates" />
+    {% endif %}
 </form>
 
 <div style="max-width: 960px;">
@@ -34,7 +38,11 @@
     <div style="visibility: hidden;">
         {{ form }}
     </div>
-    <input type="submit" value="Export All Check Outs to CSV" />
+    {% if form.is_valid %} 
+        <input type="submit" value="Export All Check Outs to CSV" />
+    {% else %}         
+        <input type="submit" value="Export All Check Outs to CSV" disabled/>
+    {% endif %}
 </form>
 
 <form method="post" action="core/export_total_check_in.csv">
@@ -42,7 +50,11 @@
     <div style="visibility: hidden;">
         {{ form }}
     </div>
-    <input type="submit" value="Export All Check Ins to CSV" />
+    {% if form.is_valid %} 
+        <input type="submit" value="Export All Check Ins to CSV" />
+    {% else %}         
+        <input type="submit" value="Export All Check Ins to CSV" disabled/>
+    {% endif %}
 </form>
 
 <form method="post" action="core/export_check_out_by_user.csv">
@@ -50,7 +62,11 @@
     <div style="visibility: hidden;">
         {{ form }}
     </div>
-    <input type="submit" value="Export Check Outs by User to CSV" />
+    {% if form.is_valid %} 
+        <input type="submit" value="Export Check Outs by User to CSV" />
+    {% else %}         
+        <input type="submit" value="Export Check Outs by User to CSV" disabled/>
+    {% endif %}
 </form>
 
 <form method="post" action="core/export_check_in_by_user.csv">
@@ -58,7 +74,35 @@
     <div style="visibility: hidden;">
         {{ form }}
     </div>
-    <input type="submit" value="Export Check Ins by User to CSV" />
+    {% if form.is_valid %} 
+        <input type="submit" value="Export Check Ins by User to CSV" />
+    {% else %}         
+        <input type="submit" value="Export Check Ins by User to CSV" disabled/>
+    {% endif %}
+</form>
+
+<form method="post" action="core/export_check_in_by_location.csv">
+    {% csrf_token %}
+    <div style="visibility: hidden;">
+        {{ form }}
+    </div>
+    {% if form.is_valid %} 
+        <input type="submit" value="Export Check Ins by Location to CSV" />
+    {% else %}         
+        <input type="submit" value="Export Check Ins by Location to CSV" disabled/>
+    {% endif %}
+</form>
+
+<form method="post" action="core/export_check_out_by_location.csv">
+    {% csrf_token %}
+    <div style="visibility: hidden;">
+        {{ form }}
+    </div>
+    {% if form.is_valid %} 
+        <input type="submit" value="Export Check Outs by Location to CSV" />
+    {% else %}         
+        <input type="submit" value="Export Check Outs by Location to CSV" disabled/>
+    {% endif %}
 </form>
 
 {% endblock %}
