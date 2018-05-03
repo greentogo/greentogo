@@ -115,6 +115,7 @@ def export_data(request, days=30, *args, **kwargs):
     view_data = {"data_json": data_json, 'form': form, 'chartData': chartData}
     return render(request, 'admin/export_data.html', view_data)
 
+# TODO All of the exports below are ugly repeat code. Consolidate into one function!
 def export_total_check_out(request, *args, **kwargs):
     from_date = request.POST.get('from_date')
     to_date = request.POST.get('to_date')
@@ -300,6 +301,7 @@ def export_check_out_by_location(request, *args, **kwargs):
                 total = total + 1
         writer.writerow([location.name, location.service, total])
     return response
+# TODO All of the exports above are ugly repeat code. Consolidate into one function!
 
 def restock_locations(request, *args, **kwargs):
     """Present all locations for restock"""
