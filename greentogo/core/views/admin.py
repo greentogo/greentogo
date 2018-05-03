@@ -111,10 +111,7 @@ def export_data(request, days=30, *args, **kwargs):
             chartData = export_chart_data(from_date, to_date)
     else:
         form = ExportForm()
-    print(form.is_valid())
-    print(form)
     data_json = json.dumps(chartData, cls=DjangoJSONEncoder)
-    print(type(data_json))
     view_data = {"data_json": data_json, 'form': form, 'chartData': chartData}
     return render(request, 'admin/export_data.html', view_data)
 
