@@ -14,7 +14,6 @@ def locations(request):
     user = request.user
     if not user.stripe_id:
         user.create_stripe_customer()
-    User.checkForMissingStripeID(user, user)
     if request.method == "POST":
         location_code = request.POST.get('location_code').upper()
         try:
