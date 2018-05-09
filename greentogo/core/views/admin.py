@@ -309,19 +309,16 @@ def export_user_reports(request, *args, **kwargs):
 
     writer = csv.writer(response)
     userquery = User.objects.all()
-    # tagquery = LocationTag.objects.filter(created_at__gte=begin_datetime_start_of_day, created_at__lte=end_datetime_start_of_day) \
-    #             .annotate(date=DateTrunc('created_at', precision='day'))
-    tags = Subscription.objects.filter(user_id=1).order_by('-ends_at')
-    # tags = Subscription.objects.filter(user=userquery[7]).order_by('ends_at')
-    # print(userquery[1].id)
-    print(tags[0].ends_at)
-    # print(BREAK)
-    writer.writerow(['Username', 'Name', 'Email', 'Date Joined', 'Last Login'])
+
+    writer.writerow(['Username', 'Name', 'Email', 'Date Joined', 'Last Login', 'Subscription Level', 'Coupon Code', 'Corp Code', 'Stripe'])
     writer.writerow([len(userquery)])
     
     for user in userquery:
-        tags = Subscription.objects.filter(user=user).order_by('-ends_at')
-        writer.writerow([user.username, user.name, user.email, user.date_joined, user.last_login])
+        subs = Subscription.objects.filter(user=user).order_by('-ends_at')
+        if len(subs) > 0:
+            writer.writerow([user.username, user.name, user.email, user.date_joined, user.last_login, subs[0].plan, subs[0].coupon_code_id, subs[0].corporate_code_id, subs[0].stripe_id])
+        else:
+            writer.writerow([user.username, user.name, user.email, user.date_joined, user.last_login, '', '', '', ''])
     return response
 
 def restock_locations(request, *args, **kwargs):
