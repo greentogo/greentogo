@@ -91,7 +91,10 @@
     <script type="text/javascript">
      $(function () {
          $("#checkin-checkout-form").on('submit', function (event) {
-             $("#checkin-checkout-button").prop('disabled', 'disabled');
+             var submitButton = document.getElementById("checkin-checkout-button");
+             submitButton.setAttribute('type', 'button');
+             submitButton.setAttribute('disabled', '');
+             submitButton.textContent = 'Please Wait...';
          });
      })
     </script>
