@@ -65,7 +65,7 @@
                     <p>
                     <label for="number_of_boxes">Number of boxes</label>
                     <input class="input-group-field" name="number_of_boxes"
-                        type="number" value="1" min="1" />
+                        type="number" value="1" min="1" required/>
                     </p>
 
                     <button type="submit" class="button" id="checkin-checkout-button">
@@ -91,7 +91,10 @@
     <script type="text/javascript">
      $(function () {
          $("#checkin-checkout-form").on('submit', function (event) {
-             $("#checkin-checkout-button").prop('disabled', 'disabled');
+             var submitButton = document.getElementById("checkin-checkout-button");
+             submitButton.setAttribute('type', 'button');
+             submitButton.setAttribute('disabled', '');
+             submitButton.textContent = 'Please Wait...';
          });
      })
     </script>
