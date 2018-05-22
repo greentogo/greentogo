@@ -21,64 +21,67 @@
                     {% else %}
                       <img class="location-confirmation-img" src="{% static 'img/return_confirmation.png' %}" alt="Return a box" />
                     {% endif %}
+                    <a class="button anotherBox" href="{% url 'locations' %}">Return another Box.</a>
                 {% else %}
                     <img class="location-confirmation-img" src="{% static 'img/checkout_confirmation.png' %}" alt="Check out a box" />
+                    <a class="button anotherBox" href="{% url 'locations' %}">Check out another Box.</a>
                 {% endif %}
                 </div>
-            {% endif %}
-
-            <h2>
-                {% if location.service == location.CHECKIN %}
-                    Return a box
-                {% else %}
-                    Check out a box
-                {% endif %}
-                at {{ location.name }}
-            </h2>
-
-            {% if subscriptions %}
-            <form action="." method="POST" id="checkin-checkout-form">
-                {% csrf_token %}
-                {% if subscriptions|length == 1 %}
-                    {% with sub=subscriptions.0 %}
-                        <p>
-                            <strong>{{ sub.available_boxes }}/{{ sub.max_boxes }} boxes available</strong>
-                        </p>
-                        <input type="hidden" name="subscription_id" value="{{ sub.id }}" />
-                    {% endwith %}
-                {% else %}
-                    <label for="subscription_id">Subscription</label>
-                    <select name="subscription_id" id="subscription_id">
-                        {% for sub in subscriptions %}
-                            <option value="{{ sub.id }}"
-                                    data-available="{{ sub.available_boxes }}"
-                                    data-max="{{ sub.max_boxes }}">
-                                {{ sub.name }} -
-                                {{ sub.available_boxes }}/{{ sub.max_boxes }} available
-                            </option>
-                        {% endfor %}
-                    </select>
-                {% endif %}
-
-                <p>
-                <label for="number_of_boxes">Number of boxes</label>
-                <input class="input-group-field" name="number_of_boxes"
-                       type="number" value="1" min="1" />
-                </p>
-
-                <button type="submit" class="button" id="checkin-checkout-button">
-                    {% if location.service == location.CHECKIN %}
-                        Return
-                    {% else %}
-                        Check out
-                    {% endif %}
-                </button>
-            </form>
             {% else %}
-                <p>
-                You do not have any current subscriptions.
-                <!--<a href="{% url 'add_subscription' %}">Go add one now.</a>-->
-                </p>
+            
+                <h2>
+                    {% if location.service == location.CHECKIN %}
+                        Return a box
+                    {% else %}
+                        Check out a box
+                    {% endif %}
+                    at {{ location.name }}
+                </h2>
+
+                {% if subscriptions %}
+                <form action="." method="POST" id="checkin-checkout-form">
+                    {% csrf_token %}
+                    {% if subscriptions|length == 1 %}
+                        {% with sub=subscriptions.0 %}
+                            <p>
+                                <strong>{{ sub.available_boxes }}/{{ sub.max_boxes }} boxes available</strong>
+                            </p>
+                            <input type="hidden" name="subscription_id" value="{{ sub.id }}" />
+                        {% endwith %}
+                    {% else %}
+                        <label for="subscription_id">Subscription</label>
+                        <select name="subscription_id" id="subscription_id">
+                            {% for sub in subscriptions %}
+                                <option value="{{ sub.id }}"
+                                        data-available="{{ sub.available_boxes }}"
+                                        data-max="{{ sub.max_boxes }}">
+                                    {{ sub.name }} -
+                                    {{ sub.available_boxes }}/{{ sub.max_boxes }} available
+                                </option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
+
+                    <p>
+                    <label for="number_of_boxes">Number of boxes</label>
+                    <input class="input-group-field" name="number_of_boxes"
+                        type="number" value="1" min="1" />
+                    </p>
+
+                    <button type="submit" class="button" id="checkin-checkout-button">
+                        {% if location.service == location.CHECKIN %}
+                            Return
+                        {% else %}
+                            Check out
+                        {% endif %}
+                    </button>
+                </form>
+                {% else %}
+                    <p>
+                    You do not have any current subscriptions.
+                    <!--<a href="{% url 'add_subscription' %}">Go add one now.</a>-->
+                    </p>
+                {% endif %}
             {% endif %}
         </div>
     </div>
