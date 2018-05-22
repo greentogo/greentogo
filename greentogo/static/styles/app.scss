@@ -96,7 +96,9 @@ form {
 }
 
 .anotherBox{
-    margin-top: 15px;
+    display: block;
+    max-width: 200px;
+    margin: 15px auto;
 }
 
 .page-footer {

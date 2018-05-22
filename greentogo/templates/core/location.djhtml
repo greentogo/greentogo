@@ -21,10 +21,10 @@
                     {% else %}
                       <img class="location-confirmation-img" src="{% static 'img/return_confirmation.png' %}" alt="Return a box" />
                     {% endif %}
-                    <a class="button anotherBox" href="{% url 'locations' %}">Return another Box.</a>
+                    <a class="button anotherBox" href="{% url 'locations' %}">Return another box</a>
                 {% else %}
                     <img class="location-confirmation-img" src="{% static 'img/checkout_confirmation.png' %}" alt="Check out a box" />
-                    <a class="button anotherBox" href="{% url 'locations' %}">Check out another Box.</a>
+                    <a class="button anotherBox" href="{% url 'locations' %}">Check out another box</a>
                 {% endif %}
                 </div>
             {% else %}
