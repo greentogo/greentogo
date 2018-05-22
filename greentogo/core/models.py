@@ -168,6 +168,8 @@ class User(AbstractUser):
 class CannotChangeException(Exception):
     """Raise when model field should not change after initial creation."""
 
+class IncorrectIntervalException(Exception):
+    """Raise when the interval string is not the correct type."""
 
 class PlanQuerySet(models.QuerySet):
     def available(self):
@@ -184,6 +186,7 @@ class Plan(models.Model):
     available = models.BooleanField(default=True)
     amount = models.PositiveIntegerField(help_text="Amount in cents.")
     number_of_boxes = models.PositiveIntegerField()
+    interval = models.CharField(max_length=255, help_text="Should say 'year' or 'month'.")
     stripe_id = models.CharField(max_length=255, unique=True, blank=True, null=True, editable=False)
 
     class Meta:
@@ -210,6 +213,7 @@ class Plan(models.Model):
             'stripe_id': self.stripe_id,
             'name': self.name,
             'amount': self.amount,
+            'interval': self.interval,
             'display_price': self.display_price(),
             'boxes': self.number_of_boxes
         }
@@ -246,19 +250,24 @@ class Plan(models.Model):
         if self.stripe_id:
             if self.is_changed('amount'):
                 raise CannotChangeException({"model": self, "field": "amount"})
+            if self.is_changed('interval'):
+                raise CannotChangeException({"model": self, "field": "interval"})
             if self.is_changed('name'):
                 stripe_plan = stripe.Plan.retrieve(self.stripe_id)
                 stripe_plan.name = self.name
                 stripe_plan.save()
         else:
-            self.stripe_id = self._generate_stripe_id()
-            plan = stripe.Plan.create(
-                name=self.name,
-                id=self.stripe_id,
-                interval="year",
-                currency="usd",
-                amount=self.amount,
-            )
+            if self.interval == 'year' or self.interval == 'month':
+                self.stripe_id = self._generate_stripe_id()
+                plan = stripe.Plan.create(
+                    name=self.name,
+                    id=self.stripe_id,
+                    interval=self.interval,
+                    currency="usd",
+                    amount=self.amount,
+                )
+            else:
+                raise IncorrectIntervalException({"model": self, "field": "interval"})
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
