@@ -44,7 +44,7 @@ class LoginScreen extends React.Component {
         
         axios({
             method: 'post',
-            url: this.props.store.makeUrl('/auth/login/'),
+            url: this.props.store.makeUrl('/api/v1/auth/login/'),
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
@@ -62,8 +62,16 @@ class LoginScreen extends React.Component {
             }
         })
         .catch((error) => {
-            console.log(JSON.stringify(error.response.data.non_field_errors[0]))
-            this.setState({error: error.response.data.non_field_errors, loading: false});
+            console.log("Error")
+            console.log(error)
+            console.log("Error Response")
+            console.log(error.response)
+            console.log("Error Response Data")
+            console.log(error.response.data)
+            // if (error.response.data && error.response.data.non_field_errors){
+            //     console.log(JSON.stringify(error.response.data.non_field_errors[0]))
+            // }
+            // this.setState({error: error.response.data, loading: false});
             // console.log("State error: " + this.state.error)
         });
         
@@ -76,6 +84,7 @@ class LoginScreen extends React.Component {
         let errorMessages = this.state.error.map((error, index) => {
                                 return <Text key={index} style={{color: 'red', textAlign: 'center'}}>{error}</Text>;
                             });
+        // let errorMessages = return <Text key={index} style={{color: 'red', textAlign: 'center'}}>{error}</Text>;
         return (
             <Container style={styles.container}>
                  <Header style={{backgroundColor: styles.primaryColor, marginTop: Constants.statusBarHeight}}>
@@ -101,7 +110,6 @@ class LoginScreen extends React.Component {
                             <Text style={styles.boldText}>Login</Text>
                         </Button>
                     </Form>
-                    {errorMessages}
                     {loadingSpinner} 
                 </Content>
             </Container>

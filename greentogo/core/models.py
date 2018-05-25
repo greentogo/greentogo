@@ -186,7 +186,7 @@ class Plan(models.Model):
     available = models.BooleanField(default=True)
     amount = models.PositiveIntegerField(help_text="Amount in cents.")
     number_of_boxes = models.PositiveIntegerField()
-    interval = models.CharField(max_length=255, help_text="Should say 'year' or 'month'.")
+    interval = models.CharField(max_length=255, help_text="Should say 'year' or 'month'.", default="year")
     stripe_id = models.CharField(max_length=255, unique=True, blank=True, null=True, editable=False)
 
     class Meta:
@@ -645,7 +645,7 @@ class LocationStockCount(models.Model):
     """
     location = models.ForeignKey(Location, related_name='stock_counts')
     created_at = models.DateTimeField(auto_now_add=True)
-    count = models.PositiveIntegerField()
+    count = models.IntegerField()
 
 class LocationStockReport(models.Model):
     """
@@ -654,8 +654,8 @@ class LocationStockReport(models.Model):
     """
     location = models.ForeignKey(Location, related_name='stock_reports')
     created_at = models.DateTimeField(auto_now_add=True)
-    actual_amount = models.PositiveIntegerField()
-    estimated_amount = models.PositiveIntegerField(blank=True)
+    actual_amount = models.IntegerField()
+    estimated_amount = models.IntegerField()
 
     def save(self, *args, **kwargs):
         """

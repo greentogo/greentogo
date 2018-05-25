@@ -25,7 +25,7 @@ def subscriptions_view(request):
     user = request.user
     if not user.stripe_id:
         user.create_stripe_customer()
-    #subscriptions = request.user.subscriptions.active().order_by("starts_at")
+    # subscriptions = request.user.subscriptions.active().order_by("starts_at")
     return render(request, 'core/subscriptions.html')
 
 

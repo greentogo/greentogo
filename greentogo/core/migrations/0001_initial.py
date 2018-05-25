@@ -157,7 +157,6 @@ class Migration(migrations.Migration):
                 ),
                 ('name', models.CharField(max_length=255, unique=True)),
                 ('available', models.BooleanField(default=True)),
-                ('interval', models.CharField(max_length=255)),
                 ('amount', models.PositiveIntegerField()),
                 ('number_of_boxes', models.PositiveIntegerField()),
             ],
