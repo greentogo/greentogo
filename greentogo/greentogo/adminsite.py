@@ -215,7 +215,7 @@ admin_site.register_view(
     path='stock_report/',
     view=stock_report,
     section="Reports",
-    name="Location Stock Report",
+    name="View GreenToGo Container Status",
     urlname="stock_report",
     only_superusers=True,
 )
