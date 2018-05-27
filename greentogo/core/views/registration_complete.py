@@ -10,6 +10,8 @@ from core.models import Location, Subscription, LocationTag, User
 
 
 def registration_complete(request):
+    print("Heyo")
+    print(request)
     activation_key = "123"
     # user = request.user
     # if not user.stripe_id:
