@@ -1,9 +1,9 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 import { Constants } from 'expo';
 
 const styles = {
     primaryColor: '#628e86',
-    primaryCream: '#FAF3CB',
+    primaryCream: '#F8F8F4',
     buttonContainer: {
         padding: 10,
         flex: 1,
@@ -13,7 +13,7 @@ const styles = {
     },
     container: {
         flex: 1,
-        backgroundColor: '#FAF3CB',
+        backgroundColor: '#F8F8F4',
         justifyContent: 'center',
     },
     fullWidthButton: {
@@ -26,6 +26,10 @@ const styles = {
     },
     bigText: {
         fontSize: 30
+    },
+    window: {
+       height: Dimensions.get('window').height,
+       width: Dimensions.get('window').width
     }
 }
 

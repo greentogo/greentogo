@@ -1,10 +1,10 @@
 import React from 'react';
 import {
-  StyleSheet,
-  View,
-  TouchableHighlight
+    StyleSheet,
+    View,
+    TouchableHighlight
 } from 'react-native';
-import {inject, observer} from "mobx-react";
+import { inject, observer } from "mobx-react";
 import styles from "../styles";
 import G2GTitleImage from "./G2GTitleImage";
 import {
@@ -17,17 +17,18 @@ import {
     Icon,
     Left
 } from "native-base";
+import axios from '../apiClient';
 
 class ListMenuItem extends React.Component {
     render() {
         const onPress = this.props.onPress || function () { };
         return (
             <TouchableHighlight>
-                <ListItem style={{flex: 1, height: 100, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: styles.primaryColor, backgroundColor: styles.primaryCream }} icon onPress={onPress}>
+                <ListItem style={{ flex: 1, height: 100, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: styles.primaryColor, backgroundColor: styles.primaryCream }} icon onPress={onPress}>
                     <Left>
-                        <Icon style={{color: styles.primaryColor}} name={this.props.icon}/>
+                        <Icon style={{ color: styles.primaryColor }} name={this.props.icon} />
                     </Left>
-                    <Body style={{borderBottomWidth: 0 }}>
+                    <Body style={{ borderBottomWidth: 0 }}>
                         <Text>{this.props.text}</Text>
                     </Body>
                 </ListItem>
@@ -39,11 +40,34 @@ class ListMenuItem extends React.Component {
 @inject("appStore")
 @observer
 class HomeScreen extends React.Component {
+    constructor(props) {
+        super(props)
+        this.props.appStore.getUserData()
+    }
+
     static route = {
         navigationBar: {
-            renderTitle: (route, props) => <G2GTitleImage />, 
+            renderTitle: (route, props) => <G2GTitleImage />,
             backgroundColor: '#628e86'
         }
+    }
+    componentWillMount() {
+        let authToken = this.props.appStore.authToken;
+        axios.get('me/', {
+            headers: {
+                'Authorization': `Token ${authToken}`
+            }
+        }).then((response) => {
+            subscriptions = response.data.data.subscriptions;
+            if (response.data.data.email) this.props.appStore.email = response.data.data.email;
+            console.log(response.data.data)
+            if (subscriptions.length > 0) {
+                this.subscriptionChange(subscriptions[0].id);
+            }
+        }).catch((error) => {
+            console.log('In the error!');
+            console.log(error);
+        })
     }
 
     goToMap = () => {
@@ -58,13 +82,23 @@ class HomeScreen extends React.Component {
         this.props.navigator.push('returnBox');
     }
 
+    goToAccount = () => {
+        this.props.navigator.push('account')
+    }
+
     logOut = () => {
         this.props.appStore.clearAuthToken()
     }
 
     render() {
+      let availableBoxes = this.props.appStore.user.availableBoxes + "";
+      let maxBoxes = this.props.appStore.user.maxBoxes + "";
+      let boxesAvailableBanner = "You do not have a Subscription."
+      if (this.props.appStore.user.subscriptions.length > 0){
+          boxesAvailableBanner = `${availableBoxes} / ${maxBoxes} boxes available`;
+      }
         return (
-            <Content style={{flex: 1, backgroundColor: styles.primaryCream}}>
+            <Content style={{ flex: 1, backgroundColor: styles.primaryCream }}>
                 <List>
                     <ListMenuItem
                         icon="log-out"
@@ -82,8 +116,9 @@ class HomeScreen extends React.Component {
                         onPress={this.goToMap}
                     />
                     <ListMenuItem
-                        icon="person" 
+                        icon="person"
                         text="Your account"
+                        onPress={this.goToAccount}
                     />
                     <ListMenuItem
                         icon="unlock"
@@ -91,6 +126,11 @@ class HomeScreen extends React.Component {
                         onPress={this.logOut}
                     />
                 </List>
+                <View style={{ flex: 1, alignItems: 'center' }}>
+                    <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>
+                    {boxesAvailableBanner}
+                    </Text>
+                </View>
             </Content>
         )
     }
