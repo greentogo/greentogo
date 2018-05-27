@@ -25,6 +25,7 @@ from rest_framework.documentation import include_docs_urls
 import core.views.locations
 import core.views.subscriptions
 import core.views.reporting
+import core.views.registration_complete
 from core import views as core_views
 from core.views.webhook import stripe_webhook
 
@@ -92,13 +93,14 @@ urlpatterns = [
     url(r'^account/$', core_views.account_settings, name='account_settings'),
 
     #catch password reset to use our own form
+    # url(r'^accounts/register/complete/', core.views.registration_complete.registration_complete),
     url(r'^accounts/password/reset/$',  auth_views.password_reset,
     {'post_reset_redirect': '/accounts/password/reset/done/',
      'html_email_template_name': 'registration/password_reset_email.html',
      'password_reset_form': EmailValidationOnForgotPassword},
     name="password_reset"),
     #route other accounts URLs to defaults
-    url(r'^accounts/', include('registration.backends.default.urls')),
+    url(r'^accounts/', include('registration.backends.simple.urls')),
 
     url(r'^admin/', admin_site.urls),
     url(r'^stock/$', core_views.reporting.stock_landing_page, name='stock_report'),
