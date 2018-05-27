@@ -1,5 +1,9 @@
 import React from 'react';
 import axios from '../apiClient';
+import { Icon, Button } from 'native-base';
+import { inject, observer } from 'mobx-react';
+const apiEndpoint = '/api/v1';
+let subscriptions = [];
 import {
     StyleSheet,
     Text,
@@ -7,17 +11,10 @@ import {
     Picker
 } from 'react-native';
 
-import { Icon, Button } from 'native-base';
-
-import { inject, observer } from 'mobx-react';
-
-const apiEndpoint = '/api/v1';
-let subscriptions = [];
-
 @inject('appStore')
 @observer
 class SubmissionScreen extends React.Component {
-   constructor(props) {
+    constructor(props) {
         super(props)
         this.state = {
             boxCount: 1
@@ -30,14 +27,14 @@ class SubmissionScreen extends React.Component {
             headers: {
                 'Authorization': `Token ${authToken}`
             }
-        })
-        .then((response) => {
+        }).then((response) => {
             subscriptions = response.data.data.subscriptions;
+            if (response.data.data.email) this.props.appStore.email = response.data.data.email;
+            console.log(response.data.data)
             if (subscriptions.length > 0) {
                 this.subscriptionChange(subscriptions[0].id);
             }
-        })
-        .catch((error) => {
+        }).catch((error) => {
             console.log('In the error!');
             console.log(error);
         })
@@ -51,19 +48,19 @@ class SubmissionScreen extends React.Component {
 
     add = () => {
         let returnableBoxes = this.state.selectedSubscription.max_boxes - this.state.selectedSubscription.available_boxes;
-        switch(this.props.appStore.action) {
+        switch (this.props.appStore.action) {
             case 'IN':
                 if (this.state.boxCount === returnableBoxes) {
                     return;
                 } else {
-                    this.setState({boxCount: this.state.boxCount + 1})
+                    this.setState({ boxCount: this.state.boxCount + 1 })
                 }
                 break;
             case 'OUT':
                 if (this.state.boxCount === this.state.selectedSubscription.available_boxes) {
                     return;
                 } else {
-                    this.setState({boxCount: this.state.boxCount + 1})
+                    this.setState({ boxCount: this.state.boxCount + 1 })
                 }
                 break;
         }
@@ -71,7 +68,7 @@ class SubmissionScreen extends React.Component {
 
     subtract = () => {
         if (this.state.boxCount > 1) {
-            this.setState({boxCount: this.state.boxCount - 1})
+            this.setState({ boxCount: this.state.boxCount - 1 })
         }
     }
 
@@ -84,7 +81,7 @@ class SubmissionScreen extends React.Component {
                 selectedSubscription = subscription;
             }
         });
-        switch(this.props.appStore.action) {
+        switch (this.props.appStore.action) {
             case 'IN':
                 console.log(selectedSubscription);
                 if (selectedSubscription.available_boxes === selectedSubscription.max_boxes) {
@@ -118,17 +115,17 @@ class SubmissionScreen extends React.Component {
         axios.post('tag/', {
             subscription: this.state.subscriptionId,
             location: this.props.appStore.locationCode,
-            action: this.props.appStore.action
-        }, config)
-        .then((response) => {
+            action: this.props.appStore.action,
+            number_of_boxes: this.state.boxCount
+        }, config).then((response) => {
+            // console.log(response)
             // TODO: Route to a success screen
-            if(this.props.appStore.action === 'OUT') {
-              this.props.navigator.push('checkOutSuccess', {boxCount: this.state.boxCount});
+            if (this.props.appStore.action === 'OUT') {
+                this.props.navigator.push('checkOutSuccess', { boxCount: this.state.boxCount });
             } else {
-              this.props.navigator.push('returnSuccess', {boxCount: this.state.boxCount});
+                this.props.navigator.push('returnSuccess', { boxCount: this.state.boxCount });
             }
-        })
-        .catch((error) => {
+        }).catch((error) => {
             console.log(error.response);
         });
     }
@@ -154,21 +151,21 @@ class SubmissionScreen extends React.Component {
         return (
             subscriptions.length > 0 ? (
                 <View>
-                     {/* TODO: Add this back in once the tag/ endpoint accepts # of boxes
-                     <View style={{marginBottom: 10}}><Text style={styles.headerText}>How many boxes to {this.props.appStore.action}?</Text></View>
+                    {/* TODO: Add this back in once the tag/ endpoint accepts # of boxes */}
+                    <View style={{ marginBottom: 10 }}><Text style={styles.headerText}>How many boxes to {this.props.appStore.action}?</Text></View>
                     <View style={styles.centeredRow}>
-                        <Button
-                            success
-                            onPress={this.add} >
-                            <Text style={styles.icon}>+</Text>
-                        </ Button>
-                        <Text style={{marginLeft: 10, marginRight: 10, fontSize: 20}}>{this.state.boxCount}</Text>
                         <Button
                             success
                             onPress={this.subtract} >
                             <Text style={styles.icon}>-</Text>
-                        </ Button>
-                    </View> */}
+                        </Button>
+                        <Text style={{ marginLeft: 10, marginRight: 10, fontSize: 20 }}>{this.state.boxCount}</Text>
+                        <Button
+                            success
+                            onPress={this.add} >
+                            <Text style={styles.icon}>+</Text>
+                        </Button>
+                    </View>
                     <View>
                         <Text style={styles.headerText}>Check {this.props.appStore.action.toLowerCase()} 1 box on which subscription?</Text>
                         <Picker
@@ -179,26 +176,25 @@ class SubmissionScreen extends React.Component {
                             {
                                 subscriptions.map((subscription, index) => {
                                     return <Picker.Item
-                                                key={index}
-                                                label={`${subscription.name} (${subscription.available_boxes}/${subscription.max_boxes})`}
-                                                value={subscription.id}
-                                            />
+                                        key={index}
+                                        label={`${subscription.name} (${subscription.available_boxes}/${subscription.max_boxes})`}
+                                        value={subscription.id}
+                                    />
                                 })
                             }
-                        </ Picker>
+                        </Picker>
                         <View style={styles.centeredRow}>
                             <Button
                                 success
-                                onPress={this.submit}
-                            >
-                                <Text style={{color: '#FFFFFF'}}>Submit</Text>
+                                onPress={this.submit}>
+                                <Text style={{ color: '#FFFFFF' }}>Submit</Text>
                             </Button>
                         </View>
                     </View>
                 </View>
             ) : (
-                <View><Text>Your account has no subscriptions</Text></View>
-            )
+                    <View><Text>Your account has no subscriptions</Text></View>
+                )
         )
     }
 }

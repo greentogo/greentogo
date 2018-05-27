@@ -1,28 +1,29 @@
 import React from 'react';
+import { Constants } from 'expo';
+import {observer, Provider} from 'mobx-react';
 import {
     StyleSheet,
     Text,
     View,
 } from 'react-native';
-import { Constants } from 'expo';
-import {observer, Provider} from 'mobx-react';
+import styles from '../styles';
+import LoginScreen from './LoginScreen';
+import HomeScreen from './HomeScreen';
+import MapScreen from './MapScreen';
+import CheckOutScreen from './CheckOutScreen';
+import ReturnBox from "./ReturnScreen";
+import SubmissionScreen from "./SubmissionScreen";
+import CheckOutSuccessScreen from "./CheckOutSuccessScreen";
+import ReturnSuccessScreen from "./ReturnSuccessScreen";
+import AccountScreen from "./AccountScreen";
+import SubscriptionScreen from "./SubscriptionScreen"
 
+import stylesheet from "../styles";
 import {
     createRouter,
     NavigationProvider,
     StackNavigation
 } from '@expo/ex-navigation';
-
-import LoginScreen from './LoginScreen';
-import HomeScreen from './HomeScreen';
-import MapScreen from './MapScreen';
-import CheckOutScreen from './CheckOutScreen';
-import styles from '../styles';
-import ReturnBox from "./ReturnScreen";
-import SubmissionScreen from "./SubmissionScreen";
-import CheckOutSuccessScreen from "./CheckOutSuccessScreen";
-import ReturnSuccessScreen from "./ReturnSuccessScreen";
-import stylesheet from "../styles";
 
 const Router = createRouter(() => ({
     home: () => HomeScreen,
@@ -31,7 +32,9 @@ const Router = createRouter(() => ({
     returnBox: () => ReturnBox,
     submission: () => SubmissionScreen,
     checkOutSuccess: () => CheckOutSuccessScreen,
-    returnSuccess: () => ReturnSuccessScreen
+    returnSuccess: () => ReturnSuccessScreen,
+    account: () => AccountScreen,
+    subscription: () => SubscriptionScreen
 }));
 
 @observer

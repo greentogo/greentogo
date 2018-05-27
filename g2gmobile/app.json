@@ -7,7 +7,7 @@
     "sdkVersion": "23.0.0",
     "version": "1.0.0",
     "orientation": "portrait",
-    "primaryColor": "#cccccc",
+    "primaryColor": "#F8F8F4",
     "icon": "./assets/icons/GTG-Box-App.png",
     "loading": {
       "icon": "./assets/icons/GTG-Box-App.png",
