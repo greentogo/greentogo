@@ -8,24 +8,38 @@
             {% csrf_token %}
             <!-- <p> {{ form.non_field_errors }} </p> -->
             <div class="reportrow">
-              <h5>Choose a location</h5>
+              {% if stock_action == "restock" %}
+              <h5>Select Restaurant for Restocking</h5>
+              {% else %}
+              <h5>Select a Return Station</h5>
+              {% endif %}
               <select id="location_id" name="location" required>
                 {% for location in locations %}
                 <option value="{{ location.id }}">{{ location }}</option>
                 {% endfor %}
               </select>
             </div>
+            {% if stock_action == "restock" %}
             <div class="reportrow">
-              <h5>Actual number of boxes at location:</h5>
+              <h5>How many clean boxes WERE ALREADY THERE when you arrived:</h5>
               <div id="sliderActual"></div>
             </div>
             <div>
               <input class="reportinput" name="actual_count" id="sliderActualText">
             </div>
+            {% else %}
+            <div class="reportrow">
+              <h5>How many dirty boxes did you collect from this return station:</h5>
+              <div id="sliderActual"></div>
+            </div>
+            <div>
+              <input class="reportinput" name="actual_count" id="sliderActualText">
+            </div>
+            {% endif %}
 
             {% if stock_action == "restock" %}
               <div class="reportrow">
-                <h5>Update stock count:</h5>
+                <h5>How many clean boxes did you ADD to their inventory:</h5>
                 <div id="sliderStock"></div>
               </div>
               <div>

@@ -15,7 +15,7 @@ from core.views.admin import (
     activity_report, empty_location, empty_locations, restock_location, restock_locations,
     stock_report, export_data, unclaimed_subscription_status_csv, export_total_check_out, 
     export_total_check_in, export_check_out_by_user, export_check_in_by_user, 
-    export_check_out_by_location, export_check_in_by_location
+    export_check_out_by_location, export_check_in_by_location, export_user_reports
 )
 
 from export_action.admin import export_selected_objects
@@ -169,6 +169,15 @@ admin_site.register_view(
     visible=False,
 )
 
+admin_site.register_view(
+    path='export_data/core/export_user_reports.csv',
+    view=export_user_reports,
+    section="Reports",
+    name="Download CSV of User Reports",
+    only_superusers=True,
+    visible=True,
+)
+
 
 # admin_site.register_view(
 #     path='restock_locations/',
@@ -206,7 +215,7 @@ admin_site.register_view(
     path='stock_report/',
     view=stock_report,
     section="Reports",
-    name="Location Stock Report",
+    name="View GreenToGo Container Status",
     urlname="stock_report",
     only_superusers=True,
 )

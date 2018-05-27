@@ -46,7 +46,7 @@ class LoginScreen extends React.Component {
 
         axios({
             method: 'post',
-            url: this.props.store.makeUrl('/auth/login/'),
+            url: this.props.store.makeUrl('/api/v1/auth/login/'),
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',

@@ -14,7 +14,6 @@ def locations(request):
     user = request.user
     if not user.stripe_id:
         user.create_stripe_customer()
-    User.checkForMissingStripeID(user, user)
     if request.method == "POST":
         location_code = request.POST.get('location_code').upper()
         try:
@@ -42,7 +41,8 @@ def location(request, location_code):
         for sub in user.get_subscriptions():
             boxesCheckedIn = boxesCheckedIn + int((LocationTag.objects.filter(subscription_id=sub.id)).count()/2)
         communityBoxesCheckedIn = int((LocationTag.objects.all()).count()/2)
-        number_of_boxes = int(request.POST.get('number_of_boxes', 1))
+        if type(communityBoxesCheckedIn).__name__ == "int":
+            communityBoxesCheckedIn = communityBoxesCheckedIn + 100
         try:
             subscription = user.subscriptions.active().get(pk=subscription_id)
         except Subscription.DoesNotExist as ex:
@@ -52,39 +52,46 @@ def location(request, location_code):
         box_plural = lambda n: pluralize(n, "box,boxes")
 
         with transaction.atomic():
-            if subscription.can_tag_location(location, number_of_boxes):
-                subscription.tag_location(location, number_of_boxes)
-                if location.service == location.CHECKIN:
-                    msg = "You have returned {} {}.".format(
-                        number_of_boxes, box_plural(number_of_boxes)
-                    )
-                else:
-                    msg = "You have checked out {} {}.".format(
-                        number_of_boxes, box_plural(number_of_boxes)
-                    )
-                complete = True
-                messages.success(request, msg)
-            else:
-                if location.service == location.CHECKIN:
-                    if number_of_boxes == 1:
-                        msg = "You have returned all of your boxes for this subscription."
-                    else:
-                        msg = ("You do not have {} {} checked out with this "
-                               "subscription.").format(
-                                   number_of_boxes, box_plural(number_of_boxes)
-                               )
-                else:
-                    if number_of_boxes == 1:
-                        msg = (
-                            "You do not have enough boxes to check out with "
-                            "this subscription."
+            if len(request.POST.get('number_of_boxes')) > 0 and int(request.POST.get('number_of_boxes')) > 0:
+                number_of_boxes = int(request.POST.get('number_of_boxes', 1))
+                if subscription.can_tag_location(location, number_of_boxes):
+                    subscription.tag_location(location, number_of_boxes)
+                    if location.service == location.CHECKIN:
+                        msg = "You have returned {} {}.".format(
+                            number_of_boxes, box_plural(number_of_boxes)
                         )
                     else:
-                        msg = (
-                            "You do not have enough boxes to check out {} {} "
-                            "with this subscription."
-                        ).format(number_of_boxes, box_plural(number_of_boxes))
+                        msg = "You have checked out {} {}.".format(
+                            number_of_boxes, box_plural(number_of_boxes)
+                        )
+                    complete = True
+                    messages.success(request, msg)
+                else:
+                    if location.service == location.CHECKIN:
+                        if number_of_boxes == 1:
+                            msg = "You have returned all of your boxes for this subscription."
+                        else:
+                            msg = ("You do not have {} {} checked out with this "
+                                "subscription.").format(
+                                    number_of_boxes, box_plural(number_of_boxes)
+                                )
+                    else:
+                        if number_of_boxes == 1:
+                            msg = (
+                                "You do not have enough boxes to check out with "
+                                "this subscription."
+                            )
+                        else:
+                            msg = (
+                                "You do not have enough boxes to check out {} {} "
+                                "with this subscription."
+                            ).format(number_of_boxes, box_plural(number_of_boxes))
 
+                    messages.error(request, msg)
+            else:
+                msg = (
+                    "Please enter a valid positive number"
+                )
                 messages.error(request, msg)
 
     subscriptions = [

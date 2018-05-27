@@ -303,6 +303,24 @@ def export_check_out_by_location(request, *args, **kwargs):
     return response
 # TODO All of the exports above are ugly repeat code. Consolidate into one function!
 
+def export_user_reports(request, *args, **kwargs):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="check_outs_by_location.csv"'
+
+    writer = csv.writer(response)
+    userquery = User.objects.all()
+
+    writer.writerow(['Username', 'Name', 'Email', 'Date Joined', 'Last Login', 'Subscription Level', 'Coupon Code', 'Corp Code', 'Stripe'])
+    writer.writerow([len(userquery)])
+    
+    for user in userquery:
+        subs = Subscription.objects.filter(user=user).order_by('-ends_at')
+        if len(subs) > 0:
+            writer.writerow([user.username, user.name, user.email, user.date_joined, user.last_login, subs[0].plan, subs[0].coupon_code_id, subs[0].corporate_code_id, subs[0].stripe_id])
+        else:
+            writer.writerow([user.username, user.name, user.email, user.date_joined, user.last_login, '', '', '', ''])
+    return response
+
 def restock_locations(request, *args, **kwargs):
     """Present all locations for restock"""
     checkout_locations = Location.objects.checkout().order_by('name')
