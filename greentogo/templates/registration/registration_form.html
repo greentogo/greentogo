@@ -19,9 +19,14 @@
                 {{ form.username }}
             </p>
             <p class="required">
-                {{ form.email.errors }}
-                <label for="{{ form.email.id_for_label }}">Email address:</label>
-                {{ form.email }}
+                {{ form.email1.errors }}
+                <label for="{{ form.email1.id_for_label }}">Email address:</label>
+                {{ form.email1 }}
+            </p>
+            <p class="required">
+                {{ form.email2.errors }}
+                <label for="{{ form.email2.id_for_label }}">Confirm Email address:</label>
+                {{ form.email2 }}
             </p>
             <p class="required">
                 {{ form.password1.errors }}
