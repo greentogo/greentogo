@@ -9,7 +9,7 @@ from .models import Plan, Subscription
 from datetime import date, timedelta, datetime
 
 class UserSignupForm(RegistrationFormTermsOfService):
-    email1 = forms.EmailField()
+    email = forms.EmailField()
     email2 = forms.EmailField()
     class Meta:
         model = get_user_model()
@@ -19,12 +19,12 @@ class UserSignupForm(RegistrationFormTermsOfService):
         ]
     def clean(self):
         cleaned_data = super(UserSignupForm, self).clean()
-        email1 = cleaned_data.get('email1')
+        email = cleaned_data.get('email')
         email2 = cleaned_data.get('email2')
 
-        if email1 and email2 and email1 != email2:
+        if email and email2 and email != email2:
             self._errors['email2'] = self.error_class(['Emails do not match.'])
-            del self.cleaned_data['email1']
+            del self.cleaned_data['email']
         return cleaned_data
 
 class ExportForm(forms.Form):

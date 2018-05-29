@@ -6,24 +6,29 @@ from django.template.defaultfilters import pluralize
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
 
 from core.models import Location, Subscription, LocationTag, User
 from core.forms import UserSignupForm
 
 def registration_form(request):
     if request.method == 'POST':
+        print('It Was A Post')
         form = UserSignupForm(request.POST)
         if form.is_valid():
             print("form is valid")
             user = form.save(commit=False)
             user.is_active = True
-            user.email = form.cleaned_data.get('email1')
+            user.email = form.cleaned_data.get('email')
             current_site = get_current_site(request)
             mail_subject = 'Welcome to GreenToGo!'
-            message = render_to_string('wlec_to_gtg.html', {
+            message = render_to_string('registration/welcome_message.html', {
                 'user': user,
                 'domain': current_site.domain,
             })
+            print(message)
+            print(user)
             print("stopping")
             print(breakHere)
             user.save()
