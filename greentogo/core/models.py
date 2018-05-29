@@ -152,6 +152,14 @@ class User(AbstractUser):
 
         customer = stripe.Customer.retrieve(self.stripe_id)
         return customer
+    
+    def add_to_mailchimp(self):
+        if settings.DJANGO_ENV == 'development':
+            print("In Development Environment")
+        elif settings.DJANGO_ENV == 'production':
+            print("In Production Environment")
+        else:
+            print("In Unknown Environment:" + settings.DJANGO_ENV)
         
     def checkForMissingStripeID(self, user):
         user_id = User.objects.get(username=user)
