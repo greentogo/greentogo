@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.defaultfilters import pluralize
@@ -28,9 +28,10 @@ def registration_form(request):
                 'domain': current_site.domain,
             })
             print(message)
+            print(user.email)
             print(user)
             print("stopping")
-            print(breakHere)
+            # print(breakHere)
             user.save()
             print("still going")
             to_email = form.cleaned_data.get('email')
@@ -38,7 +39,11 @@ def registration_form(request):
                         mail_subject, message, to=[to_email]
             )
             email.send()
-            return redirect('/subscriptions/')
+            new_user = authenticate(username=form.cleaned_data['username'],
+                                    password=form.cleaned_data['password1'],
+                                    )
+            login(request, new_user)
+            return redirect('/subscriptions/new/', {'newly_registered_user':form.cleaned_data['username']})
     else:
         form = UserSignupForm()
     return render(request, "registration/registration_form.html", {'form':form})
