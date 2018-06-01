@@ -43,11 +43,17 @@ def registration_form(request):
                                     password=form.cleaned_data['password1'],
                                     )
             login(request, new_user)
-            return render(request, 'core/add_subscription.html', {'newly_registered_user':{
+            messages.add_message(request, messages.INFO, "Your account has been registered successfully, {username}! Now you just need a subscription in order to start using GreenToGo. Your email address is {email}. If this is incorrect, change your email in 'My Settings".format(username=form.cleaned_data['username'], email=form.cleaned_data['email']))
+            return redirect('/subscriptions/new/', {'newly_registered_user':{
                 'new':True,
                 'username':form.cleaned_data['username'],
                 'email':form.cleaned_data['email']
             }})
+            # return render(request, 'core/add_subscription.html', {'newly_registered_user':{
+            #     'new':True,
+            #     'username':form.cleaned_data['username'],
+            #     'email':form.cleaned_data['email']
+            # }})
     else:
         form = UserSignupForm()
     return render(request, "registration/registration_form.html", {'form':form})

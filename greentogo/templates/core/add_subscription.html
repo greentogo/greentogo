@@ -1,20 +1,13 @@
 {% extends "core/base.html" %}
 {# -*- engine:django -*- #}
 
-
+{% autoescape on %}
 {% block content %}
 <div class="row">
     <div class="medium-12 columns">
-        {% if newly_registered_user.new %}
-            <div class="callout primary">
-                Your account has been registered successfully, {{ newly_registered_user.username }}! Now you just need a subscription in order to start using GreenToGo.
-                <br>
-                Your email address is {{ newly_registered_user.email }}. If this is incorrect, <a href="/account/">change it here.</a>
-            </div>
-        {% endif %}
-        <a href="/account/">change it here.</a>
-        <h2>Add a New Subscription</h2>
 
+        <h2>Add a New Subscription</h2>
+        
         {% if corporate_code %}
         <p>
             Your employer, {{ corporate_code.company_name }}, is a member. You receive a ${{ corporate_code.amount_off }} discount on this GreenToGo subscription.
@@ -103,3 +96,4 @@
     });
     </script>
 {% endblock %}
+{% endautoescape %}
