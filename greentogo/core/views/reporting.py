@@ -64,8 +64,10 @@ def stock_report(request, stock_action):
 
     if stock_action == 'restock':
         locations = Location.objects.checkout()
+        locations = locations.filter(retired=False)
     else:
         locations = Location.objects.checkin()
+        locations = locations.filter(retired=False)
     return render(request,'reporting/stock.html',{
         "locations": locations,
         "stock_action": stock_action,

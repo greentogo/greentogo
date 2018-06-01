@@ -5,8 +5,9 @@
 {% block content %}
 <div class="row">
     <div class="medium-12 columns">
-        <h2>Add a New Subscription</h2>
 
+        <h2>Add a New Subscription</h2>
+        
         {% if corporate_code %}
         <p>
             Your employer, {{ corporate_code.company_name }}, is a member. You receive a ${{ corporate_code.amount_off }} discount on this GreenToGo subscription.

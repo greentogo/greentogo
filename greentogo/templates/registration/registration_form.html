@@ -24,6 +24,11 @@
                 {{ form.email }}
             </p>
             <p class="required">
+                {{ form.email2.errors }}
+                <label for="{{ form.email2.id_for_label }}">Confirm Email address:</label>
+                {{ form.email2 }}
+            </p>
+            <p class="required">
                 {{ form.password1.errors }}
                 <label for="{{ form.password1.id_for_label }}">Choose a Password:</label>
                 {{ form.password1 }}
@@ -35,7 +40,7 @@
             </p>
             <p class="required">
                 {{ form.referred_by.errors }}
-                <label for="{{ form.referred_by.id_for_label }}">Referral email address</label>
+                <label for="{{ form.referred_by.id_for_label }}">Did someone refer you to GreenToGo? If so, tell us who they are so we can thank them!</label>
                 {{ form.referred_by }}
             </p>
 

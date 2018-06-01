@@ -57,12 +57,13 @@ class LoginScreen extends React.Component {
             }
         }).then((json) => {
             if (json.data.auth_token) {
+                console.log("YEAH ITS TRUE")
                 this.setState({ loading: false });
                 this.props.store.setAuthToken(json.data.auth_token);
             }
-
+            console.log("Still going")
             // Get the user data after successful login
-            axios.get('/me/', {
+            axios.get('/api/v1/me/', {
                 headers: {
                     'Authorization': `Token ${json.data.auth_token}`
                 }
@@ -73,6 +74,7 @@ class LoginScreen extends React.Component {
                 console.log(err)
             })
         }).catch((error) => {
+            console.log(error)
             console.log(JSON.stringify(error.response.data.non_field_errors[0]))
             this.setState({ error: error.response.data.non_field_errors, loading: false });
             // console.log("State error: " + this.state.error)
