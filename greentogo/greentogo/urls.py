@@ -93,8 +93,7 @@ urlpatterns = [
     url(r'^account/$', core_views.account_settings, name='account_settings'),
 
     #catch password reset to use our own form
-    url(r'^accounts/register/', core.views.registration.registration_form),
-    url(r'^accounts/register/complete/', core.views.registration.registration_complete),
+    url(r'^accounts/register/', core.views.registration.registration_form),=
     url(r'^accounts/password/reset/$',  auth_views.password_reset,
     {'post_reset_redirect': '/accounts/password/reset/done/',
      'html_email_template_name': 'registration/password_reset_email.html',
