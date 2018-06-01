@@ -523,10 +523,10 @@ def new_subscription_email_to_admins(sender, instance, created, **kwargs):
 
 class LocationQuerySet(models.QuerySet):
     def checkin(self):
-        return self.filter(service=Location.CHECKIN)
+        return self.filter(service=Location.CHECKIN).order_by('name')
 
     def checkout(self):
-        return self.filter(service=Location.CHECKOUT)
+        return self.filter(service=Location.CHECKOUT).order_by('name')
 
 
 class Location(models.Model):
