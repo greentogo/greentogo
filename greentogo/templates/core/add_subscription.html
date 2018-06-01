@@ -5,10 +5,14 @@
 {% block content %}
 <div class="row">
     <div class="medium-12 columns">
-        {% if newly_registered_user %}
-            <div class="callout primary">Your account has been registered successfully, {{ newly_registered_user }}! Now you just need a subscription in order to start using GreenToGo's services.</div>
+        {% if newly_registered_user.new %}
+            <div class="callout primary">
+                Your account has been registered successfully, {{ newly_registered_user.username }}! Now you just need a subscription in order to start using GreenToGo.
+                <br>
+                Your email address is {{ newly_registered_user.email }}. If this is incorrect, <a href="/account/">change it here.</a>
+            </div>
         {% endif %}
-        <div class="callout primary">Your account has been registered successfully, USER_NAME_HERE! Now you just need a subscription in order to start using GreenToGo's services.</div>
+        <a href="/account/">change it here.</a>
         <h2>Add a New Subscription</h2>
 
         {% if corporate_code %}

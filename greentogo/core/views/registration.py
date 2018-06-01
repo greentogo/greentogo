@@ -43,7 +43,11 @@ def registration_form(request):
                                     password=form.cleaned_data['password1'],
                                     )
             login(request, new_user)
-            return redirect('/subscriptions/new/', {'newly_registered_user':form.cleaned_data['username']})
+            return render(request, 'core/add_subscription.html', {'newly_registered_user':{
+                'new':True,
+                'username':form.cleaned_data['username'],
+                'email':form.cleaned_data['email']
+            }})
     else:
         form = UserSignupForm()
     return render(request, "registration/registration_form.html", {'form':form})
