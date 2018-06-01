@@ -27,13 +27,7 @@ def registration_form(request):
                 'user': user,
                 'domain': current_site.domain,
             })
-            print(message)
-            print(user.email)
-            print(user)
-            print("stopping")
-            # print(breakHere)
             user.save()
-            print("still going")
             to_email = form.cleaned_data.get('email')
             email = EmailMessage(
                         mail_subject, message, to=[to_email]
@@ -57,26 +51,3 @@ def registration_form(request):
     else:
         form = UserSignupForm()
     return render(request, "registration/registration_form.html", {'form':form})
-
-
-def registration_complete(request):
-    print("Heyo")
-    print(request)
-    activation_key = "123"
-    # user = request.user
-    # if not user.stripe_id:
-    #     user.create_stripe_customer()
-    # if request.method == "POST":
-    #     location_code = request.POST.get('location_code').upper()
-    #     try:
-    #         location = Location.objects.get(code=location_code)
-    #         return redirect(location.get_absolute_url())
-    #     except Location.DoesNotExist:
-    #         if location_code:
-    #             messages.error(request, "There is no location that matches that code.")
-    #         else:
-    #             messages.error(request, "Please enter a code.")
-
-    return render(request, "registration/registration_complete.html", {
-        "activation_key": activation_key,
-    })
