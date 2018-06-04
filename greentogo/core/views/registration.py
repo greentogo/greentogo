@@ -14,10 +14,8 @@ from core.forms import UserSignupForm
 
 def registration_form(request):
     if request.method == 'POST':
-        print('It Was A Post')
         form = UserSignupForm(request.POST)
         if form.is_valid():
-            print("form is valid")
             user = form.save(commit=False)
             user.is_active = True
             user.email = form.cleaned_data.get('email')
@@ -30,14 +28,14 @@ def registration_form(request):
             user.save()
             to_email = form.cleaned_data.get('email')
             email = EmailMessage(
-                        mail_subject, message, to=[to_email]
+                        subject=mail_subject, body=message, to=[to_email], from_email='greentogo@app.durhamgreentogo.com',
             )
             email.send()
             new_user = authenticate(username=form.cleaned_data['username'],
                                     password=form.cleaned_data['password1'],
                                     )
             login(request, new_user)
-            messages.add_message(request, messages.INFO, "Your account has been registered successfully, {username}! Now you just need a subscription in order to start using GreenToGo. Your email address is {email}. If this is incorrect, change your email in 'My Settings".format(username=form.cleaned_data['username'], email=form.cleaned_data['email']))
+            messages.add_message(request, messages.INFO, "Your account has been registered successfully, {username}! Now you just need a subscription in order to start using GreenToGo. Your email address is {email}. If this is incorrect, change your email in 'My Settings'".format(username=form.cleaned_data['username'], email=form.cleaned_data['email']))
             return redirect('/subscriptions/new/', {'newly_registered_user':{
                 'new':True,
                 'username':form.cleaned_data['username'],
