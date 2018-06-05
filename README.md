@@ -12,7 +12,11 @@ The files are laid out in accordance with recommendations from Two Scoops of Dja
 1. Run `make check` to make sure you have all the required programs installed.
 1. Run `make requirements`. If that worked, you should be ready for the next part!
 1. Run `make greentogo/greentogo/.env`. This will create a file to hold the database URL and API keys that you will need. (See "Environment Setup" below.)
+1. To get the Postgres server started, run `pg_ctl -D /usr/local/var/postgres start`.
+1. Next, you need to initialize the greentogo database. First, run `createdb greentogo`, which will create the database and link it with Postgres. Next, in order to do an sql dump into that database, find the g2g database file (likely sent to you by an administrator) and run `psql -d greentogo -U <username> -f <filename>.sql`. (If you don't know your username for Postgres, run `psql -l` to find out). 
+1. Make sure that the `node-sass` command is installed on by running `npm i -g node-sass`.
 1. Run `./greentogo/manage.py migrate`.
+1. Run `./greentogo/manage.py runserver` and navigate to the address provided. 
 
 ## Environment setup
 
@@ -35,7 +39,3 @@ For `DATABASE_URL`, change this to match your local database setup. If you have 
 For the Stripe keys, you will need to create an account at [Stripe](https://stripe.com/). Once you have an account, you can get your secret and publishable keys at <https://dashboard.stripe.com/account/apikeys>. For development, you can ignore `STRIPE_WEBHOOK_SECRET` and `ROLLBAR_KEY`.
 
 For your Google API key, you can generate a key at <https://console.developers.google.com/apis/credentials>. This key will need access to the Google Maps API. However, you can also ignore this in development unless working on part of the application that uses maps.
-
-## Other docs
-
-Are you a server administrator? [Check out our admin docs.](./docs/server-admin.md)
