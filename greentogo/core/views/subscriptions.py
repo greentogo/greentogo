@@ -31,6 +31,9 @@ def subscriptions_view(request):
 
 @login_required
 def add_subscription(request, *args, **kwargs):
+    user = request.user
+    if not user.stripe_id:
+        user.create_stripe_customer()
     corporate_code = None
     coupon_code = None
     if 'code' in kwargs and 'coupon_type' in kwargs:

@@ -18,6 +18,7 @@ def registration_form(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = True
+            user.create_stripe_customer()
             user.email = form.cleaned_data.get('email')
             current_site = get_current_site(request)
             mail_subject = 'Welcome to GreenToGo!'
