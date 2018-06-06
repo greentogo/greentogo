@@ -25,17 +25,19 @@
                     {% endif %}
                 </p>
             </div>
+        </div>
+        <div class="row">
             <div class="medium-6 columns">
-              {% if not sub.cancelled %}
-                {% if sub.has_stripe_subscription %}
-                    <a href="{% url 'subscription_plan' sub_id=sub.hashed_id %}" class="button">Change subscription</a>
-                {% else %}
-                    <a href="{% url 'subscription_add_credit_card' sub_id=sub.hashed_id %}" class="button">
-                        Add credit card
-                        <span data-tooltip aria-haspopup="true" class="has-tip top" data-disable-hover="false" tabindex="1" title="Without a credit card, this subscription cannot be renewed or upgraded.">(why?)</span>
-                    </a>
+                {% if not sub.cancelled %}
+                    {% if sub.has_stripe_subscription %}
+                        <a href="{% url 'subscription_plan' sub_id=sub.hashed_id %}" class="button">Change Your Current Subscription</a>
+                    {% else %}
+                        <a href="{% url 'subscription_add_credit_card' sub_id=sub.hashed_id %}" class="button">
+                            Add credit card
+                            <span data-tooltip aria-haspopup="true" class="has-tip top" data-disable-hover="false" tabindex="1" title="Without a credit card, this subscription cannot be renewed or upgraded.">(why?)</span>
+                        </a>
+                    {% endif %}
                 {% endif %}
-              {% endif %}
             </div>
         </div>
         {% endfor %}
@@ -48,7 +50,7 @@
         </div>
         {% endif %}
         <div>
-            <a href="{% url 'add_subscription' %}" class="button large">Add a new subscription</a>
+            <a href="{% url 'add_subscription' %}" class="button large">Add a NEW subscription</a>
         </div>
         {% endwith %}
     </div>
