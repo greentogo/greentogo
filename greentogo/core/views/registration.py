@@ -22,16 +22,29 @@ def registration_form(request):
             user.email = form.cleaned_data.get('email')
             current_site = get_current_site(request)
             mail_subject = 'Welcome to GreenToGo!'
-            message = render_to_string('registration/welcome_message.html', {
+            communityBoxesCheckedIn = int((LocationTag.objects.all()).count()/2) + 100
+            print(communityBoxesCheckedIn)
+            welcome_message = render_to_string('registration/welcome_message.html', {
                 'user': user,
+                'communityBoxesCheckedIn': communityBoxesCheckedIn,
                 'domain': current_site.domain,
             })
+            print(welcome_message)
             user.save()
             to_email = form.cleaned_data.get('email')
+            print(to_email)
             email = EmailMessage(
-                        subject=mail_subject, body=message, to=[to_email], from_email='greentogo@app.durhamgreentogo.com',
+                        subject=mail_subject, body=welcome_message, from_email='greentogo@app.durhamgreentogo.com', to=[to_email],
             )
+            print(email)
             email.send()
+            # send_mail(
+            #     mail_subject,
+            #     welcome_message,
+            #     'greentogo@app.durhamgreentogo.com',
+            #     [to_email],
+            #     fail_silently=False,
+            # )
             new_user = authenticate(username=form.cleaned_data['username'],
                                     password=form.cleaned_data['password1'],
                                     )

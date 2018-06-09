@@ -1,12 +1,152 @@
 {% load i18n %}
 
-Dear {{ user.username }},
-Thank you for registering your account at {{ domain }}. You're almost done!
 
-To activate this account, please click the following link within the next Never days:
 
-If you didn't register this account, please ignore this email and your address will be removed from our records.
+<!-- Emails use the XHTML Strict doctype -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 
-Thank you,
+<head>
+    <!-- The character set should be utf-8 -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <style>
+    </style>
+</head>
 
-The GreenToGo team
+<body>
+    <p>Dear {{ user.username }},</p>
+
+    <p>Welcome to GreenToGo!</p>
+
+    <p>
+        Thank you for taking action toward curing the single-use container epidemic. Together, our community has already averted
+        {{ communityBoxesCheckedIn }} from the landfill! We’re grateful for your help as we strive toward our first short-term
+        goal of averting 10,000 containers ASAP!
+    </p>
+
+    <p>
+        You’re now ready to get started!
+    </p>
+
+    <p>
+        If you haven’t yet added a subscription to your GreenToGo membership, go ahead and do that now:
+        <a href="https://app.durhamgreentogo.com/subscriptions/new/"
+            target="_blank" rel="noopener noreferrer">ADD SUBSCRIPTION.</a>
+    </p>
+
+    <p>
+        Then you’ll be ready to use GreenToGo at any of the participating restaurants:
+    </p>
+
+
+    <ol>
+        <li>
+            <a href="http://www.alpacachicken.com/" target="_blank" rel="noopener noreferrer">Alpaca Peruvian Chicken</a> | 703a 9th St, Durham, NC 27705</li>
+        <li>
+            <a href="http://bagelbarbagels.com/" target="_blank" rel="noopener noreferrer">Bagel Bar</a> | 104 City Hall Plaza #101, Durham, NC 27701</li>
+        <li>
+            <a href="http://www.bullcityburgerandbrewery.com/" target="_blank" rel="noopener noreferrer">Bull City Burger and Brewery</a> | 107 E Parrish St, Durham, NC 27701</li>
+        <li>
+            <a href="http://bullmccabesirishpub.com/" target="_blank" rel="noopener noreferrer">Bull McCabes</a> | 427 W Main St, Durham, NC 27701</li>
+        <li>
+            <a href="http://durham.coop/" target="_blank" rel="noopener noreferrer">Durham Co-Op Market</a> | 1111 W Chapel Hill St, Durham, NC 27701</li>
+        <li>
+            <a href="http://geerstreetgarden.com/" target="_blank" rel="noopener noreferrer">Geer St. Garden</a> | 644 Foster St, Durham, NC 27701</li>
+        <li>
+            <a href="http://www.kokyubbq.com/" target="_blank" rel="noopener noreferrer">Ko Ku Na’Mean</a> | 4823 Meadow Dr, Durham, NC 27713</li>
+        <li>
+            <a href="http://lunarotisserie.com/" target="_blank" rel="noopener noreferrer">Luna Rotisserie</a> | 112 W Main St, Durham, NC 27701</li>
+        <li>
+            <a href="https://www.monutsdonuts.com/" target="_blank" rel="noopener noreferrer">Monuts</a> | 1002 9th St, Durham, NC 27705</li>
+        <li>
+            <a href="http://www.nanataco.com/" target="_blank" rel="noopener noreferrer">NanaTaco</a> | 2512 University Dr, Durham, NC 277707</li>
+        <li>
+            <a href="http://www.ninthstbakery.com/" target="_blank" rel="noopener noreferrer">Ninth St. Bakery</a> | 136 E Chapel Hill St, Durham, NC 27701</li>
+        <li>
+            <a href="https://www.piepushers.com/" target="_blank" rel="noopener noreferrer">Pie Pushers</a> | 117A W Main St, Durham, NC 27701</li>
+        <li>
+            <a href="http://www.pompieripizza.com/" target="_blank" rel="noopener noreferrer">Pompieri Pizza</a> | 102 City Hall Plaza, Durham, NC 27701</li>
+        <li>
+            <a href="https://rosesmeatandsweets.com/" target="_blank" rel="noopener noreferrer">Rose’s Noodles, Dumplings, and Sweets</a> | 121 N Gregson St, Durham, NC 27701</li>
+        <li>
+            <a href="https://www.saltboxseafoodjoint.com/" target="_blank" rel="noopener noreferrer">Saltbox Seafood Joint</a> | 2637 Durham-Chapel Hill Blvd</li>
+        <li>
+            <a href="https://www.saltboxseafoodjoint.com/" target="_blank" rel="noopener noreferrer">Saltbox Seafood Joint</a> | 608 N Mangum St, Durham, NC 27701</li>
+        <li>
+            <a href="https://www.soulyvegancafe.com/" target="_blank" rel="noopener noreferrer">Souly Vegan</a> | 306 W Franklin St, Chapel Hill, NC 27516</li>
+        <li>
+            <a href="http://www.thebootdurham.com/" target="_blank" rel="noopener noreferrer">The Boot</a> | 2501 University Dr, Durham, NC 27707</li>
+        <li>
+            <a href="http://www.theqshackoriginal.com/" target="_blank" rel="noopener noreferrer">The Original Q-Shack</a> | 2510 University Dr, Durham, NC 27707</li>
+        <li>
+            <a href="http://toast-fivepoints.com/" target="_blank" rel="noopener noreferrer">Toast</a> | 345 W Main St, Durham, NC 27701</li>
+        <li>
+            <a href="http://www.veganflavacafe.com/" target="_blank" rel="noopener noreferrer">Vegan Flava Cafe</a> | 1720 Guess Rd #18, Durham, NC 27701</li>
+        <li>
+            <a href="https://www.zenfishpokebar.com/" target="_blank" rel="noopener noreferrer">Zenfish</a> | 810 9th St, Durham, NC 27705</li>
+    </ol>
+
+    <p>
+        Using GreenToGo at the Restaurants:
+    </p>
+    <p>
+        Step 1:
+        <strong>Download QR code reader.</strong> It’s easiest to check out a box if you have a QR Reader on your phone – it’s free,
+        quick, and easy to download (but not necessary).
+        <a href="https://itunes.apple.com/us/app/qr-code-reader-and-scanner/id388175979?mt=8"
+            target="_blank" rel="noopener noreferrer">DOWNLOAD FOR iPHONE</a> |
+        <a href="https://play.google.com/store/apps/details?id=me.scan.android.client&hl=en" target="_blank"
+            rel="noopener noreferrer">DOWNLOAD FOR ANDROID</a>
+    </p>
+    <p>
+        Step 2:
+        <strong>Order your food.</strong> At
+        <a href="https://durhamgreentogo.com/restaurants/" target="_blank" rel="noopener noreferrer">any participating restaurant</a>,
+        <a href="https://app.durhamgreentogo.com/accounts/login/" target="_blank" rel="noopener noreferrer">log in to your GreenToGo account.</a> When you order your food, say “GreenToGo, please!” If you’re dining in, you
+        can also request a GreenToGo box for your leftovers!
+    </p>
+    <p>
+        Once you’re logged into your account, an “ACTIVE MEMBER” banner will display at the top of your screen. Show this screen
+        to the cashier or server.
+    </p>
+    <p>
+        Step 3:
+        <strong>Use the restaurant checkout sign.</strong> There will be a sign at every restaurant for checking out boxes with 3
+        options from which you can choose: 1) Scan the QR code 2) enter the location code at app.durhamgreentogo.com or 3)
+        go to the unique URL listed on the sign. You can use whichever method you prefer!
+    </p>
+    <p>
+        Step 4:
+        <strong>Check out.</strong> Select the number of boxes you’re checking out and click “Check Out”.
+    </p>
+    <p>
+        Step 5:
+        <strong>Enjoy your take-out</strong> or leftovers at your leisure. When the box is empty, it’s ready to return! No need to
+        wash it, but if you can rinse it, we’ll appreciate that.
+    </p>
+    <p>
+        Step 6:
+        <strong>Return</strong> the box to the return station at any of the participating restaurants, Fullsteam Brewery or The Scrap
+        Exchange. Just scan the QR code on the front of the return station (or enter the URL listed), and drop it in the
+        slot!
+    </p>
+    <p>
+        Step 7:
+        <strong>Repeat!</strong> Now you’re ready to do it again. Thanks for keeping single-use boxes out of the landfill!
+    </p>
+    <p>
+        Thanks again for joining GreenToGo! Please don’t hesitate to reach out with any questions or comments you may have for our
+        team. We LOVE to hear from our customers.
+    </p>
+    <p>
+        Kindly, The GreenToGo Team
+        <a href="mailto:info@durhamgreentogo.com" target="_blank" rel="noopener noreferrer">info@durhamgreentogo.com</a> |
+        <a href="http://www.durhamgreentogo.com" target="_blank" rel="noopener noreferrer">www.durhamgreentogo.com</a>
+        <a href="https://www.facebook.com/DurhamGreenToGo" target="_blank" rel="noopener noreferrer">Facebook</a> |
+        <a href="https://www.instagram.com/durhamgreentogo/" target="_blank" rel="noopener noreferrer">Instagram</a> |
+        <a href="https://twitter.com/GreenToGo_Life" target="_blank" rel="noopener noreferrer">Twitter</a>
+    </p>
+</body>
+
+</html>

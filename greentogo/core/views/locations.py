@@ -40,9 +40,7 @@ def location(request, location_code):
         subscription_id = request.POST.get('subscription_id')
         for sub in user.get_subscriptions():
             boxesCheckedIn = boxesCheckedIn + int((LocationTag.objects.filter(subscription_id=sub.id)).count()/2)
-        communityBoxesCheckedIn = int((LocationTag.objects.all()).count()/2)
-        if type(communityBoxesCheckedIn).__name__ == "int":
-            communityBoxesCheckedIn = communityBoxesCheckedIn + 100
+        communityBoxesCheckedIn = int((LocationTag.objects.all()).count()/2) + 100
         try:
             subscription = user.subscriptions.active().get(pk=subscription_id)
         except Subscription.DoesNotExist as ex:
