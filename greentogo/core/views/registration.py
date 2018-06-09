@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template.defaultfilters import pluralize
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.core.mail import EmailMessage
+from django.core.mail import send_mail, EmailMessage
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 
@@ -21,30 +21,24 @@ def registration_form(request):
             user.create_stripe_customer()
             user.email = form.cleaned_data.get('email')
             current_site = get_current_site(request)
-            mail_subject = 'Welcome to GreenToGo!'
             communityBoxesCheckedIn = int((LocationTag.objects.all()).count()/2) + 100
-            print(communityBoxesCheckedIn)
-            welcome_message = render_to_string('registration/welcome_message.html', {
+            to_email = form.cleaned_data.get('email')
+            message_data = {
                 'user': user,
                 'communityBoxesCheckedIn': communityBoxesCheckedIn,
                 'domain': current_site.domain,
-            })
-            print(welcome_message)
+            }
+            welcome_message_txt = render_to_string('registration/welcome_message.txt', message_data)
+            welcome_message_html = render_to_string('registration/welcome_message.html', message_data)
             user.save()
-            to_email = form.cleaned_data.get('email')
-            print(to_email)
-            email = EmailMessage(
-                        subject=mail_subject, body=welcome_message, from_email='greentogo@app.durhamgreentogo.com', to=[to_email],
+            send_mail(
+                subject='Welcome to GreenToGo!',
+                message=welcome_message_txt,
+                from_email='greentogo@app.durhamgreentogo.com',
+                recipient_list=[to_email],
+                fail_silently=True,
+                html_message=welcome_message_html
             )
-            print(email)
-            email.send()
-            # send_mail(
-            #     mail_subject,
-            #     welcome_message,
-            #     'greentogo@app.durhamgreentogo.com',
-            #     [to_email],
-            #     fail_silently=False,
-            # )
             new_user = authenticate(username=form.cleaned_data['username'],
                                     password=form.cleaned_data['password1'],
                                     )
@@ -55,11 +49,6 @@ def registration_form(request):
                 'username':form.cleaned_data['username'],
                 'email':form.cleaned_data['email']
             }})
-            # return render(request, 'core/add_subscription.html', {'newly_registered_user':{
-            #     'new':True,
-            #     'username':form.cleaned_data['username'],
-            #     'email':form.cleaned_data['email']
-            # }})
     else:
         form = UserSignupForm()
     return render(request, "registration/registration_form.html", {'form':form})

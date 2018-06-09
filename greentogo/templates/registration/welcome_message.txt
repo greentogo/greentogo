@@ -1,0 +1,63 @@
+{% load i18n %}
+
+Dear {{ user.username }},
+
+Welcome to GreenToGo! 
+
+Thank you for taking action toward curing the single-use container epidemic. Together, our community has already averted {{ communityBoxesCheckedIn }} from the landfill! We’re grateful for your help as we strive toward our first short-term goal of averting 10,000 containers ASAP! 
+
+You’re now ready to get started! 
+
+If you haven’t yet added a subscription to your GreenToGo membership, go ahead and do that now: ADD SUBSCRIPTION.
+
+Then you’ll be ready to use GreenToGo at any of the participating restaurants: 
+
+Alpaca Peruvian Chicken | 703a 9th St, Durham, NC 27705
+Bagel Bar  | 104 City Hall Plaza #101, Durham, NC 27701
+Bull City Burger and Brewery |  107 E Parrish St, Durham, NC 27701
+Bull McCabes  | 427 W Main St, Durham, NC 27701
+Durham Co-Op Market  |  1111 W Chapel Hill St, Durham, NC 27701
+Geer St. Garden  |  644 Foster St, Durham, NC 27701
+Ko Ku Na’Mean |  4823 Meadow Dr, Durham, NC 27713
+Luna Rotisserie  |  112 W Main St, Durham, NC 27701
+Monuts  |  1002 9th St, Durham, NC 27705
+NanaTaco  |  2512 University Dr, Durham, NC 277707
+Ninth St. Bakery | 136 E Chapel Hill St, Durham, NC 27701
+Pie Pushers  |  117A W Main St, Durham, NC 27701
+Pompieri Pizza  |  102 City Hall Plaza, Durham, NC 27701
+Rose’s Noodles, Dumplings, and Sweets |  121 N Gregson St, Durham, NC 27701
+Saltbox Seafood Joint |  2637 Durham-Chapel Hill Blvd.
+Saltbox Seafood Joint | 608 N Mangum St, Durham, NC 27701
+Souly Vegan | 306 W Franklin St, Chapel Hill, NC 27516
+The Boot | 2501 University Dr, Durham, NC 27707
+The Original Q-Shack |  2510 University Dr, Durham, NC 27707
+Toast  |  345 W Main St, Durham, NC 27701
+Vegan Flava Cafe |  1720 Guess Rd #18, Durham, NC 27701
+Zenfish |  810 9th St, Durham, NC 27705
+
+Using GreenToGo at the Restaurants: 
+
+Step 1: Download QR code reader. It’s easiest to check out a box if you have a QR Reader on your phone – it’s free, quick, and easy to download (but not necessary). DOWNLOAD FOR iPHONE   |  DOWNLOAD FOR ANDROID
+ 
+Step 2: Order your food. At any participating restaurant, log in to your GreenToGo account When you order your food, say “GreenToGo, please!” If you’re dining in, you can also request a GreenToGo box for your leftovers! 
+Once you’re logged into your account, an “ACTIVE MEMBER” banner will display at the top of your screen. Show this screen to the cashier or server.
+ 
+Step 3: Use the restaurant checkout sign. There will be a sign at every restaurant for checking out boxes with 3 options from which you can choose: 1) Scan the QR code 2) enter the location code at app.durhamgreentogo.com or 3) go to the unique URL listed on the sign. You can use whichever method you prefer! 
+ 
+Step 4: Check out. Select the number of boxes you’re checking out and click “Check Out”.
+ 
+Step 5: Enjoy your take-out or leftovers at your leisure. When the box is empty, it’s ready to return! No need to wash it, but if you can rinse it, we’ll appreciate that. 
+ 
+Step 6: Return the box to the return station at any of the participating restaurants, Fullsteam Brewery or The Scrap Exchange. Just scan the QR code on the front of the return station (or enter the URL listed), and drop it in the slot!
+ 
+Step 7: Repeat! Now you’re ready to do it again. Thanks for keeping single-use boxes out of the landfill!
+ 
+Thanks again for joining GreenToGo! Please don’t hesitate to reach out with any questions or comments you may have for our team. We LOVE to hear from our customers. 
+ 
+Kindly, 
+The GreenToGo Team 
+info@durhamgreentogo.com |  www.durhamgreentogo.com 
+Facebook |  Instagram  | Twitter
+ 
+ 
+
