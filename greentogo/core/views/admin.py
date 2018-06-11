@@ -305,7 +305,7 @@ def export_check_out_by_location(request, *args, **kwargs):
 
 def export_user_reports(request, *args, **kwargs):
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="check_outs_by_location.csv"'
+    response['Content-Disposition'] = 'attachment; filename="user_reports.csv"'
 
     writer = csv.writer(response)
     userquery = User.objects.all()
