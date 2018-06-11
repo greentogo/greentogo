@@ -45,12 +45,6 @@ def add_subscription(request, *args, **kwargs):
     if request.method == "POST":
         form = NewSubscriptionForm(request.POST)
         if form.is_valid():
-            # if customer does not have a stripe_id
-            #    create a customer from token
-            # if customer does have a stripe_id
-            #    update source with token?
-            # create a subscription with customer, plan, and token
-            # on failure, let customer know
 
             plan_stripe_id = form.cleaned_data['plan']
             token = form.cleaned_data['token']
