@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template.defaultfilters import pluralize
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.core.mail import send_mail, EmailMessage
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 
@@ -31,14 +31,14 @@ def registration_form(request):
             welcome_message_txt = render_to_string('registration/welcome_message.txt', message_data)
             welcome_message_html = render_to_string('registration/welcome_message.html', message_data)
             user.save()
-            email = EmailMessage(
+            email = EmailMultiAlternatives(
                 subject='Welcome to GreenToGo!',
                 message=welcome_message_txt,
                 from_email='greentogo@app.durhamgreentogo.com',
                 recipient_list=[to_email],
-                html_message=welcome_message_html,
                 reply_to="amy@durhamgreentogo.com"   
             )
+            email.attach_alternative(html_content, welcome_message_html)
             # send_mail(
             #     subject='Welcome to GreenToGo!',
             #     message=welcome_message_txt,
