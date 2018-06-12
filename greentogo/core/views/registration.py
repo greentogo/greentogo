@@ -33,7 +33,7 @@ def registration_form(request):
             user.save()
             email = EmailMultiAlternatives(
                 subject='Welcome to GreenToGo!',
-                message=welcome_message_txt,
+                body=welcome_message_txt,
                 from_email='greentogo@app.durhamgreentogo.com',
                 to=[to_email],
                 reply_to="amy@durhamgreentogo.com"   
