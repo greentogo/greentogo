@@ -39,14 +39,6 @@ def registration_form(request):
                 reply_to=["amy@durhamgreentogo.com"]
             )
             email.attach_alternative(welcome_message_html, "text/html")
-            # send_mail(
-            #     subject='Welcome to GreenToGo!',
-            #     message=welcome_message_txt,
-            #     from_email='greentogo@app.durhamgreentogo.com',
-            #     recipient_list=[to_email],
-            #     fail_silently=True,
-            #     html_message=welcome_message_html
-            # )
             email.send()
             new_user = authenticate(username=form.cleaned_data['username'],
                                     password=form.cleaned_data['password1'],

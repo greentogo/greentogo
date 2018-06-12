@@ -95,7 +95,7 @@ def add_subscription(request, *args, **kwargs):
                 )
                 rollbar.report_exc_info(sys.exc_info(), request)
 
-    available_plans = Plan.objects.available()
+    available_plans = Plan.objects.available().order_by('name')
     if coupon_code and coupon_code.plans.count() > 0:
         available_plans = coupon_code.plans.all()
 
