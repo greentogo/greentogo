@@ -31,14 +31,24 @@ def registration_form(request):
             welcome_message_txt = render_to_string('registration/welcome_message.txt', message_data)
             welcome_message_html = render_to_string('registration/welcome_message.html', message_data)
             user.save()
-            send_mail(
+            email = EmailMessage(
                 subject='Welcome to GreenToGo!',
                 message=welcome_message_txt,
                 from_email='greentogo@app.durhamgreentogo.com',
                 recipient_list=[to_email],
                 fail_silently=True,
-                html_message=welcome_message_html
+                html_message=welcome_message_html,
+                reply_to="amy@durhamgreentogo.com"   
             )
+            # send_mail(
+            #     subject='Welcome to GreenToGo!',
+            #     message=welcome_message_txt,
+            #     from_email='greentogo@app.durhamgreentogo.com',
+            #     recipient_list=[to_email],
+            #     fail_silently=True,
+            #     html_message=welcome_message_html
+            # )
+            email.send()
             new_user = authenticate(username=form.cleaned_data['username'],
                                     password=form.cleaned_data['password1'],
                                     )
