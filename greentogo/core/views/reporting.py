@@ -100,7 +100,7 @@ def accidental_checkout(request):
                     available_boxes += sub.available_boxes()
             return render(request, "reporting/thank_you.html", {
                 "boxes_in_plan": boxes_in_plan,
-                "boxes_available": boxes_available
+                "boxes_available": available_boxes
             })
     else:
         form = AccidentalCheckoutForm()
