@@ -36,7 +36,7 @@ def registration_form(request):
                 body=welcome_message_txt,
                 from_email='greentogo@app.durhamgreentogo.com',
                 to=[to_email],
-                reply_to="amy@durhamgreentogo.com"   
+                reply_to=["amy@durhamgreentogo.com"]
             )
             email.attach_alternative(html_content, welcome_message_html)
             # send_mail(
