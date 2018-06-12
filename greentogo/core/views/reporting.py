@@ -4,15 +4,19 @@ Views for reporting stock counts/actuals and resetting
 
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.defaultfilters import pluralize
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from collections import OrderedDict
+from itertools import groupby
 
 from django.http import HttpResponse
 
-from core.models import LocationStockCount, LocationStockReport, Location
+from core.models import LocationStockCount, LocationStockReport, Location, Restaurant
+from core.forms import AccidentalCheckoutForm
 
 @staff_member_required()
 def stock_landing_page(request):
@@ -72,3 +76,35 @@ def stock_report(request, stock_action):
         "locations": locations,
         "stock_action": stock_action,
     })
+
+"""
+Callback for when a user has accidentally checked out a box.
+Should check if the user can check in the amount of boxes that
+they are requesting to check in, change the inventory, and then
+tell the user how many boxes they have remaining.
+"""
+@login_required
+def accidental_checkout(request):
+    if request.method == 'POST':
+        form = AccidentalCheckoutForm(request.POST)
+        if form.is_valid():
+            location = form.cleaned_data['location']
+            num_boxes = form.cleaned_data['num_boxes']
+            user = request.user
+            # Find how many boxes the user has checked out
+            available_boxes = 0
+            boxes_in_plan = 0
+            for sub in user.subscriptions.active():
+                if sub.can_check_in(num_boxes):
+                    boxes_in_plan += sub.number_of_boxes()
+                    available_boxes += sub.available_boxes()
+            return render(request, "reporting/thank_you.html", {
+                "boxes_in_plan": boxes_in_plan,
+                "boxes_available": boxes_available
+            })
+    else:
+        form = AccidentalCheckoutForm()
+        return render(request, "reporting/accidental_checkout.html", {
+            "restaurants": Restaurant.objects.all(), 
+            "form": form
+        })
