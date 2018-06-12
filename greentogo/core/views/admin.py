@@ -141,6 +141,19 @@ def export_total_check_out(request, *args, **kwargs):
         writer.writerow([tags.subscription, tags.subscription.user.username, tags.subscription.user.email, tags.created_at, tags.location])
     return response
 
+def export_subscriptions(request, *args, **kwargs):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="check_outs.csv"'
+
+    writer = csv.writer(response)
+    subs = Subscription.objects.all()
+
+    writer.writerow(['starts at', 'ends at', 'plan', 'user', 'stripe id', 'stripe status', 'cancelled',  'corporate_code_id', 'coupon_code_id'])  
+
+    for sub in subs:
+        writer.writerow([sub.starts_at, sub.ends_at, sub.plan, sub.user, sub.stripe_id, sub.stripe_status, sub.cancelled, sub.corporate_code_id, sub.coupon_code_id])
+    return response
+
 def export_total_check_in(request, *args, **kwargs):
     from_date = request.POST.get('from_date')
     to_date = request.POST.get('to_date')
