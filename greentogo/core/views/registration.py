@@ -36,7 +36,6 @@ def registration_form(request):
                 message=welcome_message_txt,
                 from_email='greentogo@app.durhamgreentogo.com',
                 recipient_list=[to_email],
-                fail_silently=True,
                 html_message=welcome_message_html,
                 reply_to="amy@durhamgreentogo.com"   
             )
