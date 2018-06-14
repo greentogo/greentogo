@@ -7,6 +7,12 @@
 <h1>GreenToGo Containers, by Location</h1>
 {% endblock %}
 {% block content %}
+<div class="medium-8 columns">
+    {% for label in data_json.cycle.count %}
+        <h1>{{ label }}</h1>
+        <h1>keke</h1>
+    {% endfor %}
+</div>
 <div style="max-width: 960px;">
 <h2>Current Container Status</h2>
 <canvas id="cycleChart" width="500" height="300"></canvas>

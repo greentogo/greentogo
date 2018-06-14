@@ -77,6 +77,7 @@ def stock_report(request, stock_action):
         "stock_action": stock_action,
     })
 
+
 """
 Callback for when a user has accidentally checked out a box.
 Should check if the user can check in the amount of boxes that
@@ -88,23 +89,27 @@ def accidental_checkout(request):
     if request.method == 'POST':
         form = AccidentalCheckoutForm(request.POST)
         if form.is_valid():
-            location = form.cleaned_data['location']
-            num_boxes = form.cleaned_data['num_boxes']
+            form_location = form.cleaned_data['location']
+            location = get_object_or_404(Location, name=form_location)
+            number_of_boxes = form.cleaned_data['num_boxes']
             user = request.user
-            # Find how many boxes the user has checked out
             available_boxes = 0
-            boxes_in_plan = 0
+            box_plural = lambda n: pluralize(n, "box,boxes")
             for sub in user.subscriptions.active():
-                if sub.can_check_in(num_boxes):
-                    boxes_in_plan += sub.number_of_boxes()
-                    available_boxes += sub.available_boxes()
+                if sub.can_tag_location(location, number_of_boxes):
+                    sub.tag_location(location, number_of_boxes)
+                    available_boxes = sub.available_boxes
+                    msg = "Thank you for returning {} {}!" \
+                    "You have {} {} remaining.".format(number_of_boxes, box_plural(number_of_boxes), available_boxes, box_plural(available_boxes))
+                    messages.success(request, msg)
+                else:
+                    msg = "You cannot currently check in {} {}.".format(number_of_boxes, box_plural(number_of_boxes))
+                    messages.error(request, msg)
             return render(request, "reporting/thank_you.html", {
-                "boxes_in_plan": boxes_in_plan,
-                "boxes_available": available_boxes
+                "boxes_available": available_boxes,
             })
     else:
         form = AccidentalCheckoutForm()
         return render(request, "reporting/accidental_checkout.html", {
-            "restaurants": Restaurant.objects.all(), 
             "form": form
         })
