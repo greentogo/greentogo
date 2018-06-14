@@ -1,0 +1,26 @@
+{% extends "core/base.html" %}
+{% load i18n %}
+{% block content %}
+
+<div class="row">
+    <div class="medium-12 columns">
+        <h5>Oops! You have a GreenToGo box checked out to you that you don't actually have.</h5>
+        <h5>Sometimes it happens due to user or restaurant error.</h5>
+        <h5>Please use the form below to make the necessary correction.</h5>
+        <form action="." method="POST">
+            {% csrf_token %}
+            <p class="required">
+                {{ form.location.errors }}
+                <label for="{{ form.location.id_for_label }}">At which restaurant did this incorrect checkout occur?</label>
+                {{ form.location }}
+            </p>
+            <p class="required">
+                {{ form.num_boxes.errors }}
+                <label for="{{ form.num_boxes.id_for_label }}">How many boxes were checked out in error?</label>
+                {{ form.num_boxes }}
+            </p>
+            <input type="submit" value="{% trans 'Submit' %}" />
+        </form>
+    </div>
+</div>
+{% endblock %}
