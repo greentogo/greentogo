@@ -6,13 +6,16 @@
     <div class="row">
         <div class="medium-12 columns">
             <h5>Ready to check out or return a box?</h5>
-            <h3>Enter a location code below</h3>
+            <h3>Select a location OR enter a location code</h3>
             <form action="." method="POST">
                 {% csrf_token %}
+                {{ form.location.errors }}
+                <label for="{{ form.location.id_for_label }}">Select a location</label>
+                {{ form.location }}
+                <h1>OR</h1>
                 <label for="location_code">Location code</label>
                 <input type="text" id="location_code" name="location_code"
                 autofocus maxlength="6" miinlength="6" pattern="[A-Za-z1-9]{6}" />
-
                 <button type="submit" class="button">
                     Continue
                 </button>

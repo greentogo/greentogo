@@ -99,3 +99,10 @@ class AccidentalCheckoutForm(forms.Form):
     def clean_num_boxes(self):
         data = self.cleaned_data['num_boxes']
         return data
+
+class LocationForm(forms.Form):
+    locations = [(location.name, location.name) for location in Location.objects.all()]
+    location = forms.ChoiceField(choices=locations)
+    def clean_location(self):
+        data = self.cleaned_data['location']
+        return data
