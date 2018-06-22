@@ -93,9 +93,21 @@ class EmailValidationOnForgotPassword(PasswordResetForm):
         return email
 
 class AccidentalCheckoutForm(forms.Form):
+    print("Accidental Checkout Start")
     num_boxes = forms.IntegerField(min_value=0, max_value=4)
+    print("Accidental Checkout Start 1")
+    print(num_boxes)
+    print("Accidental Checkout Start 2")
     locations = [(location, location) for location in Location.objects.filter(service="OUT", admin_location=False, retired=False)]
+    print("Accidental Checkout Start 3")
+    print(locations)
+    print("Accidental Checkout Start 4")
+    print(Location.objects.filter(service="OUT", admin_location=False, retired=False))
+    print("Accidental Checkout Start 5")
     location = forms.ChoiceField(choices=locations)
+    print("Accidental Checkout Start 6")
+    print(location)
+    print("Accidental Checkout Start 7")
     def clean_num_boxes(self):
         data = self.cleaned_data['num_boxes']
         return data
