@@ -3,6 +3,7 @@ Views for reporting stock counts/actuals and resetting
 """
 
 from django.contrib import messages
+from django import forms
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
@@ -104,16 +105,13 @@ def accidental_checkout(request):
         form = AccidentalCheckoutForm(request.POST)
         if form.is_valid():
             num_boxes = int(request.POST.get('num_boxes'))
-            locationName = request.POST.get('location')
-            locationCode = locationName[locationName.find("(")+1:locationName.find(")")]
-            location = Location.objects.filter(code=locationCode, service="OUT", admin_location=False, retired=False)
-            resturant = location[0]
+            location = form.cleaned_data.get('location')
             dumpSet = Location.objects.filter(name="Accidental Checkout Dumping Location", service="IN", retired=True)
             dump = dumpSet[0]
             if subscription.available_boxes - num_boxes <= subscription.number_of_boxes:
-                resCount = resturant.get_estimated_stock()
+                resCount = location.get_estimated_stock()
                 subscription.tag_location(dump, num_boxes)
-                resturant.set_stock(resCount + num_boxes)
+                location.set_stock(resCount + num_boxes)
                 return render(request, "reporting/thank_you.html", {
                     "boxes_in_plan": subscription.number_of_boxes,
                     "boxes_available": subscription.available_boxes
