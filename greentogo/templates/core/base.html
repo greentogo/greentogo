@@ -46,7 +46,6 @@
 
                             {% if user.is_authenticated %}
                                 <li><a href="{% url 'locations' %}">Check out or return boxes</a></li>
-                                <li><a href="{% url 'accidental_checkout' %}">Accidental Checkout</a></li>
                                 <li><a href="{% url 'subscriptions' %}">My subscriptions</a></li>
                                 <li><a href="{% url 'account_settings' %}">My settings</a></li>
                                 <li><a href="{% url 'auth_logout' %}">Logout</a></li>
