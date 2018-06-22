@@ -39,3 +39,7 @@ For `DATABASE_URL`, change this to match your local database setup. If you have 
 For the Stripe keys, you will need to create an account at [Stripe](https://stripe.com/). Once you have an account, you can get your secret and publishable keys at <https://dashboard.stripe.com/account/apikeys>. For development, you can ignore `STRIPE_WEBHOOK_SECRET` and `ROLLBAR_KEY`.
 
 For your Google API key, you can generate a key at <https://console.developers.google.com/apis/credentials>. This key will need access to the Google Maps API. However, you can also ignore this in development unless working on part of the application that uses maps.
+
+## Other docs
+
+Are you a server administrator? [Check out our admin docs.](./docs/server-admin.md)

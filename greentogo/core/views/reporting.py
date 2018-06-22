@@ -15,7 +15,7 @@ from itertools import groupby
 
 from django.http import HttpResponse
 
-from core.models import LocationStockCount, LocationStockReport, Location, Restaurant
+from core.models import LocationStockCount, LocationStockReport, Location, Subscription
 from core.forms import AccidentalCheckoutForm
 
 @staff_member_required()
@@ -85,26 +85,49 @@ tell the user how many boxes they have remaining.
 """
 @login_required
 def accidental_checkout(request):
+    user = request.user
+    subscriptions = [
+        {
+            "id": subscription.pk,
+            "name": subscription.plan_display,
+            "max_boxes": subscription.number_of_boxes,
+            "available_boxes": subscription.available_boxes,
+        } for subscription in user.subscriptions.active()
+    ]
     if request.method == 'POST':
+        subscription_id = request.POST.get('subscription_id')
+        try:
+            subscription = user.subscriptions.active().get(pk=subscription_id)
+        except Subscription.DoesNotExist as ex:
+            # TODO: handle this
+            raise ex
         form = AccidentalCheckoutForm(request.POST)
         if form.is_valid():
-            location = form.cleaned_data['location']
-            num_boxes = form.cleaned_data['num_boxes']
-            user = request.user
-            # Find how many boxes the user has checked out
-            available_boxes = 0
-            boxes_in_plan = 0
-            for sub in user.subscriptions.active():
-                if sub.can_check_in(num_boxes):
-                    boxes_in_plan += sub.number_of_boxes()
-                    available_boxes += sub.available_boxes()
-            return render(request, "reporting/thank_you.html", {
-                "boxes_in_plan": boxes_in_plan,
-                "boxes_available": available_boxes
-            })
+            num_boxes = int(request.POST.get('num_boxes'))
+            locationName = request.POST.get('location')
+            locationCode = locationName[locationName.find("(")+1:locationName.find(")")]
+            location = Location.objects.filter(code=locationCode, service="OUT", admin_location=False, retired=False)
+            resturant = location[0]
+            dumpSet = Location.objects.filter(name="Accidental Checkout Dumping Location", service="IN", retired=True)
+            dump = dumpSet[0]
+            if subscription.available_boxes - num_boxes <= subscription.number_of_boxes:
+                resCount = resturant.get_estimated_stock()
+                subscription.tag_location(dump, num_boxes)
+                resturant.set_stock(resCount + num_boxes)
+                return render(request, "reporting/thank_you.html", {
+                    "boxes_in_plan": subscription.number_of_boxes,
+                    "boxes_available": subscription.available_boxes
+                })
+            else:
+                msg = "Please make sure you are returning the correct number of boxes"
+                messages.add_message(request, messages.ERROR, msg)
+                return render(request, "reporting/accidental_checkout.html", {
+                    "subscriptions": subscriptions,
+                    "form": form
+                })
     else:
         form = AccidentalCheckoutForm()
         return render(request, "reporting/accidental_checkout.html", {
-            "restaurants": Restaurant.objects.all(), 
+            "subscriptions": subscriptions,
             "form": form
         })
