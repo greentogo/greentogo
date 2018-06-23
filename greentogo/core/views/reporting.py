@@ -78,6 +78,7 @@ def stock_report(request, stock_action):
         "stock_action": stock_action,
     })
 
+
 """
 Callback for when a user has accidentally checked out a box.
 Should check if the user can check in the amount of boxes that
@@ -113,7 +114,6 @@ def accidental_checkout(request):
                 subscription.tag_location(dump, num_boxes)
                 location.set_stock(resCount + num_boxes)
                 return render(request, "reporting/thank_you.html", {
-                    "boxes_in_plan": subscription.number_of_boxes,
                     "boxes_available": subscription.available_boxes
                 })
             else:

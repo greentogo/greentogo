@@ -38,6 +38,13 @@ For the Stripe keys, you will need to create an account at [Stripe](https://stri
 
 For your Google API key, you can generate a key at <https://console.developers.google.com/apis/credentials>. This key will need access to the Google Maps API. However, you can also ignore this in development unless working on part of the application that uses maps.
 
+
+## Create a test user
+
+First, make sure the server is running (`./greentogo/manage.py runserver`). If you haven't already, make an account on the developer instance. Since this is a fake account and you can grant access to whatever you like, the email does not matter. Make sure you have a fresh install of the `g2g` database in postgres. Then, begin using postgres' cli with `psql greentogo`.
+
+Next, run `UPDATE core_user SET is_superuser = TRUE, is_staff = TRUE, is_active = TRUE WHERE username = '<your-username>'`. This will grant you access to a lot of priveleges in the site, including the `/admin/` page. 
+
 ## Other docs
 
 Are you a server administrator? [Check out our admin docs.](./docs/server-admin.md)
