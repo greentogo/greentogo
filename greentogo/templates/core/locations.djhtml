@@ -11,7 +11,7 @@
                 {% csrf_token %}
                 <label for="location_code">Location code</label>
                 <input type="text" id="location_code" name="location_code"
-                autofocus maxlength="6" miinlength="6" pattern="[A-Za-z1-9]{6}" />
+                autofocus maxlength="6" minlength="6" pattern="[A-Za-z1-9]{6}" oninput="autoCapitalize()" />
 
                 <button type="submit" class="button">
                     Continue
@@ -19,4 +19,15 @@
             </form>
         </div>
     </div>
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript">
+    function autoCapitalize(){
+        var newValue = document.getElementById('location_code').value.toUpperCase();
+        document.getElementById('location_code').value = newValue;
+        console.log("Boop")
+        return 
+    }
+    </script>
 {% endblock %}
