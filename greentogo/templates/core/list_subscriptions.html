@@ -18,7 +18,7 @@
                     {% if sub.will_auto_renew and sub.ends_at %}
                         Renews automatically on {{ sub.ends_at }}
                     {% elif sub.ends_at %}
-                        {% if sub.cancelled %}Cancelled - {% endif %}
+                        {% if sub.cancelled and sub.corporate_code %}Corporate - {% elif sub.cancelled %}Cancelled - {% endif %}
                         Ends on {{ sub.ends_at }}
                     {% else %}
                         No end date

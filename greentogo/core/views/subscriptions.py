@@ -79,6 +79,12 @@ def add_subscription(request, *args, **kwargs):
                     corporate_code=corporate_code,
                     coupon_code=coupon_code
                 )
+                if corporate_code:
+                    #'cancel' the subscription, so that the corporate plans do not auto renew
+                    stripe_sub = subscription.get_stripe_subscription()
+                    stripe_sub.delete(at_period_end = True)
+                    subscription.cancelled = True
+                    subscription.save()
                 return redirect(reverse('subscriptions'))
             except stripe.error.CardError as ex:
                 error = ex.json_body.get('error')
@@ -179,7 +185,6 @@ def cancel_subscription(request, sub_id):
     if request.method == "POST":
         #cancel the subscription
         stripe_sub = subscription.get_stripe_subscription()
-        print(stripe_sub)
 
         #delete the stripe sub
         stripe_sub.delete(at_period_end = True)
