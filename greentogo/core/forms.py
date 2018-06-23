@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
 
 from registration.forms import RegistrationFormTermsOfService
-from .models import Plan, Subscription, Restaurant, Location
+from .models import Plan, Subscription, Location
 
 # import datetime
 from datetime import date, timedelta, datetime
@@ -94,8 +94,7 @@ class EmailValidationOnForgotPassword(PasswordResetForm):
 
 class AccidentalCheckoutForm(forms.Form):
     num_boxes = forms.IntegerField(min_value=0, max_value=4)
-    locations = [(location.name, location.name) for location in Location.objects.all() if location.service == location.CHECKIN]
-    location = forms.ChoiceField(choices=locations)
+    location = forms.ModelChoiceField(queryset=Location.objects.filter(service="OUT", admin_location=False, retired=False))
     def clean_num_boxes(self):
         data = self.cleaned_data['num_boxes']
         return data

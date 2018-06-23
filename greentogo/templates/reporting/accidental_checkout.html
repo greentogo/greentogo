@@ -7,8 +7,29 @@
         <h5>Oops! You have a GreenToGo box checked out to you that you don't actually have.</h5>
         <h5>Sometimes it happens due to user or restaurant error.</h5>
         <h5>Please use the form below to make the necessary correction.</h5>
+        {% if subscriptions %}
         <form action="." method="POST">
             {% csrf_token %}
+            {% if subscriptions|length == 1 %}
+                {% with sub=subscriptions.0 %}
+                    <p>
+                        <strong>{{ sub.available_boxes }}/{{ sub.max_boxes }} boxes available</strong>
+                    </p>
+                    <input type="hidden" name="subscription_id" value="{{ sub.id }}" />
+                {% endwith %}
+            {% else %}
+                <label for="subscription_id">Subscription</label>
+                <select name="subscription_id" id="subscription_id">
+                    {% for sub in subscriptions %}
+                        <option value="{{ sub.id }}"
+                                data-available="{{ sub.available_boxes }}"
+                                data-max="{{ sub.max_boxes }}">
+                            {{ sub.name }} -
+                            {{ sub.available_boxes }}/{{ sub.max_boxes }} available
+                        </option>
+                    {% endfor %}
+                </select>
+            {% endif %}
             <p class="required">
                 {{ form.location.errors }}
                 <label for="{{ form.location.id_for_label }}">At which restaurant did this incorrect checkout occur?</label>
@@ -21,6 +42,12 @@
             </p>
             <input type="submit" value="{% trans 'Submit' %}" />
         </form>
+        {% else %}
+            <p>
+            You do not have any current subscriptions.
+            <!--<a href="{% url 'add_subscription' %}">Go add one now.</a>-->
+            </p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
