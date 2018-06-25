@@ -6,7 +6,7 @@ urlpatterns = [
     url(r'^tag/$', views.CheckinCheckoutView.as_view(), name="api_v1_tag"),
     url(r'^me/$', views.UserView.as_view(), name="api_v1_user"),
     url(r'^stats/$', views.Statistics.as_view(), name="api_v1_stats"),
-    url(r'^location/(?P<location_code>[A-Za-z0-9]+)/$', views.LocationView.as_view(), name="api_v1_location"),
+    url(r'^locations/(?P<location_code>[A-Za-z0-9]+)/$', views.LocationView.as_view(), name="api_v1_location"),
     url(
         r'^subscriptions/plans/$',
         views.SubscriptionPlansView.as_view(),

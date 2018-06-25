@@ -72,13 +72,13 @@ class LocationView(GenericAPIView):
     """
     Get information about Locations
     """
-
-    permission_classes = (IsAuthenticated, )
-    # serializer_class = LocationSerializer
+    
     # Tell DRF documentation you are not a list view.
     action = 'retrieve'
 
     def get(self, request, location_code):
+        print("request")
+        print(request)
         try:
             location = Location.objects.get(code=location_code)
         except Location.DoesNotExist:
