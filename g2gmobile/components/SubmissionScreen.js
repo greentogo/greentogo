@@ -3,7 +3,6 @@ import axios from '../apiClient';
 import { Icon, Button } from 'native-base';
 import { inject, observer } from 'mobx-react';
 const apiEndpoint = '/api/v1';
-let subscriptions = [];
 import {
     StyleSheet,
     Text,
@@ -17,7 +16,11 @@ class SubmissionScreen extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            boxCount: 1
+            subscriptions: [],
+            subscriptionId: false,
+            selectedSubscription: false,
+            boxCount: 1,
+            locationData: this.props.route.params.locationData,
         }
     }
 
@@ -28,16 +31,25 @@ class SubmissionScreen extends React.Component {
                 'Authorization': `Token ${authToken}`
             }
         }).then((response) => {
-            subscriptions = response.data.data.subscriptions;
             if (response.data.data.email) this.props.appStore.email = response.data.data.email;
+            this.setState({ subscriptions: response.data.data.subscriptions }, () => {
+                if (this.state.subscriptions.length > 0) {
+                    this.subscriptionChange(subscriptions[0].id);
+                }
+            })
             console.log(response.data.data)
-            if (subscriptions.length > 0) {
-                this.subscriptionChange(subscriptions[0].id);
-            }
         }).catch((error) => {
+            if (err.response.status === 401) {
+                this.props.appStore.clearAuthToken();
+            };
             console.log('In the error! SUBMISSIONSCREEN.JS');
             console.log(error);
         })
+    }
+
+    componentDidMount() {
+        console.log("MOUNTED")
+        console.log(this.state.locationData);
     }
 
     static route = {
@@ -48,7 +60,7 @@ class SubmissionScreen extends React.Component {
 
     add = () => {
         let returnableBoxes = this.state.selectedSubscription.max_boxes - this.state.selectedSubscription.available_boxes;
-        switch (this.props.appStore.action) {
+        switch (this.state.locationData.service) {
             case 'IN':
                 if (this.state.boxCount === returnableBoxes) {
                     return;
@@ -81,9 +93,8 @@ class SubmissionScreen extends React.Component {
                 selectedSubscription = subscription;
             }
         });
-        switch (this.props.appStore.action) {
+        switch (this.state.locationData.service) {
             case 'IN':
-                console.log(selectedSubscription);
                 if (selectedSubscription.available_boxes === selectedSubscription.max_boxes) {
                     boxCount = 0;
                 } else {
@@ -98,7 +109,7 @@ class SubmissionScreen extends React.Component {
                 }
                 break;
         }
-
+        if (boxCount === undefined) { boxCount = 1 };
         this.setState({
             subscriptionId,
             boxCount,
@@ -114,13 +125,13 @@ class SubmissionScreen extends React.Component {
         }
         axios.post('tag/', {
             subscription: this.state.subscriptionId,
-            location: this.props.appStore.locationCode,
-            action: this.props.appStore.action,
+            location: this.state.locationData.code,
+            action: this.state.locationData.service,
             number_of_boxes: this.state.boxCount
         }, config).then((response) => {
             // console.log(response)
             // TODO: Route to a success screen
-            if (this.props.appStore.action === 'OUT') {
+            if (this.state.locationData.service === 'OUT') {
                 this.props.navigator.push('checkOutSuccess', { boxCount: this.state.boxCount });
             } else {
                 this.props.navigator.push('returnSuccess', { boxCount: this.state.boxCount });
@@ -139,7 +150,11 @@ class SubmissionScreen extends React.Component {
             icon: {
                 fontSize: 20,
                 fontWeight: '800',
-                color: 'white'
+                color: 'white',
+                textAlign: 'center',
+                width: 50,
+                // height: 50,
+                alignSelf: 'center'
             },
             headerText: {
                 fontSize: 18,
@@ -152,14 +167,15 @@ class SubmissionScreen extends React.Component {
             subscriptions.length > 0 ? (
                 <View>
                     {/* TODO: Add this back in once the tag/ endpoint accepts # of boxes */}
-                    <View style={{ marginBottom: 10 }}><Text style={styles.headerText}>How many boxes to {this.props.appStore.action}?</Text></View>
+                    <View style={{ marginBottom: 10 }}><Text style={styles.headerText}>{this.state.locationData.name}</Text></View>
+                    <View style={{ marginBottom: 10 }}><Text style={styles.headerText}>How many boxes to check {this.state.locationData.service.toLowerCase()}?</Text></View>
                     <View style={styles.centeredRow}>
                         <Button
                             success
                             onPress={this.subtract} >
                             <Text style={styles.icon}>-</Text>
                         </Button>
-                        <Text style={{ marginLeft: 10, marginRight: 10, fontSize: 20 }}>{this.state.boxCount}</Text>
+                        <Text style={{ marginLeft: 10, marginRight: 10, fontSize: 20, alignSelf: 'center' }}>{this.state.boxCount}</Text>
                         <Button
                             success
                             onPress={this.add} >
@@ -167,7 +183,7 @@ class SubmissionScreen extends React.Component {
                         </Button>
                     </View>
                     <View>
-                        <Text style={styles.headerText}>Check {this.props.appStore.action.toLowerCase()} 1 box on which subscription?</Text>
+                        <Text style={styles.headerText}>Check {this.state.locationData.service.toLowerCase()} {this.state.boxCount === 1 ? `${this.state.boxCount} box` : `${this.state.boxCount} boxes`} on which subscription?</Text>
                         <Picker
                             mode="dropdown"
                             selectedValue={this.state.subscriptionId}

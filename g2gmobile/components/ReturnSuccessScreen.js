@@ -81,7 +81,7 @@ class ReturnSuccessScreen extends React.Component {
                     {this.state.location ? "from " + this.state.location : ""}
                     </Text> */}
                     <Text style={styles.dateTimeText}>
-                    {this.state.time ? this.state.time.toLocaleTimeString() : ""}
+                        {this.state.time ? this.state.time.toLocaleTimeString() : ""}
                     </Text>
                     <Text style={styles.dateTimeText}>
                         {this.state.time ? this.state.time.toLocaleDateString() : ""}

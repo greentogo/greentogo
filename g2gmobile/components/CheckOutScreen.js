@@ -4,18 +4,6 @@ import { inject, observer } from "mobx-react";
 import { Permissions } from 'expo';
 import BarCodeScannerReader from './BarCodeScannerReader';
 import { Text } from 'react-native';
-import {
-    Container,
-    Header,
-    Body,
-    Title,
-    Content,
-    Form,
-    Item,
-    Input,
-    Button,
-    Spinner,
-} from "native-base";
 
 @inject("appStore")
 @observer
@@ -23,9 +11,8 @@ class CheckOutScreen extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            hasCameraPermission: false
+            hasCameraPermission: false,
         }
-        this.props.appStore.action = "OUT";
     }
 
     static route = {
@@ -34,8 +21,8 @@ class CheckOutScreen extends React.Component {
         }
     }
 
-    navigateNext = () => {
-        this.props.navigator.push('submission');
+    navigateNext = (locationData) => {
+        this.props.navigator.push('submission', { locationData: locationData });
     };
 
     render() {

@@ -13,7 +13,8 @@ enableLogging({
 export class AppStore {
     @observable authToken = ''
     @observable user = {}
-    siteUrl = "https://app.durhamgreentogo.com/api/v1"
+    siteUrl = 'http://56009b6f.ngrok.io/api/v1'
+    // siteUrl = 'https://app.durhamgreentogo.com/api/v1'
 
     constructor() {
         console.log('appStore constructor')

@@ -7,7 +7,6 @@ import {
     TouchableOpacity
 } from 'react-native';
 import { Constants } from 'expo';
-import styles from "../styles";
 
 class CheckOutSuccessScreen extends React.Component {
     constructor(props) {

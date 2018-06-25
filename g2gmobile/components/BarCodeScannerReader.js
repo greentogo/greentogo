@@ -1,6 +1,7 @@
 import React from 'react';
-import {StyleSheet, TextInput, View} from 'react-native';
-import {inject, observer} from "mobx-react";
+import { StyleSheet, TextInput, View } from 'react-native';
+import { inject, observer } from "mobx-react";
+import axios from '../apiClient';
 import styles from "../styles";
 import { Permissions, BarCodeScanner } from 'expo';
 import SubmissionScreen from './SubmissionScreen';
@@ -36,35 +37,42 @@ class BarCodeScannerReader extends React.Component {
 
     async componentWillMount() {
         const { status } = await Permissions.askAsync(Permissions.CAMERA);
-        this.setState({hasCameraPermission: status === 'granted'});
+        this.setState({ hasCameraPermission: status === 'granted' });
     }
 
     handleBarCodeRead = (data) => {
-        if ( !this.state.barCodeScanned ) {
-            console.log("BAR CODE IS BEING READ")
+        if (!this.state.barCodeScanned) {
+            this.setState({ barCodeScanned: true });
+            let authToken = this.props.appStore.authToken;
             let url = JSON.stringify(data.data);
+            url = "/locations/AY4LCB/"
             console.log("url @@@@@@@@@@@@@@@@@@@@@@@@@@@")
             console.log(url)
-            let locationUrl = /(\/locations\/)([A-Z0-9]*)/.exec(url);
-            let newUrl = url.substring(0, url.length - 2);
-            console.log("newUrl @@@@@@@@@@@@@@@@@@@@@@@@@@@")
-            console.log(newUrl)
-            let locationCode = newUrl.substr(newUrl.lastIndexOf('/') + 1);
-            console.log("locationCode @@@@@@@@@@@@@@@@@@@@@@@@@@@")
-            console.log(locationCode)
-            this.props.appStore.locationCode = locationCode;
-            this.setState({barCodeScanned: true});
-            this.props.navigateNext();
+            let locationUrl = /(\/locations\/)([A-Z0-9]{6})/.exec(url);
+            console.log("locationUrl @@@@@@@@@@@@@@@@@@@@@@@@@@@")
+            console.log(locationUrl[1] + locationUrl[2])
+            axios.get(locationUrl[1] + locationUrl[2], {
+                headers: {
+                    'Authorization': `Token ${authToken}`
+                }
+            }).then((response) => {
+                this.props.appStore.locationCode = locationUrl[2];
+                this.props.navigateNext(response.data.data);
+                // this.props.store.setUserData(response.data.data);
+            }).catch((err) => {
+                console.log("ERROR");
+                console.log(err.response);
+            })
         }
     }
 
     render() {
-        if ( this.state.hasCameraPermission ) {
+        if (this.state.hasCameraPermission) {
             return (
-                <View style={{flex: 1}}>
+                <View style={{ flex: 1 }}>
                     <BarCodeScanner
-                    onBarCodeRead={this.handleBarCodeRead}
-                    style={StyleSheet.absoluteFill}
+                        onBarCodeRead={this.handleBarCodeRead}
+                        style={StyleSheet.absoluteFill}
                     />
                 </View>
             );

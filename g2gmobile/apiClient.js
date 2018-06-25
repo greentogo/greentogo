@@ -1,7 +1,8 @@
 import axios from 'axios';
 
+// baseURL: 'https://app.durhamgreentogo.com/api/v1',
 const instance = axios.create({
-  baseURL: 'https://app.durhamgreentogo.com/api/v1',
+  baseURL: 'http://56009b6f.ngrok.io/api/v1',
   timeout: 5000,
   headers: {
     Accept: 'application/json'
