@@ -8,4 +8,7 @@ source env/bin/activate
 source envvars
 ```
 
+Logs are at:
+/opt/greentogo/logs
+
 Then you should be good to go!

@@ -3,6 +3,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -11,6 +12,8 @@ from core.models import Subscription
 from core.stripe import stripe
 
 from templated_email import send_templated_mail
+
+import datetime
 
 endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
 logger = logging.getLogger('django')
@@ -143,23 +146,32 @@ def handle_invoice_upcoming(event):
         )
         return
 
+
     # Send email to customer if invoice needs payment
-    if customer.email and invoice.next_payment_attempt:
+    try:
+        if customer.email:
+            #convert the date to readable string
+            if invoice.next_payment_attempt:
+                renew_date = datetime.datetime.fromtimestamp(
+                    int(invoice.next_payment_attempt)
+                ).strftime('%B %d')
+            else:
+                logger.error('next_payment_attempt WAS NULL, HARDCODING UPCOMING INVOICE PLUS SEVEN DAYS')
+                renew_date =  datetime.datetime.fromtimestamp(
+                    int(invoice.date) + 604800
+                ).strftime('%B %d')
 
-        #convert the date to readable string
-        renew_date = datetime.datetime.fromtimestamp(
-            int(invoice.next_payment_attempt)
-        ).strftime('%B %d')
-
-        site = Site.objects.get_current()
-
-        send_templated_mail(
-            template_name='upcoming_invoice',
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[customer.email,],
-            context={
-                    'renew_date': renew_date,
-                    'amount_due': invoice.amount_due,
-                    'site': site
-                }
-        )
+            site = Site.objects.get_current()
+            
+            send_templated_mail(
+                template_name='upcoming_invoice',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[customer.email,],
+                context={
+                        'renew_date': renew_date,
+                        'amount_due': invoice.amount_due,
+                        'site': site
+                    }
+            )
+    except Exception as e:
+        raise e
