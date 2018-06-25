@@ -13,7 +13,7 @@ from core.models import User, Location, LocationTag, Plan, Restaurant, Subscript
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
-from .serializers import CheckinCheckoutSerializer, LocationTagSerializer, UserSerializer, LocationSerializer
+from .serializers import CheckinCheckoutSerializer, LocationTagSerializer, UserSerializer, LocationSerializer, RestaurantSerializer
 
 
 class CheckinCheckoutView(GenericAPIView):
