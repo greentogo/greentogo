@@ -43,6 +43,17 @@ class UserSerializer(serializers.ModelSerializer):
     subscriptions = SubscriptionSerializer(many=True)
 
 
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = ('service', 'address', 'code', 'name')
+
+    service = serializers.CharField()
+    address = serializers.CharField()
+    code = serializers.CharField()
+    name = serializers.CharField()
+
+
 class LocationTagSerializer(serializers.Serializer):
     subscription = serializers.IntegerField(source="subscription.id")
     location = serializers.CharField(source="location.code")

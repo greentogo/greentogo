@@ -13,7 +13,7 @@ from core.models import User, Location, LocationTag, Plan, Restaurant, Subscript
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
-from .serializers import CheckinCheckoutSerializer, LocationTagSerializer, UserSerializer
+from .serializers import CheckinCheckoutSerializer, LocationTagSerializer, UserSerializer, LocationSerializer
 
 
 class CheckinCheckoutView(GenericAPIView):
@@ -66,6 +66,27 @@ class UserView(GenericAPIView):
     def get(self, request):
         serializer = self.get_serializer(request.user)
         return jsend_success(serializer.data)
+
+
+class LocationView(GenericAPIView):
+    """
+    Get information about Locations
+    """
+
+    permission_classes = (IsAuthenticated, )
+    # serializer_class = LocationSerializer
+    # Tell DRF documentation you are not a list view.
+    action = 'retrieve'
+
+    def get(self, request, location_code):
+        try:
+            location = Location.objects.get(code=location_code)
+        except Location.DoesNotExist:
+            location = None
+            return jsend_fail({"error": "Location does not exist"}, status=200)
+
+        serializer = LocationSerializer(location)
+        return jsend_success(serializer.data)    
 
 
 # /subscriptions/:id
