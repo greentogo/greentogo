@@ -74,8 +74,8 @@ class HomeScreen extends React.Component {
         this.props.navigator.push('map');
     }
 
-    goToCheckOut = () => {
-        this.props.navigator.push('checkOutBox');
+    goToScanQRCode = () => {
+        this.props.navigator.push('scanQRCode');
     }
 
     goToReturn = () => {
@@ -136,13 +136,8 @@ class HomeScreen extends React.Component {
                 <List>
                     <ListMenuItem
                         icon="log-out"
-                        text="Checkout container"
-                        onPress={this.goToCheckOut}
-                    />
-                    <ListMenuItem
-                        icon="log-in"
-                        text="Return container"
-                        onPress={this.goToReturn}
+                        text="Check In/Out container"
+                        onPress={this.goToScanQRCode}
                     />
                     <ListMenuItem
                         icon="map"

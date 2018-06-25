@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { Constants } from 'expo';
 
-class CheckOutSuccessScreen extends React.Component {
+class ContainerSuccessScreen extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -16,9 +16,10 @@ class CheckOutSuccessScreen extends React.Component {
             time: new Date()
         }
     }
-    static route = {
+    static route  = {
         navigationBar: {
-            title: 'Check out success'
+            title: `Check In/Out success!`,
+            renderLeft: (route, props) => null
         }
     }
 
@@ -39,22 +40,23 @@ class CheckOutSuccessScreen extends React.Component {
             },
             goHomeButton: {
                 fontSize: 50,
-                color: '#628e86',
+                color: 'white',
                 paddingTop: 5,
                 paddingLeft: 5
             },
-            checkOutTextContainer: {
+            textContainer: {
                 flex: 1,
                 flexDirection: 'column',
+                //alignItems: 'center',//????
                 justifyContent: 'center'
             },
-            checkOutText: {
-                color: '#628e86',
+            text: {
+                color: 'white',
                 textAlign: 'center',
                 fontSize: 45
             },
             dateTimeText: {
-                color: '#628e86',
+                color: 'white',
                 textAlign: 'center',
                 fontSize: 30
             },
@@ -66,19 +68,18 @@ class CheckOutSuccessScreen extends React.Component {
         });
 
         return (
-            <View>
+            <View style={styles.topContainer}>
                 <TouchableOpacity>
                     <Text
                         style={styles.goHomeButton}
                         onPress={() => this.goHome()}
                     >X</Text>
                 </TouchableOpacity>
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-
-                    <Text style={styles.checkOutText}>
+                <View style={styles.textContainer}>
+                    <Text style={styles.text}>
                         Checked out
                     </Text>
-                    <Text style={styles.checkOutText}>
+                    <Text style={styles.text}>
                         {this.state.boxCount === 1 ? "1 box" : this.state.boxCount + " boxes"}
                     </Text>
                     {/* TODO: Give location name on successful checkOut and set it to state */
@@ -104,4 +105,4 @@ class CheckOutSuccessScreen extends React.Component {
     }
 }
 
-export default CheckOutSuccessScreen;
+export default ContainerSuccessScreen;

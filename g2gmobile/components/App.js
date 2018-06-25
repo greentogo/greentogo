@@ -10,11 +10,9 @@ import styles from '../styles';
 import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
 import MapScreen from './MapScreen';
-import CheckOutScreen from './CheckOutScreen';
-import ReturnBox from "./ReturnScreen";
+import ScanQRCode from './ScanQRCode';
 import SubmissionScreen from "./SubmissionScreen";
-import CheckOutSuccessScreen from "./CheckOutSuccessScreen";
-import ReturnSuccessScreen from "./ReturnSuccessScreen";
+import ContainerSuccessScreen from "./ContainerSuccessScreen";
 import AccountScreen from "./AccountScreen";
 import SubscriptionScreen from "./SubscriptionScreen"
 
@@ -28,11 +26,9 @@ import {
 const Router = createRouter(() => ({
     home: () => HomeScreen,
     map: () => MapScreen,
-    checkOutBox: () => CheckOutScreen,
-    returnBox: () => ReturnBox,
+    scanQRCode: () => ScanQRCode,
     submission: () => SubmissionScreen,
-    checkOutSuccess: () => CheckOutSuccessScreen,
-    returnSuccess: () => ReturnSuccessScreen,
+    containerSuccessScreen: () => ContainerSuccessScreen,
     account: () => AccountScreen,
     subscription: () => SubscriptionScreen
 }));

@@ -7,7 +7,7 @@ import { Text } from 'react-native';
 
 @inject("appStore")
 @observer
-class CheckOutScreen extends React.Component {
+class ScanQRCode extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -17,7 +17,7 @@ class CheckOutScreen extends React.Component {
 
     static route = {
         navigationBar: {
-            title: 'Checkout container'
+            title: 'Scan QR Code'
         }
     }
 
@@ -34,4 +34,4 @@ class CheckOutScreen extends React.Component {
     }
 }
 
-export default CheckOutScreen;
+export default ScanQRCode;
