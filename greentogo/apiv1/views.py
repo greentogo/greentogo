@@ -148,6 +148,7 @@ class RestaurantsView(APIView):
         serializer = RestaurantSerializer(Restaurant.objects.filter(phase__in=phases), many=True)
         return jsend_success(serializer.data)
 
+
 class Statistics(GenericAPIView):
     """
     Get stats for box returns, users and subscriptions

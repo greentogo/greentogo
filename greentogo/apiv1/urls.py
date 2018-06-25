@@ -1,5 +1,6 @@
 from django.conf.urls import url
-
+from django.contrib.auth import views as auth_views
+from core.forms import EmailValidationOnForgotPassword
 import apiv1.views as views
 
 urlpatterns = [
@@ -17,5 +18,5 @@ urlpatterns = [
         views.SubscriptionView.as_view(),
         name="api_v1_subscription"
     ),
-    url(r'^restaurants/', views.RestaurantsView.as_view(), name="api_v1_restaurants"),
+    url(r'^restaurants/', views.RestaurantsView.as_view(), name="api_v1_restaurants")
 ]
