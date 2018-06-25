@@ -39,16 +39,16 @@ class LoginScreen extends React.Component {
             error: [],
             loading: false,
             type: 'login',
-            redirect: false
+            redirectToWeb: false
         }
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (this.state.type !== 'login') {
             if (this.state.type === 'signUp') {
-                this.setState({ redirect: 'https://app.durhamgreentogo.com/accounts/register/', type: 'login' })
+                this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/accounts/register/', type: 'login' })
             } else if (this.state.type === 'passwordReset') {
-                this.setState({ redirect: 'https://app.durhamgreentogo.com/accounts/password/reset/', type: 'login' })
+                this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/accounts/password/reset/', type: 'login' })
             }
         }
     }
@@ -164,14 +164,14 @@ class LoginScreen extends React.Component {
         let errorMessages = this.state.error.map((error, index) => {
             return <Text key={index} style={{ color: 'red', textAlign: 'center' }}>{error}</Text>;
         });
-        if (this.state.redirect) {
-            let uri = this.state.redirect;
+        if (this.state.redirectToWeb) {
+            let uri = this.state.redirectToWeb;
             return (
                 <WebView
                     ref={(ref) => { this.webview = ref; }}
                     source={{ uri }}
                     onNavigationStateChange={(event) => {
-                        this.setState({ redirect: false })
+                        this.setState({ redirectToWeb: false })
                         Linking.openURL(event.url);
                         this.webview.stopLoading();
                     }}

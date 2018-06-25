@@ -4,7 +4,9 @@ import {
     TextInput,
     View,
     Button,
-    Image
+    Image,
+    WebView,
+    Linking
 } from 'react-native';
 import { inject, observer } from "mobx-react";
 import { Permissions } from 'expo';
@@ -18,7 +20,11 @@ import styles from "../styles";
 class AccountScreen extends React.Component {
     constructor(props) {
         super(props)
-        this.state = this.props.appStore.user
+        this.state = {
+            ...this.props.appStore.user,
+            redirectToWeb: false,
+
+        }
     }
 
     static route = {
@@ -28,15 +34,30 @@ class AccountScreen extends React.Component {
     }
 
     render() {
-        console.log("Account State: ", this.state)
-        console.log(this.state.username)
-        return (
-            <View style={{ flex: 1, alignItems: 'center', backgroundColor: styles.primaryCream, paddingTop: 30 }}>
-                <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>{this.state.email}</Text>
-                <Text style={{ color: '#0000EE', fontSize: 14 }} onPress={() => { this.setState({ type: 'passwordReset' }) }}>Reset Password</Text>
-                {/* <Subscription /> */}
-                <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>{this.state.availableBoxes}/ {this.state.maxBoxes} available</Text>
-                {/* <View style={{ flex: 1, justifyContent: 'center', backgroundColor: styles.primaryCream, paddingTop: 30 }}>
+        if (this.state.redirectToWeb) {
+            let uri = this.state.redirectToWeb;
+            return (
+                <WebView
+                    ref={(ref) => { this.webview = ref; }}
+                    source={{ uri }}
+                    onNavigationStateChange={(event) => {
+                        this.setState({ redirectToWeb: false })
+                        Linking.openURL(event.url);
+                        this.webview.stopLoading();
+                    }}
+                />
+            );
+        } else {
+            console.log("Account State: ", this.state)
+            console.log(this.state.username)
+            return (
+                <View style={{ flex: 1, alignItems: 'center', backgroundColor: styles.primaryCream, paddingTop: 30 }}>
+                    <Text style={{ paddingTop: 10, paddingBottom: 10, color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>Email: {this.state.email}</Text>
+                    <Text style={{ paddingTop: 5, paddingBottom: 10, color: '#0000EE', fontSize: 14 }} onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/account/change_password/' }) }}>Change Password</Text>
+                    {/* <Subscription /> */}
+                    <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>{this.state.availableBoxes}/ {this.state.maxBoxes} boxes available</Text>
+                    <Text style={{ paddingTop: 5, paddingBottom: 10, color: '#0000EE', fontSize: 14 }} onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/account/change_payment_method/' }) }}>Change your default payment method</Text>
+                    {/* <View style={{ flex: 1, justifyContent: 'center', backgroundColor: styles.primaryCream, paddingTop: 30 }}>
                     <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 26 }}>You've saved</Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                         <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 40, paddingRight: 10 }}>12</Text>
@@ -48,8 +69,9 @@ class AccountScreen extends React.Component {
                     </View>
                     <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 26 }}>from a landfill</Text>
                 </View> */}
-            </View>
-        )
+                </View>
+            )
+        }
     }
 }
 
