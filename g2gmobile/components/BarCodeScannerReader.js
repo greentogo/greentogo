@@ -46,7 +46,7 @@ class BarCodeScannerReader extends React.Component {
             let authToken = this.props.appStore.authToken;
             let url = JSON.stringify(data.data);
             this.setState({ barCodeScanned: true, error: false }, () => {
-                // url = "/locations/AY4LCB/"
+                url = "/locations/AY4LCB/"
                 let locationUrl = /(\/locations\/)([A-Z0-9]{6})/.exec(url);
                 if (locationUrl && locationUrl[1] && locationUrl[2]) {
                     axios.get(locationUrl[1] + locationUrl[2], {
@@ -75,7 +75,7 @@ class BarCodeScannerReader extends React.Component {
                 </View>
             );
         } else {
-            return <Text> No camera view </Text>
+            return <Text> No camera view. Please give GreenToGo permission to access your camera so we can read QR codes! </Text>
         }
     }
 }

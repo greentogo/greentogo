@@ -2,13 +2,15 @@ import React from 'react';
 import axios from '../apiClient';
 import { Icon, Button } from 'native-base';
 import { inject, observer } from 'mobx-react';
-const apiEndpoint = '/api/v1';
 import {
     StyleSheet,
     Text,
     View,
-    Picker
+    Picker,
+    WebView,
+    Linking
 } from 'react-native';
+import styles from "../styles";
 
 @inject('appStore')
 @observer
@@ -32,6 +34,7 @@ class SubmissionScreen extends React.Component {
             }
         }).then((response) => {
             if (response.data.data.email) this.props.appStore.email = response.data.data.email;
+            console.log(response.data.data)
             this.setState({ subscriptions: response.data.data.subscriptions }, () => {
                 if (this.state.subscriptions.length > 0) {
                     this.subscriptionChange(subscriptions[0].id);
@@ -156,58 +159,81 @@ class SubmissionScreen extends React.Component {
                 fontSize: 18,
                 fontWeight: '800',
                 textAlign: 'center'
+            },
+            noSubText: {
+
             }
         });
-
-        return (
-            subscriptions.length > 0 ? (
-                <View>
-                    {/* TODO: Add this back in once the tag/ endpoint accepts # of boxes */}
-                    <View style={{ marginBottom: 10 }}><Text style={styles.headerText}>{this.state.locationData.name}</Text></View>
-                    <View style={{ marginBottom: 10 }}><Text style={styles.headerText}>How many boxes to check {this.state.locationData.service.toLowerCase()}?</Text></View>
-                    <View style={styles.centeredRow}>
-                        <Button
-                            success
-                            onPress={this.subtract} >
-                            <Text style={styles.icon}>-</Text>
-                        </Button>
-                        <Text style={{ marginLeft: 10, marginRight: 10, fontSize: 20, alignSelf: 'center' }}>{this.state.boxCount}</Text>
-                        <Button
-                            success
-                            onPress={this.add} >
-                            <Text style={styles.icon}>+</Text>
-                        </Button>
-                    </View>
+        if (this.state.redirectToWeb) {
+            let uri = this.state.redirectToWeb;
+            return (
+                <WebView
+                    ref={(ref) => { this.webview = ref; }}
+                    source={{ uri }}
+                    onNavigationStateChange={(event) => {
+                        this.setState({ redirectToWeb: false })
+                        Linking.openURL(event.url);
+                        this.webview.stopLoading();
+                    }}
+                />
+            );
+        } else {
+            return (
+                subscriptions.length > 10 ? (
                     <View>
-                        <Text style={styles.headerText}>Check {this.state.locationData.service.toLowerCase()} {this.state.boxCount === 1 ? `${this.state.boxCount} box` : `${this.state.boxCount} boxes`} on which subscription?</Text>
-                        <Picker
-                            mode="dropdown"
-                            selectedValue={this.state.subscriptionId}
-                            onValueChange={(itemValue, itemIndex) => this.subscriptionChange(itemValue)}
-                        >
-                            {
-                                subscriptions.map((subscription, index) => {
-                                    return <Picker.Item
-                                        key={index}
-                                        label={`${subscription.name} (${subscription.available_boxes}/${subscription.max_boxes})`}
-                                        value={subscription.id}
-                                    />
-                                })
-                            }
-                        </Picker>
+                        {/* TODO: Add this back in once the tag/ endpoint accepts # of boxes */}
+                        <View style={{ marginBottom: 10 }}><Text style={styles.headerText}>{this.state.locationData.name}</Text></View>
+                        <View style={{ marginBottom: 10 }}><Text style={styles.headerText}>How many boxes to check {this.state.locationData.service.toLowerCase()}?</Text></View>
                         <View style={styles.centeredRow}>
                             <Button
                                 success
-                                onPress={this.submit}>
-                                <Text style={{ color: '#FFFFFF' }}>Submit</Text>
+                                onPress={this.subtract} >
+                                <Text style={styles.icon}>-</Text>
+                            </Button>
+                            <Text style={{ marginLeft: 10, marginRight: 10, fontSize: 20, alignSelf: 'center' }}>{this.state.boxCount}</Text>
+                            <Button
+                                success
+                                onPress={this.add} >
+                                <Text style={styles.icon}>+</Text>
                             </Button>
                         </View>
+                        <View>
+                            <Text style={styles.headerText}>Check {this.state.locationData.service.toLowerCase()} {this.state.boxCount === 1 ? `${this.state.boxCount} box` : `${this.state.boxCount} boxes`} on which subscription?</Text>
+                            <Picker
+                                mode="dropdown"
+                                selectedValue={this.state.subscriptionId}
+                                onValueChange={(itemValue, itemIndex) => this.subscriptionChange(itemValue)}
+                            >
+                                {
+                                    subscriptions.map((subscription, index) => {
+                                        return <Picker.Item
+                                            key={index}
+                                            label={`${subscription.name} (${subscription.available_boxes}/${subscription.max_boxes})`}
+                                            value={subscription.id}
+                                        />
+                                    })
+                                }
+                            </Picker>
+                            <View style={styles.centeredRow}>
+                                <Button
+                                    success
+                                    onPress={this.submit}>
+                                    <Text style={{ color: '#FFFFFF' }}>Submit</Text>
+                                </Button>
+                            </View>
+                        </View>
                     </View>
-                </View>
-            ) : (
-                    <View><Text>Your account has no subscriptions</Text></View>
-                )
-        )
+                ) : (
+                        <View>
+                            <Button style={{ backgroundColor: styles.primaryCream }} light full onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/subscriptions/new/' }) }}>
+                                <Text style={{ backgroundColor: styles.primaryCream, color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>
+                                    Your account has no subscriptions. Tap here to add a subscription.
+                            </Text>
+                            </Button>
+                        </View>
+                    )
+            )
+        }
     }
 }
 
