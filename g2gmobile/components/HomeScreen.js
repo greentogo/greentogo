@@ -65,7 +65,7 @@ class HomeScreen extends React.Component {
                 this.subscriptionChange(subscriptions[0].id);
             }
         }).catch((error) => {
-            console.log('In the error!');
+            console.log('In the error! HOMESCREEN.JS');
             console.log(error);
         })
     }
@@ -88,6 +88,40 @@ class HomeScreen extends React.Component {
 
     logOut = () => {
         this.props.appStore.clearAuthToken()
+    }
+
+    subscriptionChange = (subscriptionId) => {
+        let boxCount;
+        let selectedSubscription;
+        // find the selected subscription
+        subscriptions.forEach((subscription) => {
+            if (subscription.id === subscriptionId) {
+                selectedSubscription = subscription;
+            }
+        });
+        switch (this.props.appStore.action) {
+            case 'IN':
+                console.log(selectedSubscription);
+                if (selectedSubscription.available_boxes === selectedSubscription.max_boxes) {
+                    boxCount = 0;
+                } else {
+                    boxCount = 1;
+                }
+                break;
+            case 'OUT':
+                if (selectedSubscription.available_boxes === 0) {
+                    boxCount = 0;
+                } else {
+                    boxCount = 1;
+                }
+                break;
+        }
+
+        this.setState({
+            subscriptionId,
+            boxCount,
+            selectedSubscription
+        });
     }
 
     render() {

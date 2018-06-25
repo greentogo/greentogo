@@ -41,9 +41,17 @@ class BarCodeScannerReader extends React.Component {
 
     handleBarCodeRead = (data) => {
         if ( !this.state.barCodeScanned ) {
+            console.log("BAR CODE IS BEING READ")
             let url = JSON.stringify(data.data);
+            console.log("url @@@@@@@@@@@@@@@@@@@@@@@@@@@")
+            console.log(url)
+            let locationUrl = /(\/locations\/)([A-Z0-9]*)/.exec(url);
             let newUrl = url.substring(0, url.length - 2);
+            console.log("newUrl @@@@@@@@@@@@@@@@@@@@@@@@@@@")
+            console.log(newUrl)
             let locationCode = newUrl.substr(newUrl.lastIndexOf('/') + 1);
+            console.log("locationCode @@@@@@@@@@@@@@@@@@@@@@@@@@@")
+            console.log(locationCode)
             this.props.appStore.locationCode = locationCode;
             this.setState({barCodeScanned: true});
             this.props.navigateNext();

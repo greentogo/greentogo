@@ -35,7 +35,7 @@ class SubmissionScreen extends React.Component {
                 this.subscriptionChange(subscriptions[0].id);
             }
         }).catch((error) => {
-            console.log('In the error!');
+            console.log('In the error! SUBMISSIONSCREEN.JS');
             console.log(error);
         })
     }
