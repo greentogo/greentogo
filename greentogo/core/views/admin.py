@@ -35,7 +35,8 @@ def unclaimed_subscription_status_csv(request, *args, **kwargs):
 def stock_report(request, *args, **kwargs):
     """Show a report of current stock at each location."""
     checkout_locations = Location.objects.checkout().order_by('name').filter(retired=False)
-    checkin_locations = Location.objects.checkin().order_by('name').filter(retired=False)
+    checkin_locations = Location.objects.checkin().order_by('name').filter(retired=False, admin_location=False)
+    hqLocation = Location.objects.checkin().order_by('name').get(retired=False, admin_location=True)
 
     checkout_data = {
         "names": [],
@@ -70,16 +71,22 @@ def stock_report(request, *args, **kwargs):
             Subscription.objects.active()])
         return count
 
+    def get_estimated_at_hq():
+        count = hqLocation.get_estimated_stock()
+        return count
+
     cycle_data = {
         "labels": [
             "Clean at restaurants",
             "Checked out",
-            "Dirty", #this should expand to 3 categories
+            "Dirty", #this should expand to 3 categories, one of them is below
+            "Clean at GTG HQ",
         ],
         "count": [
             get_estimated_at_checkout(),
             get_estimated_checkedout(),
             get_estimated_at_checkin(),
+            get_estimated_at_hq(),
         ],
     }
 
@@ -89,7 +96,7 @@ def stock_report(request, *args, **kwargs):
             "data_json":json.dumps(dict(
                 checkin=checkin_data, 
                 checkout=checkout_data,
-                cycle=cycle_data,
+                cycle=cycle_data
         ))}
     )
 
