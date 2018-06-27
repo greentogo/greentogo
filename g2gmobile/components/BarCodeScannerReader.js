@@ -41,12 +41,14 @@ class BarCodeScannerReader extends React.Component {
         this.setState({ hasCameraPermission: status === 'granted' });
     }
 
+
     handleBarCodeRead = (data) => {
         if (!this.state.barCodeScanned) {
             let authToken = this.props.appStore.authToken;
             let url = JSON.stringify(data.data);
+            console.log(url)
             this.setState({ barCodeScanned: true, error: false }, () => {
-                url = "/locations/AY4LCB/"
+                // url = "/locations/AY4LCB/"
                 let locationUrl = /(\/locations\/)([A-Z0-9]{6})/.exec(url);
                 if (locationUrl && locationUrl[1] && locationUrl[2]) {
                     axios.get(locationUrl[1] + locationUrl[2], {
@@ -55,6 +57,7 @@ class BarCodeScannerReader extends React.Component {
                         }
                     }).then((response) => {
                         this.props.navigateNext(response.data.data);
+                        this.setState({ barCodeScanned: false });
                     }).catch((err) => {
                         console.log("ERROR");
                         console.log(err.response);

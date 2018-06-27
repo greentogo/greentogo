@@ -86,6 +86,8 @@ class LoginScreen extends React.Component {
                 console.log(err)
             })
         }).catch((error) => {
+            // TODO
+            // HANDLE THESE LOCALLY
             if (error.response.data.non_field_errors) {
                 this.setState({ error: error.response.data.non_field_errors, loading: false });
             } else if (error.response.data.password || error.response.data.username) {

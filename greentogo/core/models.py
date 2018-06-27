@@ -638,7 +638,7 @@ class LocationTagQuerySet(models.QuerySet):
 
 class LocationTag(models.Model):
     objects = LocationTagQuerySet.as_manager()
-
+    
     subscription = models.ForeignKey(Subscription)
     location = models.ForeignKey(Location)
     created_at = models.DateTimeField(auto_now_add=True)

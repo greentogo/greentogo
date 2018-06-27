@@ -60,8 +60,9 @@ def stock_report(request, stock_action):
         try:
             if stock_action == 'restock':
                 #subtract restocked boxes from the admin total
+                countToSubfromHQ = int(stock_count) - int(actual_count)
                 admin_location = Location.objects.checkin().get(admin_location=True)
-                new_count = admin_location.get_estimated_stock() - int(stock_count)
+                new_count = admin_location.get_estimated_stock() - int(countToSubfromHQ)
                 admin_location.stock_counts.create(count=new_count)
         except:
             pass

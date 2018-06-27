@@ -179,7 +179,7 @@ class SubmissionScreen extends React.Component {
             );
         } else {
             return (
-                subscriptions.length > 10 ? (
+                subscriptions.length > 0 ? (
                     <View>
                         {/* TODO: Add this back in once the tag/ endpoint accepts # of boxes */}
                         <View style={{ marginBottom: 10 }}><Text style={styles.headerText}>{this.state.locationData.name}</Text></View>
