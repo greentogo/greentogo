@@ -14,6 +14,7 @@
 </div>
 <div style="max-width: 960px;">
 <h2>Current Container Status</h2>
+<p>Total Containers: <span id="totalContainerCount"></span></p>
 <canvas id="cycleChart" width="500" height="300"></canvas>
 </div>
 
@@ -41,7 +42,6 @@ $(function () {
         return dataArray
             .map(categoryFn)
             .map(function (category) {
-                console.log(category)
                 if (category == 1) {
                     return 'rgba(26, 150, 65, 0.5)';
                 } else if (category == 2) {
@@ -52,6 +52,12 @@ $(function () {
             });
     };
 
+    var totalcountP = document.getElementById("totalContainerCount");
+    var count = 0;
+    data.cycle.count.forEach(function(number){
+        count = count + number;
+    });
+    totalcountP.textContent = count;
 
     var checkoutCanvas = document.getElementById("checkoutStockChart");
     var checkoutChart = new Chart(checkoutCanvas, {
