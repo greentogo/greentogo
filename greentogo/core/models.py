@@ -546,16 +546,23 @@ class Location(models.Model):
     admin_location = models.BooleanField(
         blank=True,
         default=False,
-        help_text="Admin locations are locations where \
-        boxes will be checked in when they are \
-        cleaned. \
-        THERE CAN ONLY BE ONE ADMIN LOCATION!")
+        help_text="Admin locations are locations that \
+        are only supposed to be used for administrative \
+        and backend purposes.")
 
     retired = models.BooleanField(
         blank=True,
         default=False,
         help_text="Retired locations will not show up in reporting \
         but their data will remain in history.")
+
+    headquarter = models.BooleanField(
+        blank=True,
+        default=False,
+        help_text="Admin locations are locations where \
+        boxes will be checked in when they are \
+        cleaned. \
+        THERE CAN ONLY BE ONE ADMIN LOCATION!")
 
     def __str__(self):
         return "{} - {} ({})".format(self.name, self.service, self.code)
