@@ -108,6 +108,43 @@ def activity_report(request, days=30, *args, **kwargs):
     return render(request, 'admin/activity_report.html', view_data)
 
 
+def restock_locations(request, *args, **kwargs):
+    """Present all locations for restock"""
+    checkout_locations = Location.objects.checkout().order_by('name')
+    return render(request, "admin/restock_locations.html", {'locations': checkout_locations})
+
+
+@require_POST
+def restock_location(request, location_id, *args, **kwargs):
+    """Restock a specific location"""
+    return _set_stock_count(request, location_id, "admin:restock_locations")
+
+
+def empty_locations(request, *args, **kwargs):
+    """Present all checkin locations for emptying"""
+    checkin_locations = Location.objects.checkin().order_by('name').get(admin_location=False)
+    return render(request, "admin/empty_locations.html", {'locations': checkin_locations})
+
+
+@require_POST
+def empty_location(request, location_id, *args, **kwargs):
+    """Empty a specific location"""
+    return _set_stock_count(request, location_id, "admin:empty_locations")
+
+
+def _set_stock_count(request, location_id, redirect_to):
+    location = get_object_or_404(Location, pk=location_id)
+    stock_count_str = request.POST['stock_count']
+    try:
+        stock_count = int(stock_count_str, base=10)
+    except ValueError:
+        return redirect(reverse(redirect_to))
+
+    if stock_count >= 0:
+        location.stock_counts.create(count=stock_count)
+
+    return redirect(reverse(redirect_to))
+
 def export_data(request, days=30, *args, **kwargs):
     chartData = False
     if request.method == "POST":
@@ -340,40 +377,3 @@ def export_user_reports(request, *args, **kwargs):
         else:
             writer.writerow([user.username, user.name, user.email, user.date_joined, user.last_login, '', '', '', ''])
     return response
-
-def restock_locations(request, *args, **kwargs):
-    """Present all locations for restock"""
-    checkout_locations = Location.objects.checkout().order_by('name')
-    return render(request, "admin/restock_locations.html", {'locations': checkout_locations})
-
-
-@require_POST
-def restock_location(request, location_id, *args, **kwargs):
-    """Restock a specific location"""
-    return _set_stock_count(request, location_id, "admin:restock_locations")
-
-
-def empty_locations(request, *args, **kwargs):
-    """Present all checkin locations for emptying"""
-    checkin_locations = Location.objects.checkin().order_by('name')
-    return render(request, "admin/empty_locations.html", {'locations': checkin_locations})
-
-
-@require_POST
-def empty_location(request, location_id, *args, **kwargs):
-    """Empty a specific location"""
-    return _set_stock_count(request, location_id, "admin:empty_locations")
-
-
-def _set_stock_count(request, location_id, redirect_to):
-    location = get_object_or_404(Location, pk=location_id)
-    stock_count_str = request.POST['stock_count']
-    try:
-        stock_count = int(stock_count_str, base=10)
-    except ValueError:
-        return redirect(reverse(redirect_to))
-
-    if stock_count >= 0:
-        location.stock_counts.create(count=stock_count)
-
-    return redirect(reverse(redirect_to))
