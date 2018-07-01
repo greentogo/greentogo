@@ -22,6 +22,9 @@
 
 <h2>Dirty Containers in Return Stations</h2>
 <canvas id="checkinStockChart" width="500" height="300"></canvas>
+
+<h2>Admin Locations</h2>
+<canvas id="adminlocations" width="500" height="300"></canvas>
 </div>
 {% endblock %}
 
@@ -121,7 +124,43 @@ $(function () {
             }
         }
     });
-    console.log(data)
+    
+    var adminCanvas = document.getElementById("adminlocations");
+    var adminChart = new Chart(adminCanvas, {
+        type: 'bar',
+        data: {
+            labels: data.admin.names,
+            datasets: [{
+                label: "# of Boxes",
+                data: data.admin.count,
+                backgroundColor: colorMap(function (val) {
+                    if (val > 30) {
+                        return 3
+                    } else if (val > 15) {
+                        return 2
+                    } else {
+                        return 1
+                    }
+                }, data.admin.count),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    ticks: {
+                        autoSkip: false
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+    
     var cycleCanvas = document.getElementById("cycleChart");
     var cycleChart = new Chart(cycleCanvas, {
         type: 'pie',
@@ -131,7 +170,7 @@ $(function () {
                 label: "# of Boxes",
                 data: data.cycle.count,
                 borderWidth: 1,
-                backgroundColor:['#88df67','#c576e3','#e06528','#ffff00']
+                backgroundColor:['#88df67','#c576e3','#e06528','#ffff00', '#006400']
             }],
         },
         options: {

@@ -105,6 +105,7 @@ urlpatterns = [
     url(r'^admin/', admin_site.urls),
     url(r'^stock/$', core_views.reporting.stock_landing_page, name='stock_report'),
     url(r'^shelve/$', core_views.reporting.stock_shelve, name='stock_shelve'),
+    url(r'^addboxes/$', core_views.reporting.stock_add_to_shelf, name='stock_add_to_shelf'),
     url(r'^(?P<stock_action>restock)/$', core_views.reporting.stock_report, name='stock_report_restock'),
     url(r'^(?P<stock_action>empty)/$', core_views.reporting.stock_report, name='stock_report_empty'),
     url(r'^api/docs/', include_docs_urls(title='GreenToGo API')),

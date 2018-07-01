@@ -1,0 +1,14 @@
+{% extends "core/base.html" %}
+{% load staticfiles %}
+{% block content %}
+<div class="row">
+  <div class="medium-12 columns">
+    <h2>Add new boxes at GreenToGo HQ</h2>
+    <h4>How many boxes are you adding?</h4>
+    <form action="." method="POST">
+      <input class="reportinput" name="stock_count" type="number">
+      <button type="submit" class="button">Add</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

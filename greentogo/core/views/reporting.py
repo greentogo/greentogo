@@ -33,16 +33,36 @@ def stock_shelve(request):
     """
     if request.method == 'POST':
         try:
-            location = Location.objects.checkin().get(headquarters=True)
             stock_count = request.POST.get('stock_count')
-            estimated_amount = location.get_estimated_stock()
-            new_count = estimated_amount + int(stock_count)
-            location.stock_counts.create(count=new_count)
+            hqlocation = Location.objects.checkin().get(headquarters=True)
+            washlocation = Location.objects.checkin().get(washing_location=True)
+            new_wash_count = washlocation.get_estimated_stock() - int(stock_count)
+            washlocation.stock_counts.create(count=new_wash_count)
+            new_hq_count = hqlocation.get_estimated_stock() + int(stock_count)
+            hqlocation.stock_counts.create(count=new_hq_count)
             messages.info(request,"{} clean boxes successfully shelved at GreenToGo HQ!".format(stock_count))
         except:
-            messages.error(request,"There are no headquarter locations! Add one by assigning an admin location")
+            messages.error(request,"There are no headquarter locations! Add one by assigning a headquarters location")
 
     return render(request,'reporting/shelve.html',{ })
+
+@staff_member_required()
+def stock_add_to_shelf(request):
+    """
+    This view is for adding new boxes to G2g HQ
+    """
+    if request.method == 'POST':
+        try:
+            hqlocation = Location.objects.checkin().get(headquarters=True)
+            stock_count = request.POST.get('stock_count')
+            estimated_amount = hqlocation.get_estimated_stock()
+            new_count = estimated_amount + int(stock_count)
+            hqlocation.stock_counts.create(count=new_count)
+            messages.info(request,"{} boxes successfully added and shelved at GreenToGo HQ!".format(stock_count))
+        except:
+            messages.error(request,"There are no headquarter locations! Add one by assigning a headquarters location")
+
+    return render(request,'reporting/addboxes.html',{ })
 
 
 @staff_member_required()
@@ -58,6 +78,15 @@ def stock_report(request, stock_action):
         location.stock_reports.create(actual_amount=actual_count)
         location.stock_counts.create(count=stock_count)
         try:
+            if stock_action == 'empty':
+                #Add Count of boxes to washing location
+                countToAddtoWash = int(actual_count)
+                washlocation = Location.objects.checkin().get(washing_location=True)
+                new_count = washlocation.get_estimated_stock() + int(countToAddtoWash)
+                washlocation.stock_counts.create(count=new_count)
+        except:
+            pass
+        try:
             if stock_action == 'restock':
                 #subtract restocked boxes from the admin total
                 countToSubfromHQ = int(stock_count) - int(actual_count)
@@ -70,10 +99,10 @@ def stock_report(request, stock_action):
 
     if stock_action == 'restock':
         locations = Location.objects.checkout()
-        locations = locations.filter(retired=False)
+        locations = locations.filter(retired=False, admin_location=False)
     else:
         locations = Location.objects.checkin()
-        locations = locations.filter(retired=False)
+        locations = locations.filter(retired=False, admin_location=False)
     return render(request,'reporting/stock.html',{
         "locations": locations,
         "stock_action": stock_action,
