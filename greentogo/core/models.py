@@ -547,8 +547,9 @@ class Location(models.Model):
         blank=True,
         default=False,
         help_text="Admin locations are locations where \
-        boxes will be checked in when resetting a \
-        subscriptions box count manually")
+        boxes will be checked in when they are \
+        cleaned. \
+        THERE CAN ONLY BE ONE ADMIN LOCATION!")
 
     retired = models.BooleanField(
         blank=True,
@@ -638,7 +639,7 @@ class LocationTagQuerySet(models.QuerySet):
 
 class LocationTag(models.Model):
     objects = LocationTagQuerySet.as_manager()
-    
+
     subscription = models.ForeignKey(Subscription)
     location = models.ForeignKey(Location)
     created_at = models.DateTimeField(auto_now_add=True)
