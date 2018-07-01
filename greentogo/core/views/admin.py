@@ -36,7 +36,7 @@ def stock_report(request, *args, **kwargs):
     """Show a report of current stock at each location."""
     checkout_locations = Location.objects.checkout().order_by('name').filter(retired=False)
     checkin_locations = Location.objects.checkin().order_by('name').filter(retired=False, admin_location=False)
-    hqLocation = Location.objects.checkin().order_by('name').get(retired=False, admin_location=True)
+    hqLocation = Location.objects.checkin().order_by('name').get(retired=False, headquarters=True)
 
     checkout_data = {
         "names": [],

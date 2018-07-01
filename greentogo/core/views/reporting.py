@@ -33,7 +33,7 @@ def stock_shelve(request):
     """
     if request.method == 'POST':
         try:
-            location = Location.objects.checkin().get(admin_location=True)
+            location = Location.objects.checkin().get(headquarters=True)
             stock_count = request.POST.get('stock_count')
             estimated_amount = location.get_estimated_stock()
             new_count = estimated_amount + int(stock_count)
@@ -61,9 +61,9 @@ def stock_report(request, stock_action):
             if stock_action == 'restock':
                 #subtract restocked boxes from the admin total
                 countToSubfromHQ = int(stock_count) - int(actual_count)
-                admin_location = Location.objects.checkin().get(admin_location=True)
-                new_count = admin_location.get_estimated_stock() - int(countToSubfromHQ)
-                admin_location.stock_counts.create(count=new_count)
+                hqlocation = Location.objects.checkin().get(headquarters=True)
+                new_count = hqlocation.get_estimated_stock() - int(countToSubfromHQ)
+                hqlocation.stock_counts.create(count=new_count)
         except:
             pass
         messages.success(request,"Successfully stocked and submitted a report for {}".format(location))
@@ -108,7 +108,7 @@ def accidental_checkout(request):
         if form.is_valid():
             num_boxes = int(request.POST.get('num_boxes'))
             location = form.cleaned_data.get('location')
-            dumpSet = Location.objects.filter(name="Accidental Checkout Dumping Location", service="IN", retired=True)
+            dumpSet = Location.objects.filter(dumping_location=True, service="IN", retired=True)
             dump = dumpSet[0]
             if subscription.available_boxes - num_boxes <= subscription.number_of_boxes:
                 resCount = location.get_estimated_stock()

@@ -556,18 +556,37 @@ class Location(models.Model):
         help_text="Retired locations will not show up in reporting \
         but their data will remain in history.")
 
-    headquarter = models.BooleanField(
+    headquarters = models.BooleanField(
         blank=True,
         default=False,
-        help_text="Admin locations are locations where \
-        boxes will be checked in when they are \
+        help_text="Headquarters is a location where \
+        boxes will be moved to when they are \
         cleaned. \
-        THERE CAN ONLY BE ONE ADMIN LOCATION!")
+        THERE CAN ONLY BE ONE HEADQUARTER LOCATION!")
+
+    washing_location = models.BooleanField(
+        blank=True,
+        default=False,
+        help_text="washing_location is a location where \
+        boxes are moved when they are picked up \
+        from checkin locations. \
+        THERE CAN ONLY BE ONE WASHING LOCATION!")
+
+    dumping_location = models.BooleanField(
+        blank=True,
+        default=False,
+        help_text="dumping_location is a location where \
+        accidental checkout boxes are 'checked in' to. \
+        THERE CAN ONLY BE ONE DUMPING LOCATION!")
 
     def __str__(self):
         return "{} - {} ({})".format(self.name, self.service, self.code)
 
     def save(self, *args, **kwargs):
+        if self.headquarters or self.washing_location or self.dumping_location:
+            self.admin_location = True
+        else:
+            self.admin_location = False
         self._set_code()
         self._geocode()
         super().save(*args, **kwargs)
