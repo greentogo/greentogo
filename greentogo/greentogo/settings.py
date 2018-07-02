@@ -177,7 +177,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = str(__root__.path("staticfiles/"))
 STATICFILES_DIRS = [
-    str(__root__.path('bower_components/')),
+    str(__root__.path('greentogo/vendor/')),
     str(__root__.path('greentogo/static/')),
 ]
 STATICFILES_FINDERS = (

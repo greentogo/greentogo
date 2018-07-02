@@ -4,10 +4,9 @@ HOSTNAME := 'greentogo'
 
 PIPTOOLS_INSTALLED := $(shell command -v pip-sync 2> /dev/null)
 NPM_INSTALLED := $(shell command -v npm 2> /dev/null)
-BOWER_INSTALLED := $(shell command -v bower 2> /dev/null)
 NODESASS_INSTALLED := $(shell command -v node-sass 2> /dev/null)
 
-.PHONY: deploy-staging deploy-production requirements server update-requirements check check-pip-tools check-bower check-npm check-node-sass
+.PHONY: deploy-staging deploy-production requirements server update-requirements check check-pip-tools check-npm check-node-sass
 
 check: check-pip-tools check-bower
 	@echo "You have all required programs installed."
@@ -16,12 +15,6 @@ check-pip-tools:
 ifndef PIPTOOLS_INSTALLED
 	@echo "Installing pip-tools"
 	pip install pip-tools
-endif
-
-check-bower: check-npm
-ifndef BOWER_INSTALLED
-	@echo "Installing bower"
-	npm install -g bower
 endif
 
 check-node-sass: check-npm
@@ -38,9 +31,8 @@ endif
 server: requirements
 	./greentogo/manage.py runserver_plus
 
-requirements: requirements.txt dev-requirements.txt bower.json check-pip-tools check-bower
+requirements: requirements.txt dev-requirements.txt check-pip-tools
 	pip-sync requirements.txt dev-requirements.txt
-	bower install
 
 requirements.txt: requirements.in
 	pip-compile requirements.in
