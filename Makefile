@@ -8,7 +8,7 @@ NODESASS_INSTALLED := $(shell command -v node-sass 2> /dev/null)
 
 .PHONY: deploy-staging deploy-production requirements server update-requirements check check-pip-tools check-npm check-node-sass
 
-check: check-pip-tools check-bower
+check: check-pip-tools
 	@echo "You have all required programs installed."
 
 check-pip-tools:
