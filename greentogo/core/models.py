@@ -189,12 +189,13 @@ class PlanQuerySet(models.QuerySet):
 
 class Plan(models.Model):
     objects = PlanQuerySet.as_manager()
+    INTERVAL_CHOICES = (('month', 'month'), ('year', 'year'), )
 
     name = models.CharField(max_length=255, unique=True)
     available = models.BooleanField(default=True)
     amount = models.PositiveIntegerField(help_text="Amount in cents.")
     number_of_boxes = models.PositiveIntegerField()
-    interval = models.CharField(max_length=255, help_text="Should say 'year' or 'month'.", default="year")
+    interval = models.CharField(max_length=255, choices=INTERVAL_CHOICES, help_text="Should say 'year' or 'month'.", default="year")
     stripe_id = models.CharField(max_length=255, unique=True, blank=True, null=True, editable=False)
 
     class Meta:
