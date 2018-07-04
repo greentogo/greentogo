@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.defaultfilters import pluralize
+from django.template.loader import render_to_string
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -54,6 +56,22 @@ def location(request, location_code):
                 number_of_boxes = int(request.POST.get('number_of_boxes', 1))
                 if subscription.can_tag_location(location, number_of_boxes):
                     subscription.tag_location(location, number_of_boxes)
+                    if location.notify and len(location.notifyEmail) > 1:
+                        message_data = {
+                            'email': user.email,
+                            'action': 'checked in'
+                        }
+                        message_txt = render_to_string('admin/notify_email.txt', message_data)
+                        message_html = render_to_string('admin/notify_email.html', message_data)
+                        email = EmailMultiAlternatives(
+                            subject='GreenToGo Box Notification',
+                            body=message_txt,
+                            from_email='greentogo@app.durhamgreentogo.com',
+                            to=[location.notifyEmail],
+                            reply_to=["amy@durhamgreentogo.com"]
+                        )
+                        email.attach_alternative(message_html, "text/html")
+                        email.send()
                     if location.service == location.CHECKIN:
                         msg = "You have returned {} {}.".format(
                             number_of_boxes, box_plural(number_of_boxes)

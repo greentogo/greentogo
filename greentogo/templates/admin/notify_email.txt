@@ -1,0 +1,10 @@
+{% load i18n %}
+
+Hello,
+
+A user has {{ action }} box(s).
+
+User email: {{ email }}
+
+
+Automated GreenToGo Email

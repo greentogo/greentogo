@@ -543,6 +543,16 @@ class Location(models.Model):
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
 
+    notify = models.BooleanField(
+        default=False,
+        help_text="If checked, an email will be sent any \
+        time a box is checked in or out of this location")
+
+    notifyEmail = models.CharField(
+        blank=True,
+        max_length=255,
+        help_text="Email for notify option")
+
     admin_location = models.BooleanField(
         blank=True,
         default=False,
