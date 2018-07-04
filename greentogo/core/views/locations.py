@@ -60,7 +60,7 @@ def location(request, location_code):
                     if location.notify and len(location.notifyEmail) > 1:
                         message_data = {
                             'email': user.email,
-                            'action': 'checked in'
+                            'action': location.service
                         }
                         message_txt = render_to_string('admin/notify_email.txt', message_data)
                         message_html = render_to_string('admin/notify_email.html', message_data)

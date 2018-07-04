@@ -2,7 +2,7 @@
 
 Hello,
 
-A user has {{ action }} box(s).
+A user has checked {{ action }} box(s).
 
 User email: {{ email }}
 
