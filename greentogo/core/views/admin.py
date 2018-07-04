@@ -74,7 +74,7 @@ def stock_report(request, *args, **kwargs):
 
     def get_estimated_at_checkin():
         count = sum([l.get_estimated_stock() for l in
-            Location.objects.checkin()])
+            checkin_locations])
         return count
 
     def get_estimated_checkedout():
