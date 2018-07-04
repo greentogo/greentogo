@@ -56,6 +56,7 @@ def location(request, location_code):
                 number_of_boxes = int(request.POST.get('number_of_boxes', 1))
                 if subscription.can_tag_location(location, number_of_boxes):
                     subscription.tag_location(location, number_of_boxes)
+                    # TODO MOVE THIS ENTIRE IF BLOCK TO MODELS.PY
                     if location.notify and len(location.notifyEmail) > 1:
                         message_data = {
                             'email': user.email,
