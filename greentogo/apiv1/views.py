@@ -166,3 +166,65 @@ class Statistics(GenericAPIView):
 
             }
         return jsend_success(data)
+
+class RfidView(APIView):
+    """
+    Get and Put for rfid chips to checkout or checkin a box 
+    """
+
+
+    def get(self, request, location_code, username):
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return jsend_fail({"error:": "User does not exist"}, status=404)
+
+        try:
+            location = Location.objects.get(code=location_code)
+        except Location.DoesNotExist:
+            return jsend_fail({"error:": "Location does not exist"}, status=404)
+
+        if user.has_active_subscription():
+            for sub in user.get_subscriptions():
+                if sub.available_boxes > 1:
+                    subscription = sub
+                    break
+            print(subscription)
+            # serializer = SubscriptionSerializer(subscription)
+            data = {
+                "Boxes Avail": subscription.available_boxes,
+                "Boxes Max": subscription.max_boxes,
+                "User Email": user.email,
+                "location": location.name
+                }
+            return jsend_success(data)
+        else:
+            return jsend_fail({"error:": "User exists but has no active subscriptions"}, status=401)
+
+    def put(self, request, location_code, username):
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return jsend_fail({"error:": "User does not exist"}, status=404)
+
+        try:
+            location = Location.objects.get(code=location_code)
+        except Location.DoesNotExist:
+            return jsend_fail({"error:": "Location does not exist"}, status=404)
+
+        if user.has_active_subscription():
+            for sub in user.get_subscriptions():
+                if sub.available_boxes > 1:
+                    subscription = sub
+                    break
+            print(subscription.available_boxes)
+            if subscription:
+                subscription.tag_location(location, 1)
+                data = {
+                    "msg": "1 box checked {}! {} out of {} now avaiable".format(location.service, subscription.available_boxes, subscription.max_boxes)
+                    }
+                return jsend_success(data)
+            else: 
+                return jsend_fail({"error:": "User has no boxes left in subscription"}, status=403)
+        else:
+            return jsend_fail({"error:": "User exists but has no active subscriptions"}, status=403)

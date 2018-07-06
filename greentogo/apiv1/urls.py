@@ -18,5 +18,10 @@ urlpatterns = [
         views.SubscriptionView.as_view(),
         name="api_v1_subscription"
     ),
-    url(r'^restaurants/', views.RestaurantsView.as_view(), name="api_v1_restaurants")
+    url(r'^restaurants/', views.RestaurantsView.as_view(), name="api_v1_restaurants"),
+    url(
+        r'^rfid/locationcode/(?P<location_code>\w+)/username/(?P<username>\w+)$',
+        views.RfidView.as_view(),
+        name="RfidView"
+    ),
 ]
