@@ -709,6 +709,7 @@ class Restaurant(models.Model):
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
     phase = models.PositiveIntegerField(default=1)
+    active = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
         if self.address and self.latitude is None or self.longitude is None:

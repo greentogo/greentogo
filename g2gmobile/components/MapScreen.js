@@ -1,9 +1,48 @@
 import React from 'react';
-import { StyleSheet, Image, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, Image, Animated, Text, View } from 'react-native';
 import { inject, observer } from 'mobx-react';
 import axios from '../apiClient';
 import { MapView } from 'expo';
 import openMap from 'react-native-open-maps';
+
+class FadeInView extends React.Component {
+    state = {
+        fadeAnim: new Animated.Value(0),  // Initial value for opacity: 0
+    }
+
+    componentDidMount() {
+        this.cycleAnimation();
+    }
+
+    cycleAnimation() {
+        Animated.sequence([
+            Animated.timing(this.state.fadeAnim, { // Animate over time
+                toValue: 1,                 // Animate to opacity: 1 (opaque)
+                duration: 500              // Make it take a while
+            }),
+            Animated.timing(this.state.fadeAnim, {  // The animated value to drive
+                toValue: 0,
+                duration: 500
+            })
+        ]).start(() => {                // Starts the animation
+            this.cycleAnimation();
+        });
+    }
+
+    render() {
+        let { fadeAnim } = this.state;
+        return (
+            <Animated.View                 // Special animatable View
+                style={{
+                    ...this.props.style,
+                    opacity: fadeAnim,         // Bind opacity to animated value
+                }}
+            >
+                {this.props.children}
+            </Animated.View>
+        );
+    }
+}
 
 
 @inject('appStore')
@@ -19,18 +58,20 @@ class MapScreen extends React.Component {
     }
 
     componentWillMount() {
-      axios.get('restaurants/', {
-          headers: {
-              'Authorization': `Token ${this.state.authToken}`
-          }
-      })
-      .then((json) => {
-        navigator.geolocation.getCurrentPosition(((user)=>{
+        // setInterval(flashText, 1000);
+        axios.get('restaurants/', {
+            headers: {
+                'Authorization': `Token ${this.state.authToken}`
+            }
+        })
+            .then((json) => {
+                this.setState({ locations: json.data.data })
+            })
+            .catch((e) => console.log(e))
+        navigator.geolocation.getCurrentPosition(((user) => {
             console.log(user.coords);
-            this.setState({locations: json.data.data, currentLocation: user.coords})
+            this.setState({ currentLocation: user.coords })
         }))
-      })
-      .catch((e) => console.log(e))
     }
 
 
@@ -45,7 +86,7 @@ class MapScreen extends React.Component {
         console.log(latitude);
         console.log(longitude);
         openMap({ latitude: latitude, longitude: longitude, query: title });
-      }
+    }
 
     render() {
         const styles = StyleSheet.create({
@@ -58,41 +99,76 @@ class MapScreen extends React.Component {
             calloutText: {
                 flex: 1,
                 textAlign: 'left'
+            },
+            calloutDirections: {
+                flex: 1,
+                textAlign: 'left',
+                fontWeight: 'bold'
             }
         });
-        return (
-            <MapView
-               style={{flex: 1}}
-               initialRegion={{
-                    latitude: 35.9940,
-                    longitude: -78.8986,
-                    latitudeDelta: 0.05,
-                    longitudeDelta: 0.05
-                }}>
-                {this.state.locations.map(marker => (
-                  <MapView.Marker
+        let markers = []
+        this.state.locations.map((marker, i) => {
+            markers.push(
+                <MapView.Marker
                     coordinate={{
                         latitude: marker.latitude,
                         longitude: marker.longitude
                     }}
                     // title={marker.name}
                     // description={marker.address}
-                    key={marker.name}
-                  >
+                    // key={marker.name}
+                    key={i}
+                    ref={comp => this['callout-' + i] = comp}
+                    zIndex={0}
+                    onPress={() => {
+                        markers.map((mark, index) => {
+                            this['callout-' + index].setNativeProps({ zIndex: 0 })
+                        })
+                        this['callout-' + i].setNativeProps({ zIndex: 9999 })
+                    }}
+                >
                     <Image
-                      source={require('../assets/icons/Drop-Pin_Box.png')}
-                      style={{ height: 75, width: 75 }}
+                        source={require('../assets/icons/Drop-Pin_Box.png')}
+                        style={{ height: 75, width: 75 }}
                     />
                     <MapView.Callout
-                    style={{width: 300}}
-                    onPress={() => this._goToLocation(marker.latitude, marker.longitude, marker.name)}
+                        style={{ width: 300 }}
+                        onPress={() => this._goToLocation(marker.latitude, marker.longitude, marker.name)}
                     >
                         <Text numberOfLines={1} style={styles.calloutTitle}>{marker.name}</Text>
                         <Text numberOfLines={1} style={styles.calloutText}>{marker.address}</Text>
-                        <Text numberOfLines={1} style={styles.calloutText}>Tap for directions!</Text>
+                        <Text numberOfLines={1} style={styles.calloutDirections}>Tap for directions!</Text>
                     </MapView.Callout>
-                  </MapView.Marker>
-                ))}
+                </MapView.Marker>
+            )
+        })
+        return (
+            <MapView
+                style={{ flex: 1 }}
+                initialRegion={{
+                    latitude: 35.9940,
+                    longitude: -78.8986,
+                    latitudeDelta: 0.05,
+                    longitudeDelta: 0.05
+                }}>
+                {this.state.currentLocation &&
+                    <MapView.Marker
+                        coordinate={{
+                            latitude: this.state.currentLocation.latitude,
+                            longitude: this.state.currentLocation.longitude
+                        }}
+                        title={"You"}
+                        key={"You"}
+                    >
+                        <FadeInView>
+                            <Image
+                                source={require('../assets/icons/you.png')}
+                                style={{ height: 15, width: 15 }}
+                            />
+                        </FadeInView>
+                    </MapView.Marker>
+                }
+                {markers}
             </MapView>
         )
     }

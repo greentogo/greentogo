@@ -144,8 +144,7 @@ class RestaurantsView(APIView):
     """Returns list of active restaurants"""
 
     def get(self, request, format=None):
-        phases = [1]
-        serializer = RestaurantSerializer(Restaurant.objects.filter(phase__in=phases), many=True)
+        serializer = RestaurantSerializer(Restaurant.objects.filter(active=True), many=True)
         return jsend_success(serializer.data)
 
 
