@@ -2,13 +2,15 @@ import React from 'react';
 import axios from '../apiClient';
 import { Icon, Button } from 'native-base';
 import { inject, observer } from 'mobx-react';
+import { NavigationActions } from '@expo/ex-navigation';
 import {
     StyleSheet,
     Text,
     View,
     Picker,
     WebView,
-    Linking
+    Linking,
+    TouchableOpacity
 } from 'react-native';
 import styles from "../styles";
 
@@ -24,6 +26,7 @@ class SubmissionScreen extends React.Component {
             boxCount: 1,
             locationData: this.props.route.params.locationData,
         }
+        this.goHome = this.goHome.bind(this)
     }
 
     componentWillMount() {
@@ -34,13 +37,13 @@ class SubmissionScreen extends React.Component {
             }
         }).then((response) => {
             if (response.data.data.email) this.props.appStore.email = response.data.data.email;
-            console.log(response.data.data)
+            // console.log(response.data.data)
             this.setState({ subscriptions: response.data.data.subscriptions }, () => {
                 if (this.state.subscriptions.length > 0) {
                     this.subscriptionChange(subscriptions[0].id);
                 }
             })
-            console.log(response.data.data)
+            // console.log(response.data.data)
         }).catch((error) => {
             if (err.response.status === 401) {
                 this.props.appStore.clearAuthToken();
@@ -50,15 +53,29 @@ class SubmissionScreen extends React.Component {
         })
     }
 
-    componentDidMount() {
-        console.log("MOUNTED")
-        console.log(this.state.locationData);
-    }
-
     static route = {
         navigationBar: {
-            title: `Check In/Out`
+            title: `Check In/Out`,
+            renderLeft: (route, props) =>  null
+            // renderLeft: (route, props) =>  <TouchableOpacity><Text style={{
+            //     fontSize: 50,
+            //     color: 'white',
+            //     paddingTop: 5,
+            //     paddingLeft: 5
+            // }} onPress={ () => {
+            //     // props.dispatch(NavigationActions.popToTop())
+            //     // console.log(this.navigator.geolocation.getCurrentPosition(((x)=>{
+            //     //     console.log(x)
+            //     // })));
+            //     console.log(NavigationActions);
+            //     console.log(NavigationActions.popToTop());
+            //     NavigationActions.popToTop();
+            // }} >X</Text></TouchableOpacity>
         }
+    }
+
+    goHome = () => {
+        this.props.navigator.popToTop();
     }
 
     add = () => {
@@ -146,6 +163,12 @@ class SubmissionScreen extends React.Component {
                 flexDirection: 'row',
                 justifyContent: 'center'
             },
+            goHomeButton: {
+                fontSize: 50,
+                color: 'black',
+                paddingTop: 5,
+                paddingLeft: 5
+            },
             icon: {
                 fontSize: 20,
                 fontWeight: '800',
@@ -181,6 +204,12 @@ class SubmissionScreen extends React.Component {
             return (
                 subscriptions.length > 0 ? (
                     <View>
+                        <TouchableOpacity>
+                            <Text
+                                style={styles.goHomeButton}
+                                onPress={() => this.goHome()}
+                            >X</Text>
+                        </TouchableOpacity>
                         {/* TODO: Add this back in once the tag/ endpoint accepts # of boxes */}
                         <View style={{ marginBottom: 10 }}><Text style={styles.headerText}>{this.state.locationData.name}</Text></View>
                         <View style={{ marginBottom: 10 }}><Text style={styles.headerText}>How many boxes to check {this.state.locationData.service.toLowerCase()}?</Text></View>

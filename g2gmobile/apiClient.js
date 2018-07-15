@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const url = 'https://app.durhamgreentogo.com/api/v1';
-// const url = 'http://c5e6d01f.ngrok.io/api/v1';
+// const url = 'https://app.durhamgreentogo.com/api/v1';
+const url = 'http://3c99a421.ngrok.io/api/v1';
 
 const instance = axios.create({
   baseURL: url,

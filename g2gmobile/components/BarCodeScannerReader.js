@@ -37,18 +37,18 @@ class BarCodeScannerReader extends React.Component {
     }
 
     async componentWillMount() {
+        console.log("Bar Code Scanner Has Been Mounted");
         const { status } = await Permissions.askAsync(Permissions.CAMERA);
         this.setState({ hasCameraPermission: status === 'granted' });
     }
-
 
     handleBarCodeRead = (data) => {
         if (!this.state.barCodeScanned) {
             let authToken = this.props.appStore.authToken;
             let url = JSON.stringify(data.data);
-            console.log(url)
+            console.log(url);
             this.setState({ barCodeScanned: true, error: false }, () => {
-                // url = "/locations/AY4LCB/"
+                // url = "/locations/AY4LCB/";
                 let locationUrl = /(\/locations\/)([A-Z0-9]{6})/.exec(url);
                 if (locationUrl && locationUrl[1] && locationUrl[2]) {
                     axios.get(locationUrl[1] + locationUrl[2], {
@@ -56,12 +56,18 @@ class BarCodeScannerReader extends React.Component {
                             'Authorization': `Token ${authToken}`
                         }
                     }).then((response) => {
-                        this.props.navigateNext(response.data.data);
-                        this.setState({ barCodeScanned: false });
+                        if (response.data.data.code){
+                            this.props.navigateNext(response.data.data);
+                        } else {
+                            this.setState({ barCodeScanned: false });
+                        }
                     }).catch((err) => {
                         console.log("ERROR");
                         console.log(err.response);
+                        this.setState({ barCodeScanned: false });
                     })
+                } else {
+                    this.setState({ barCodeScanned: false });
                 }
             });
         }

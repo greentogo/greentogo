@@ -1,8 +1,10 @@
 import React from 'react';
-import { Image } from 'react-native';
+import { StyleSheet, Image, TouchableOpacity, Text } from 'react-native';
 import { inject, observer } from 'mobx-react';
 import axios from '../apiClient';
 import { MapView } from 'expo';
+import openMap from 'react-native-open-maps';
+
 
 @inject('appStore')
 @observer
@@ -11,7 +13,8 @@ class MapScreen extends React.Component {
         super(props);
         this.state = {
             locations: [],
-            authToken: this.props.appStore.authToken
+            authToken: this.props.appStore.authToken,
+            currentLocation: null
         }
     }
 
@@ -22,18 +25,53 @@ class MapScreen extends React.Component {
           }
       })
       .then((json) => {
-        this.setState({locations: json.data.data})
+        navigator.geolocation.getCurrentPosition(((user)=>{
+            console.log(user.coords);
+            this.setState({locations: json.data.data, currentLocation: user.coords})
+        }))
       })
       .catch((e) => console.log(e))
     }
 
+
     static route = {
         navigationBar: {
-            title: 'Participating Restaurants'
+            title: `Participating Restaurants`,
+            renderRight: (route, props) =>  <TouchableOpacity><Text style={{
+                fontSize: 50,
+                color: 'white',
+                paddingTop: 5,
+                paddingLeft: 5
+            }} onPress={
+                /* Finds Current Location Apparently */
+                console.log("boop")
+                // this.navigator.geolocation.getCurrentPosition(((x)=>{
+                //     console.log(x)
+                // }))
+        } >X</Text></TouchableOpacity>
         }
     }
 
+    _goToLocation(latitude, longitude) {
+        console.log("Map Being Called");
+        console.log(latitude)
+        console.log(longitude)
+        openMap({ latitude: latitude, longitude: longitude });
+      }
+
     render() {
+        const styles = StyleSheet.create({
+            calloutTitle: {
+                flex: 1,
+                textAlign: 'left',
+                fontSize: 20,
+                fontWeight: 'bold',
+            },
+            calloutText: {
+                flex: 1,
+                textAlign: 'left'
+            }
+        });
         return (
             <MapView
                style={{flex: 1}}
@@ -52,12 +90,19 @@ class MapScreen extends React.Component {
                     title={marker.name}
                     description={marker.address}
                     key={marker.name}
-
                   >
                     <Image
                       source={require('../assets/icons/Drop-Pin_Box.png')}
                       style={{ height: 75, width: 75 }}
                     />
+                    <MapView.Callout
+                    style={{width: 300}}
+                    onPress={() => this._goToLocation(marker.latitude, marker.longitude)}
+                    >
+                        <Text numberOfLines={1} style={styles.calloutTitle}>{marker.name}</Text>
+                        <Text numberOfLines={1} style={styles.calloutText}>{marker.address}</Text>
+                        <Text numberOfLines={1} style={styles.calloutText}>Tap for directions!</Text>
+                    </MapView.Callout>
                   </MapView.Marker>
                 ))}
             </MapView>

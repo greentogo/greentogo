@@ -20,7 +20,7 @@ import stylesheet from "../styles";
 import {
     createRouter,
     NavigationProvider,
-    StackNavigation
+    StackNavigation,
 } from '@expo/ex-navigation';
 
 const Router = createRouter(() => ({
@@ -37,7 +37,6 @@ const Router = createRouter(() => ({
 class App extends React.Component {
     render() {
         const store = this.props.store;
-
         if (!store.authToken) {
             return <LoginScreen store={store} />;
         } else {

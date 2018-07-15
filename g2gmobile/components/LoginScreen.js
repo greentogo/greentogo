@@ -54,56 +54,68 @@ class LoginScreen extends React.Component {
     }
 
     attemptLogin() {
-        this.setState({ error: [], loading: true });
+        if (this.state.username && this.state.password){
+            this.setState({ error: [], loading: true });
 
-        axios({
-            method: 'post',
-            url: this.props.store.makeUrl('/auth/login/'),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            data: {
-                username: this.state.username,
-                password: this.state.password
-            }
-        }).then((json) => {
-            if (json.data.auth_token) {
-                console.log("YEAH ITS TRUE")
-                this.setState({ loading: false });
-                this.props.store.setAuthToken(json.data.auth_token);
-            }
-            console.log("Still going")
-            // Get the user data after successful login
-            axios.get('/me/', {
+            axios({
+                method: 'post',
+                url: this.props.store.makeUrl('/auth/login/'),
                 headers: {
-                    'Authorization': `Token ${json.data.auth_token}`
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                data: {
+                    username: this.state.username,
+                    password: this.state.password
                 }
-            }).then((response) => {
-                console.log(response.data)
-                this.props.store.setUserData(response.data.data);
-            }).catch((err) => {
-                console.log(err)
-            })
-        }).catch((error) => {
-            // TODO
-            // HANDLE THESE LOCALLY
-            if (error.response.data.non_field_errors) {
-                this.setState({ error: error.response.data.non_field_errors, loading: false });
-            } else if (error.response.data.password || error.response.data.username) {
-                let tempErrors = [];
-                if (error.response.data.username && error.response.data.username[0] === "This field may not be null.") {
-                    tempErrors.push("Username cannot be empty.");
+            }).then((json) => {
+                if (json.data.auth_token) {
+                    console.log("YEAH ITS TRUE")
+                    this.setState({ loading: false });
+                    this.props.store.setAuthToken(json.data.auth_token);
                 }
-                if (error.response.data.password && error.response.data.password[0] === "This field may not be null.") {
-                    tempErrors.push("Password cannot be empty.");
+                console.log("Still going")
+                // Get the user data after successful login
+                axios.get('/me/', {
+                    headers: {
+                        'Authorization': `Token ${json.data.auth_token}`
+                    }
+                }).then((response) => {
+                    console.log(response.data)
+                    this.props.store.setUserData(response.data.data);
+                }).catch((err) => {
+                    console.log(err);
+                    this.props.appStore.clearAuthToken();
+                })
+            }).catch((error) => {
+                // TODO
+                // HANDLE THESE LOCALLY
+                if (error.response.data.non_field_errors) {
+                    this.setState({ error: error.response.data.non_field_errors, loading: false });
+                } else if (error.response.data.password || error.response.data.username) {
+                    let tempErrors = [];
+                    if (error.response.data.username && error.response.data.username[0] === "This field may not be null.") {
+                        tempErrors.push("Username cannot be empty.");
+                    }
+                    if (error.response.data.password && error.response.data.password[0] === "This field may not be null.") {
+                        tempErrors.push("Password cannot be empty.");
+                    }
+                    this.setState({ error: tempErrors, loading: false });
+                } else {
+                    let tempErrors = ["We are sorry, we are having trouble processing your request. Please try again later."];
+                    this.setState({ error: tempErrors, loading: false });
                 }
-                this.setState({ error: tempErrors, loading: false });
-            } else {
-                let tempErrors = ["We are sorry, the app is having trouble processing your request. Please try again later: UNHANDLED EXCEPTION"];
-                this.setState({ error: tempErrors, loading: false });
+            });
+        } else {
+            let tempErrors = [];
+            if (!this.state.username){
+                tempErrors.push("Username cannot be empty.");
             }
-        });
+            if (!this.state.password){
+                tempErrors.push("Password cannot be empty.");
+            }
+            this.setState({ error: tempErrors, loading: false });
+        }
     }
 
     attemptSignUp() {
@@ -186,7 +198,6 @@ class LoginScreen extends React.Component {
                         <G2GTitleImage />
                     </Header>
                     <Content style={{ alignContent: 'center' }}>
-                        {errorMessages}
                         {this.state.type === 'login' ?
                             // Login form
                             <Form>
@@ -207,6 +218,8 @@ class LoginScreen extends React.Component {
                                         onChangeText={(text) => this.setState({ password: text })}
                                     />
                                 </Item>
+                                {errorMessages}
+                                {loadingSpinner}
                                 {this.state.error.password ? <Text style={{ color: 'red', textAlign: 'center' }}>{this.state.error.password}</Text> : <Text></Text>}
                                 <Button style={{ backgroundColor: styles.primaryCream }} light full title="Login" onPress={() => { this.attemptLogin() }}>
                                     <Text style={{ fontWeight: 'bold', color: styles.primaryColor }}>Login</Text>
@@ -244,6 +257,8 @@ class LoginScreen extends React.Component {
                                             value={this.state.passwordConfirmation}
                                         />
                                     </Item>
+                                    {errorMessages}
+                                    {loadingSpinner}
                                     <Button style={{ backgroundColor: styles.primaryCream }} light full title="Login" onPress={() => { this.attemptLogin }}>
                                         <Text style={{ fontWeight: 'bold', color: styles.primaryColor }}>Sign Up</Text>
                                     </Button>
@@ -269,6 +284,8 @@ class LoginScreen extends React.Component {
                                                 onChangeText={(text) => this.setState({ username: text })}
                                             />
                                         </Item>
+                                        {errorMessages}
+                                        {loadingSpinner}
                                         <Button style={{ backgroundColor: styles.primaryCream }} light full title="resetPassword" onPress={() => { this.attemptPasswordReset() }}>
                                             <Text style={{ fontWeight: 'bold', color: styles.primaryColor }}>Reset Password</Text>
                                         </Button>
@@ -277,7 +294,6 @@ class LoginScreen extends React.Component {
                                         </Button>
                                     </Form>
                         }
-                        {loadingSpinner}
                     </Content>
                 </Container>
             )

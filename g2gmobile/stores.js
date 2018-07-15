@@ -1,6 +1,7 @@
 import { observable, action } from 'mobx';
 import { enableLogging } from 'mobx-logger';
 import simpleStore from 'react-native-simple-store';
+import { createNavigationEnabledStore, NavigationReducer } from '@expo/ex-navigation';
 import axios from './apiClient';
 
 enableLogging({
@@ -13,8 +14,8 @@ enableLogging({
 export class AppStore {
     @observable authToken = ''
     @observable user = {}
-    // siteUrl = 'http://c5e6d01f.ngrok.io/api/v1'
-    siteUrl = 'https://app.durhamgreentogo.com/api/v1'
+    siteUrl = 'http://3c99a421.ngrok.io/api/v1'
+    // siteUrl = 'https://app.durhamgreentogo.com/api/v1'
 
     constructor() {
         console.log('appStore constructor')
@@ -58,7 +59,8 @@ export class AppStore {
             console.log("User data success")
             this.setUserData(response.data.data);
         }).catch((err) => {
-            console.log(err)
+            console.log(err);
+            console.log(this.clearAuthToken());
         })
     }
     
