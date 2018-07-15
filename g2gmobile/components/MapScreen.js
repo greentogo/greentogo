@@ -22,7 +22,8 @@ class FadeInView extends React.Component {
             }),
             Animated.timing(this.state.fadeAnim, {  // The animated value to drive
                 toValue: 0,
-                duration: 500
+                duration: 500,
+                delay: 500                // Make it last for a little
             })
         ]).start(() => {                // Starts the animation
             this.cycleAnimation();
@@ -53,12 +54,11 @@ class MapScreen extends React.Component {
         this.state = {
             locations: [],
             authToken: this.props.appStore.authToken,
-            currentLocation: null
+            currentLocation: false
         }
     }
 
     componentWillMount() {
-        // setInterval(flashText, 1000);
         axios.get('restaurants/', {
             headers: {
                 'Authorization': `Token ${this.state.authToken}`
@@ -68,17 +68,30 @@ class MapScreen extends React.Component {
                 this.setState({ locations: json.data.data })
             })
             .catch((e) => console.log(e))
-        navigator.geolocation.getCurrentPosition(((user) => {
-            console.log(user.coords);
-            this.setState({ currentLocation: user.coords })
-        }))
+        this._getCurrentLocation();
+        this._interval = setInterval(() => {
+            this._getCurrentLocation();
+        }, 5000);
     }
+
 
 
     static route = {
         navigationBar: {
             title: `Participating Restaurants`,
         }
+    }
+
+    componentWillUnmount() {
+        clearInterval(this._interval);
+    }
+
+    _getCurrentLocation() {
+        navigator.geolocation.getCurrentPosition(((user) => {
+            console.log("Requesting Location");
+            console.log(user.coords);
+            this.setState({ currentLocation: user.coords })
+        }))
     }
 
     _goToLocation(latitude, longitude, title) {
