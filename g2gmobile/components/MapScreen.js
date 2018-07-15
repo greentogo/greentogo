@@ -37,26 +37,14 @@ class MapScreen extends React.Component {
     static route = {
         navigationBar: {
             title: `Participating Restaurants`,
-            renderRight: (route, props) =>  <TouchableOpacity><Text style={{
-                fontSize: 50,
-                color: 'white',
-                paddingTop: 5,
-                paddingLeft: 5
-            }} onPress={
-                /* Finds Current Location Apparently */
-                console.log("boop")
-                // this.navigator.geolocation.getCurrentPosition(((x)=>{
-                //     console.log(x)
-                // }))
-        } >X</Text></TouchableOpacity>
         }
     }
 
-    _goToLocation(latitude, longitude) {
+    _goToLocation(latitude, longitude, title) {
         console.log("Map Being Called");
-        console.log(latitude)
-        console.log(longitude)
-        openMap({ latitude: latitude, longitude: longitude });
+        console.log(latitude);
+        console.log(longitude);
+        openMap({ latitude: latitude, longitude: longitude, query: title });
       }
 
     render() {
@@ -87,8 +75,8 @@ class MapScreen extends React.Component {
                         latitude: marker.latitude,
                         longitude: marker.longitude
                     }}
-                    title={marker.name}
-                    description={marker.address}
+                    // title={marker.name}
+                    // description={marker.address}
                     key={marker.name}
                   >
                     <Image
@@ -97,7 +85,7 @@ class MapScreen extends React.Component {
                     />
                     <MapView.Callout
                     style={{width: 300}}
-                    onPress={() => this._goToLocation(marker.latitude, marker.longitude)}
+                    onPress={() => this._goToLocation(marker.latitude, marker.longitude, marker.name)}
                     >
                         <Text numberOfLines={1} style={styles.calloutTitle}>{marker.name}</Text>
                         <Text numberOfLines={1} style={styles.calloutText}>{marker.address}</Text>
