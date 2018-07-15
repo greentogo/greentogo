@@ -78,7 +78,7 @@ class ContainerSuccessScreen extends React.Component {
                 </TouchableOpacity>
                 <View style={styles.textContainer}>
                     <Text style={styles.text}>
-                        Checked out
+                        Checked {this.props.route.params.locationData.service.toLowerCase()}
                     </Text>
                     <Text style={styles.text}>
                         {this.state.boxCount === 1 ? "1 box" : this.state.boxCount + " boxes"}

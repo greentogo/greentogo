@@ -25,14 +25,6 @@ class ScanQRCode extends React.Component {
         this.props.navigator.push('submission', { locationData: locationData });
     };
 
-    componentDidUpdate(){
-        console.log("SCANQRCODE UPDATED");
-    };
-
-    componentDidMount(){
-        console.log("SCANQRCODE MOUNTED");
-    };
-
     render() {
         return (
             <View style={{ flex: 1 }}>
