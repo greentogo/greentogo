@@ -127,15 +127,15 @@ class HomeScreen extends React.Component {
     render() {
         let availableBoxes = "";
         let maxBoxes = "";
+        let boxesAvailableBanner = "";
         if (this.props.appStore.user) {
             availableBoxes = this.props.appStore.user.availableBoxes + "";
             maxBoxes = this.props.appStore.user.maxBoxes + "";
-        }
-        let boxesAvailableBanner = "";
-        if (this.props.appStore.user.subscriptions.length > 0) {
-            boxesAvailableBanner = `${availableBoxes} / ${maxBoxes} boxes available`;
-        } else {
-            boxesAvailableBanner = "You do not have a Subscription.";
+            if (this.props.appStore.user.subscriptions.length > 0) {
+                boxesAvailableBanner = `${availableBoxes} / ${maxBoxes} boxes available`;
+            } else {
+                boxesAvailableBanner = "You do not have a Subscription.";
+            }
         }
         return (
             <Content style={{ flex: 1, backgroundColor: styles.primaryCream }}>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Image, Animated, Text, View } from 'react-native';
+import { StyleSheet, Image, ImageBackground, Animated, Text, View } from 'react-native';
 import { inject, observer } from 'mobx-react';
 import axios from '../apiClient';
 import { MapView } from 'expo';
@@ -139,13 +139,19 @@ class MapScreen extends React.Component {
                         })
                         this['callout-' + i].setNativeProps({ zIndex: 9999 })
                     }}
+                    // onLoad={() => this.forceUpdate()}
+                    // onLayout={() => this.forceUpdate()}
                 >
-                    <Image
+                    <ImageBackground
                         source={require('../assets/icons/Drop-Pin_Box.png')}
-                        style={{ height: 75, width: 75 }}
-                    />
+                        style={{ height: 75, width: 75, zIndex: 1 }}
+                        onLoad={() => this.forceUpdate()}
+                        onLayout={() => this.forceUpdate()}
+                    >
+                        <Text style={{width:0,height:0}}>{Math.random()}</Text>
+                    </ImageBackground>
                     <MapView.Callout
-                        style={{ width: 300 }}
+                        style={{ width: 300, zIndex: 9999 }}
                         onPress={() => this._goToLocation(marker.latitude, marker.longitude, marker.name)}
                     >
                         <Text numberOfLines={1} style={styles.calloutTitle}>{marker.name}</Text>
@@ -174,10 +180,13 @@ class MapScreen extends React.Component {
                         key={"You"}
                     >
                         <FadeInView>
-                            <Image
+                            <ImageBackground
                                 source={require('../assets/icons/you.png')}
                                 style={{ height: 15, width: 15 }}
-                            />
+                                onLoad={() => this.forceUpdate()}
+                                onLayout={() => this.forceUpdate()}
+                            >
+                            </ImageBackground>
                         </FadeInView>
                     </MapView.Marker>
                 }
