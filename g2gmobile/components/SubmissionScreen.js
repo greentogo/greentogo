@@ -10,7 +10,8 @@ import {
     Picker,
     WebView,
     Linking,
-    TouchableOpacity
+    TouchableOpacity,
+    ActivityIndicator
 } from 'react-native';
 import styles from "../styles";
 
@@ -20,13 +21,14 @@ class SubmissionScreen extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            loading: true,
+            error: false,
             subscriptions: [],
             subscriptionId: false,
             selectedSubscription: false,
             boxCount: 1,
             locationData: this.props.route.params.locationData,
         }
-        this.goHome = this.goHome.bind(this)
     }
 
     componentWillMount() {
@@ -37,13 +39,11 @@ class SubmissionScreen extends React.Component {
             }
         }).then((response) => {
             if (response.data.data.email) this.props.appStore.email = response.data.data.email;
-            // console.log(response.data.data)
-            this.setState({ subscriptions: response.data.data.subscriptions }, () => {
+            this.setState({ subscriptions: response.data.data.subscriptions, loading: false }, () => {
                 if (this.state.subscriptions.length > 0) {
                     this.subscriptionChange(subscriptions[0].id);
                 }
             })
-            // console.log(response.data.data)
         }).catch((error) => {
             if (err.response.status === 401) {
                 this.props.appStore.clearAuthToken();
@@ -107,6 +107,7 @@ class SubmissionScreen extends React.Component {
     subscriptionChange = (subscriptionId) => {
         let boxCount;
         let selectedSubscription;
+        let error;
         // find the selected subscription
         subscriptions.forEach((subscription) => {
             if (subscription.id === subscriptionId) {
@@ -115,22 +116,27 @@ class SubmissionScreen extends React.Component {
         });
         switch (this.state.locationData.service) {
             case 'IN':
-                if (selectedSubscription.available_boxes === selectedSubscription.max_boxes) {
+                if (selectedSubscription.available_boxes >= selectedSubscription.max_boxes) {
                     boxCount = 0;
+                    error = "You have checked in all of your boxes for this subscription";
                 } else {
                     boxCount = 1;
+                    error = false;
                 }
                 break;
             case 'OUT':
                 if (selectedSubscription.available_boxes === 0) {
                     boxCount = 0;
+                    error = "You have checked out all of your boxes for this subscription";
                 } else {
                     boxCount = 1;
+                    error = false;
                 }
                 break;
         }
         if (boxCount === undefined) { boxCount = 1 };
         this.setState({
+            error,
             subscriptionId,
             boxCount,
             selectedSubscription
@@ -150,7 +156,6 @@ class SubmissionScreen extends React.Component {
             number_of_boxes: this.state.boxCount
         }, config).then((response) => {
             // console.log(response)
-            // TODO: Route to a success screen
             this.props.navigator.push('containerSuccessScreen', { boxCount: this.state.boxCount, locationData: this.state.locationData });
         }).catch((error) => {
             console.log(error.response);
@@ -183,6 +188,31 @@ class SubmissionScreen extends React.Component {
                 fontWeight: '800',
                 textAlign: 'center'
             },
+            submitButton:{
+                paddingRight:20,
+                paddingLeft:20,
+                paddingTop:20,
+                paddingBottom:20,
+                backgroundColor:'#5fb75f',
+                borderRadius:10,
+                borderWidth: 1,
+                borderColor: '#fff'
+            },
+            submitButtonBlocked: {
+                paddingRight:20,
+                paddingLeft:20,
+                paddingTop:20,
+                paddingBottom:20,
+                backgroundColor:'#808080',
+                borderRadius:10,
+                borderWidth: 1,
+                borderColor: '#fff'
+            },
+            loadingContainer: {
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center'
+            },
             noSubText: {
 
             }
@@ -202,7 +232,12 @@ class SubmissionScreen extends React.Component {
             );
         } else {
             return (
-                subscriptions.length > 0 ? (
+                this.state.loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+                ) : (
+                this.state.subscriptions.length > 0 ? (
                     <View>
                         <TouchableOpacity>
                             <Text
@@ -234,7 +269,7 @@ class SubmissionScreen extends React.Component {
                                 onValueChange={(itemValue, itemIndex) => this.subscriptionChange(itemValue)}
                             >
                                 {
-                                    subscriptions.map((subscription, index) => {
+                                    this.state.subscriptions.map((subscription, index) => {
                                         return <Picker.Item
                                             key={index}
                                             label={`${subscription.name} (${subscription.available_boxes}/${subscription.max_boxes})`}
@@ -243,12 +278,21 @@ class SubmissionScreen extends React.Component {
                                     })
                                 }
                             </Picker>
+                            {this.state.error &&
+                                <View style={styles.centeredRow}>
+                                    <Text style={styles.headerText}>{this.state.error}</Text>
+                                </View>
+                            }
                             <View style={styles.centeredRow}>
-                                <Button
-                                    success
-                                    onPress={this.submit}>
+                            {this.state.error ? (
+                                <TouchableOpacity style={styles.submitButtonBlocked}>
+                                    <Text style={{ color: '#FFFFFF' }}>Cannot Submit</Text>
+                                </TouchableOpacity>
+                            ) : (
+                                <TouchableOpacity style={styles.submitButton} onPress={this.submit}>
                                     <Text style={{ color: '#FFFFFF' }}>Submit</Text>
-                                </Button>
+                                </TouchableOpacity>
+                            )}
                             </View>
                         </View>
                     </View>
@@ -262,6 +306,8 @@ class SubmissionScreen extends React.Component {
                         </View>
                     )
             )
+            )
+
         }
     }
 }

@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Constants } from 'expo';
 
+
 class ContainerSuccessScreen extends React.Component {
     constructor(props) {
         super(props)
