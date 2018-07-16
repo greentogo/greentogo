@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Image, ImageBackground, Animated, Text, View } from 'react-native';
+import { StyleSheet, Platform, Image, ImageBackground, Animated, Text, View } from 'react-native';
 import { inject, observer } from 'mobx-react';
 import axios from '../apiClient';
 import { MapView } from 'expo';
@@ -58,6 +58,10 @@ class MapScreen extends React.Component {
         }
     }
 
+    static navigationOptions = {
+        title: 'Participating Restaurants',
+    };
+
     componentWillMount() {
         axios.get('restaurants/', {
             headers: {
@@ -68,22 +72,14 @@ class MapScreen extends React.Component {
                 this.setState({ locations: json.data.data })
             })
             .catch((e) => console.log(e))
-        this._getCurrentLocation();
-        this._interval = setInterval(() => {
-            this._getCurrentLocation();
-        }, 5000);
-    }
-
-
-
-    static route = {
-        navigationBar: {
-            title: `Participating Restaurants`,
-        }
+        // this._getCurrentLocation();
+        // this._interval = setInterval(() => {
+        //     this._getCurrentLocation();
+        // }, 5000);
     }
 
     componentWillUnmount() {
-        clearInterval(this._interval);
+        // clearInterval(this._interval);
     }
 
     _getCurrentLocation() {
@@ -139,17 +135,13 @@ class MapScreen extends React.Component {
                         })
                         this['callout-' + i].setNativeProps({ zIndex: 9999 })
                     }}
-                    // onLoad={() => this.forceUpdate()}
-                    // onLayout={() => this.forceUpdate()}
                 >
-                    <ImageBackground
+                    {Platform.OS === 'ios' && <ImageBackground
                         source={require('../assets/icons/Drop-Pin_Box.png')}
                         style={{ height: 75, width: 75, zIndex: 1 }}
-                        onLoad={() => this.forceUpdate()}
-                        onLayout={() => this.forceUpdate()}
                     >
-                        <Text style={{width:0,height:0}}>{Math.random()}</Text>
-                    </ImageBackground>
+                        <Text style={{ width: 0, height: 0 }}>{Math.random()}</Text>
+                    </ImageBackground>}
                     <MapView.Callout
                         style={{ width: 300, zIndex: 9999 }}
                         onPress={() => this._goToLocation(marker.latitude, marker.longitude, marker.name)}
@@ -183,8 +175,6 @@ class MapScreen extends React.Component {
                             <ImageBackground
                                 source={require('../assets/icons/you.png')}
                                 style={{ height: 15, width: 15 }}
-                                onLoad={() => this.forceUpdate()}
-                                onLayout={() => this.forceUpdate()}
                             >
                             </ImageBackground>
                         </FadeInView>

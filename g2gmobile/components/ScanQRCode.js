@@ -15,14 +15,12 @@ class ScanQRCode extends React.Component {
         }
     }
 
-    static route = {
-        navigationBar: {
-            title: 'Scan QR Code'
-        }
-    }
+    static navigationOptions = {
+        title: 'Scan QR Code',
+    };
 
     navigateNext = (locationData) => {
-        this.props.navigator.push('submission', { locationData: locationData });
+        this.props.navigation.navigate('submission', { locationData: locationData });
     };
 
     render() {

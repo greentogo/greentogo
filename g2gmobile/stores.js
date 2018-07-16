@@ -15,7 +15,7 @@ export class AppStore {
     @observable authToken = ''
     @observable user = {}
     // siteUrl = 'https://app.durhamgreentogo.com/api/v1'
-    siteUrl = 'http://3c99a421.ngrok.io/api/v1'
+    siteUrl = 'http://d0113866.ngrok.io/api/v1'
 
     constructor() {
         console.log('appStore constructor')
@@ -65,7 +65,6 @@ export class AppStore {
     }
     
     @action setUserData(data) {
-        // console.log('setting user data ', data);
         this.user = data
         if (data.subscriptions) {
             this.user.maxBoxes = this.reduceBoxes(data.subscriptions, "max_boxes")

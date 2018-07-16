@@ -13,20 +13,24 @@ class ContainerSuccessScreen extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            boxCount: this.props.route.params.boxCount,
+            boxCount: this.props.navigation.state.params.boxCount,
             time: new Date()
         }
     }
-    static route  = {
-        navigationBar: {
-            title: `Check In/Out success!`,
-            renderLeft: (route, props) => null
-        }
-    }
 
-    goHome = () => {
-        this.props.navigator.popToTop();
-    }
+    static navigationOptions = ({ navigation }) => {
+        return {
+            title: 'Check In/Out success!',
+            headerLeft: (
+                <TouchableOpacity><Text style={{
+                    fontSize: 50,
+                    color: 'white',
+                    paddingTop: 5,
+                    paddingLeft: 5
+                }} onPress={() => navigation.popToTop()} >X</Text></TouchableOpacity>
+            ),
+        }
+    };
 
     render() {
         const styles = StyleSheet.create({
@@ -38,12 +42,6 @@ class ContainerSuccessScreen extends React.Component {
             statusBar: {
                 paddingTop: Constants.statusBarHeight,
                 backgroundColor: '#ffffff'
-            },
-            goHomeButton: {
-                fontSize: 50,
-                color: 'white',
-                paddingTop: 5,
-                paddingLeft: 5
             },
             textContainer: {
                 flex: 1,
@@ -70,15 +68,9 @@ class ContainerSuccessScreen extends React.Component {
 
         return (
             <View style={styles.topContainer}>
-                <TouchableOpacity>
-                    <Text
-                        style={styles.goHomeButton}
-                        onPress={() => this.goHome()}
-                    >X</Text>
-                </TouchableOpacity>
                 <View style={styles.textContainer}>
                     <Text style={styles.text}>
-                        Checked {this.props.route.params.locationData.service.toLowerCase()}
+                        Checked {this.props.navigation.state.params.locationData.service.toLowerCase()}
                     </Text>
                     <Text style={styles.text}>
                         {this.state.boxCount === 1 ? "1 box" : this.state.boxCount + " boxes"}

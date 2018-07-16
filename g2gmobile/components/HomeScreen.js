@@ -45,12 +45,10 @@ class HomeScreen extends React.Component {
         this.props.appStore.getUserData()
     }
 
-    static route = {
-        navigationBar: {
-            renderTitle: (route, props) => <G2GTitleImage />,
-            backgroundColor: '#628e86'
-        }
-    }
+    static navigationOptions = {
+        headerTitle: <G2GTitleImage />,
+    };
+
     componentWillMount() {
         let authToken = this.props.appStore.authToken;
         axios.get('me/', {
@@ -71,19 +69,23 @@ class HomeScreen extends React.Component {
     }
 
     goToMap = () => {
-        this.props.navigator.push('map');
+        // this.props.navigator.push('map');
+        this.props.navigation.navigate('map');
     }
 
     goToScanQRCode = () => {
-        this.props.navigator.push('scanQRCode');
+        // this.props.navigator.push('scanQRCode');
+        this.props.navigation.navigate('scanQRCode');
     }
 
     goToReturn = () => {
-        this.props.navigator.push('returnBox');
+        // this.props.navigator.push('returnBox');
+        this.props.navigation.navigate('returnBox');
     }
 
     goToAccount = () => {
-        this.props.navigator.push('account')
+        // this.props.navigator.push('account');
+        this.props.navigation.navigate('account');
     }
 
     logOut = () => {

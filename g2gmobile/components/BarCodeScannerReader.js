@@ -4,7 +4,6 @@ import { inject, observer } from "mobx-react";
 import axios from '../apiClient';
 import styles from "../styles";
 import { Permissions, BarCodeScanner } from 'expo';
-import SubmissionScreen from './SubmissionScreen';
 
 import {
     Container,

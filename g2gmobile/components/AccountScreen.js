@@ -23,15 +23,12 @@ class AccountScreen extends React.Component {
         this.state = {
             ...this.props.appStore.user,
             redirectToWeb: false,
-
         }
     }
 
-    static route = {
-        navigationBar: {
-            title: 'Account'
-        }
-    }
+    static navigationOptions = {
+        title: 'Account',
+    };
 
     render() {
         if (this.state.redirectToWeb) {
