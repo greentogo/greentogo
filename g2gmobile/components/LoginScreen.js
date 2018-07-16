@@ -54,7 +54,7 @@ class LoginScreen extends React.Component {
     }
 
     attemptLogin() {
-        if (this.state.username && this.state.password){
+        if (this.state.username && this.state.password) {
             this.setState({ error: [], loading: true });
 
             axios({
@@ -108,10 +108,10 @@ class LoginScreen extends React.Component {
             });
         } else {
             let tempErrors = [];
-            if (!this.state.username){
+            if (!this.state.username) {
                 tempErrors.push("Username cannot be empty.");
             }
-            if (!this.state.password){
+            if (!this.state.password) {
                 tempErrors.push("Password cannot be empty.");
             }
             this.setState({ error: tempErrors, loading: false });

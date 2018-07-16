@@ -99,7 +99,7 @@ class SubmissionScreen extends React.Component {
         let selectedSubscription;
         let error;
         // find the selected subscription
-        subscriptions.forEach((subscription) => {
+        this.state.subscriptions.forEach((subscription) => {
             if (subscription.id === subscriptionId) {
                 selectedSubscription = subscription;
             }
@@ -163,7 +163,6 @@ class SubmissionScreen extends React.Component {
                 color: 'white',
                 textAlign: 'center',
                 width: 50,
-                // height: 50,
                 alignSelf: 'center'
             },
             headerText: {

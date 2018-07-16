@@ -157,12 +157,18 @@ class Statistics(GenericAPIView):
     # Tell DRF documentation you are not a list view.
     action = 'retrieve'
 
-    def get(self, request):
+    def get(self, request, username):
+        boxesCheckedIn = 0
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return jsend_fail({"error:": "User does not exist"}, status=404)
+        for sub in user.get_subscriptions():
+            boxesCheckedIn = boxesCheckedIn + int((LocationTag.objects.filter(subscription_id=sub.id)).count()/2)
         data = {
             "total_boxes_returned": LocationTag.objects.checkin().count(),
-            "total_users": User.objects.count(),
-            "total_subscriptions": Subscription.objects.active().count(),
-
+            "total_user_boxes_returned": boxesCheckedIn,
+            "total_active_subscriptions": Subscription.objects.active().count(),
             }
         return jsend_success(data)
 
