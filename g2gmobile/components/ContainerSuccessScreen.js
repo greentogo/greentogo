@@ -46,7 +46,6 @@ class ContainerSuccessScreen extends React.Component {
             textContainer: {
                 flex: 1,
                 flexDirection: 'column',
-                //alignItems: 'center',//????
                 justifyContent: 'center'
             },
             text: {

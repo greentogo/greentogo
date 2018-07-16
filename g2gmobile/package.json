@@ -2,7 +2,7 @@
   "name": "g2gmobile",
   "version": "0.0.0",
   "description": "Hello Expo!",
-  "author": null,
+  "author": "GreenToGo",
   "private": true,
   "main": "main.js",
   "dependencies": {

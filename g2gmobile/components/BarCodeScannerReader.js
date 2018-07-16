@@ -1,28 +1,12 @@
 import React from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { inject, observer } from "mobx-react";
 import axios from '../apiClient';
-import styles from "../styles";
 import { Permissions, BarCodeScanner } from 'expo';
 
 import {
-    Container,
-    Header,
-    Body,
-    Title,
-    Content,
-    Form,
-    Item,
-    Input,
-    Button,
-    List,
-    ListItem,
     Text,
-    Icon,
-    Left,
-    Right
 } from "native-base";
-import stylesheet from "../styles";
 
 @inject("appStore")
 @observer
@@ -45,9 +29,7 @@ class BarCodeScannerReader extends React.Component {
         if (!this.state.barCodeScanned) {
             let authToken = this.props.appStore.authToken;
             let url = JSON.stringify(data.data);
-            console.log(url);
             this.setState({ barCodeScanned: true, error: false }, () => {
-                // url = "/locations/AY4LCB/";
                 let locationUrl = /(\/locations\/)([A-Z0-9]{6})/.exec(url);
                 if (locationUrl && locationUrl[1] && locationUrl[2]) {
                     axios.get(locationUrl[1] + locationUrl[2], {

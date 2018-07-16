@@ -53,23 +53,6 @@ class AccountScreen extends React.Component {
     }
 
     render() {
-        // const styles = StyleSheet.create({
-        //     calloutTitle: {
-        //         flex: 1,
-        //         textAlign: 'left',
-        //         fontSize: 20,
-        //         fontWeight: 'bold',
-        //     },
-        //     calloutText: {
-        //         flex: 1,
-        //         textAlign: 'left'
-        //     },
-        //     calloutDirections: {
-        //         flex: 1,
-        //         textAlign: 'left',
-        //         fontWeight: 'bold'
-        //     }
-        // });
         if (this.state.redirectToWeb) {
             let uri = this.state.redirectToWeb;
             return (

@@ -98,7 +98,6 @@ class SubmissionScreen extends React.Component {
         let boxCount;
         let selectedSubscription;
         let error;
-        // find the selected subscription
         this.state.subscriptions.forEach((subscription) => {
             if (subscription.id === subscriptionId) {
                 selectedSubscription = subscription;

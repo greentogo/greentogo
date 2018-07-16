@@ -1,12 +1,6 @@
 import React from 'react';
 import { Constants } from 'expo';
 import { observer, Provider } from 'mobx-react';
-import {
-    StyleSheet,
-    Text,
-    View,
-    TouchableOpacity
-} from 'react-native';
 import styles from '../styles';
 import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
