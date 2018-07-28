@@ -17,8 +17,6 @@ import datetime
 
 import rollbar
 
-rollbar.init(settings.ROLLBAR_KEY, settings.ROLLBAR_ENV)
-
 endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
 logger = logging.getLogger('django')
 User = get_user_model()
@@ -163,7 +161,9 @@ def handle_invoice_upcoming(event):
                     int(invoice.next_payment_attempt)
                 ).strftime('%B %d')
             else:
-                logger.error('next_payment_attempt WAS NULL, HARDCODING UPCOMING INVOICE PLUS SEVEN DAYS')
+                dateNotFoundMessage = "next_payment_attempt was null, hardcoding upcoming invoice plus seven days"
+                logger.error(dateNotFoundMessage)
+                rollbar.report_message(dateNotFoundMessage, "error")
                 renew_date =  datetime.datetime.fromtimestamp(
                     int(invoice.date) + 604800
                 ).strftime('%B %d')
@@ -182,5 +182,7 @@ def handle_invoice_upcoming(event):
                     }
             )
     except Exception as e:
-        rollbar.report_exc_info()
+        genericErrorMessage = "invoice.upcoming webhook fail for user {}".format(invoice.customer)
+        logger.error(genericErrorMessage)
+        rollbar.report_message(genericErrorMessage, "error")
         raise e
