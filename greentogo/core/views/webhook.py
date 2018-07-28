@@ -141,7 +141,7 @@ def handle_invoice_upcoming(event):
     invoice = event.data.object
     customer = User.objects.filter(stripe_id=invoice.customer).first()
     if not customer:
-        logger.warn(
+        logger.error(
             "Customer {} not found for invoice.upcoming webhook".format(invoice.customer)
         )
         return
@@ -149,7 +149,8 @@ def handle_invoice_upcoming(event):
 
     # Send email to customer if invoice needs payment
     try:
-        if customer.email:
+        # if customer.email:
+        if True:
             #convert the date to readable string
             if invoice.next_payment_attempt:
                 renew_date = datetime.datetime.fromtimestamp(
@@ -166,7 +167,8 @@ def handle_invoice_upcoming(event):
             send_templated_mail(
                 template_name='upcoming_invoice',
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[customer.email,],
+                recipient_list=['jonathantcanfield@gmail.com',],
+                # recipient_list=[customer.email,],
                 context={
                         'renew_date': renew_date,
                         'amount_due': invoice.amount_due,
