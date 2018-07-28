@@ -71,6 +71,11 @@ def add_subscription(request, *args, **kwargs):
                     
 
             try:
+                if corporate_code:
+                    sub_kwargs['billing'] = 'send_invoice'
+                    sub_kwargs['days_until_due'] = 30
+                # sub_kwargs
+                # {'customer': 'cus_Ck3yEqbljkn0Zp', 'source': 'tok_1CszGPDR4unvi416aLuq8bR5', 'items': [{'plan': '4-boxesC9MB77'}]}
                 stripe_subscription = stripe.Subscription.create(**sub_kwargs)
                 subscription = Subscription.create_from_stripe_sub(
                     user=user,
@@ -79,12 +84,12 @@ def add_subscription(request, *args, **kwargs):
                     corporate_code=corporate_code,
                     coupon_code=coupon_code
                 )
-                if corporate_code:
-                    #'cancel' the subscription, so that the corporate plans do not auto renew
-                    stripe_sub = subscription.get_stripe_subscription()
-                    stripe_sub.delete(at_period_end = True)
-                    subscription.cancelled = True
-                    subscription.save()
+                #'cancel' the subscription, so that the corporate plans do not auto renew
+                # if corporate_code:
+                #     stripe_sub = subscription.get_stripe_subscription()
+                #     stripe_sub.delete(at_period_end = True)
+                #     subscription.cancelled = True
+                #     subscription.save()
                 return redirect(reverse('subscriptions'))
             except stripe.error.CardError as ex:
                 error = ex.json_body.get('error')
@@ -131,6 +136,20 @@ def add_subscription(request, *args, **kwargs):
         }
     )
 
+@login_required
+def renew_corporate(request, *args, **kwargs):
+    # TODO UNUSED, NEEDS TO ADD CUPON TO CORP PLAN AND CHARGE CUSTOMER IMMEDIATELY
+    if request.method == "POST":
+        try:
+            code = CorporateCode.objects.get(code=request.POST['code'])
+            if request.user.subscriptions.filter(corporate_code=code).count() == 0:
+                print(code)
+                    # kwargs={'code': code.code,'coupon_type':'corporate'}))
+            else:
+                messages.error(request, "You have already used that corporate access code.")
+        except CorporateCode.DoesNotExist:
+            messages.error(request, "That is not a valid corporate access code.")
+    return render(request, "core/renew_corporate.html")
 
 @login_required
 def corporate_subscription(request, *args, **kwargs):

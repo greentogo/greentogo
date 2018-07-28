@@ -40,6 +40,11 @@ subscriptions_patterns = [
         core.views.subscriptions.corporate_subscription,
         name='corporate_subscription'
     ),
+        url(
+        r'^renew_corporate/$',
+        core.views.subscriptions.renew_corporate,
+        name='renew_corporate'
+    ),
     url(
         r'^coupon/$',
         core.views.subscriptions.coupon_subscription,
