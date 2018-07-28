@@ -141,20 +141,27 @@ def handle_invoice_payment_failed(event):
 @handle_event('invoice.upcoming')
 def handle_invoice_upcoming(event):
     """When an invoice is upcoming, let the customer know by email"""
+    customer = None
 
     invoice = event.data.object
-    customer = User.objects.filter(stripe_id=invoice.customer).first()
+
+    # Invoice lines have a list that should include one subscription id that we can use
+    subObj = Subscription.objects.filter(stripe_id=invoice.lines.data[0].id).first()
+
+    if subObj:
+        customer = subObj.user
+    else:
+        customer = User.objects.filter(stripe_id=invoice.customer).first()
+
     if not customer:
         custNotFoundMessage = "Customer {} not found for invoice.upcoming webhook".format(invoice.customer)
         logger.error(custNotFoundMessage)
         rollbar.report_message(custNotFoundMessage, "error")
-        # return
-
+        return
 
     # Send email to customer if invoice needs payment
     try:
-        # if customer.email:
-        if True:
+        if customer.email:
             #convert the date to readable string
             if invoice.next_payment_attempt:
                 renew_date = datetime.datetime.fromtimestamp(
@@ -173,16 +180,19 @@ def handle_invoice_upcoming(event):
             send_templated_mail(
                 template_name='upcoming_invoice',
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=['jonathantcanfield@gmail.com',],
-                # recipient_list=[customer.email,],
+                recipient_list=[customer.email,],
                 context={
                         'renew_date': renew_date,
                         'amount_due': invoice.amount_due,
                         'site': site
                     }
             )
+        else:
+            userMissingEmailMessage = "invoice.upcoming webhook fail for user {} - user did not have email".format(invoice.customer)
+            logger.error(userMissingEmailMessage)
+            rollbar.report_message(userMissingEmailMessage, "error")
     except Exception as e:
-        genericErrorMessage = "invoice.upcoming webhook fail for user {}".format(invoice.customer)
+        genericErrorMessage = "invoice.upcoming webhook fail for user {} - generic exception".format(invoice.customer)
         logger.error(genericErrorMessage)
         rollbar.report_message(genericErrorMessage, "error")
         raise e
