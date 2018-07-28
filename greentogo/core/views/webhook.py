@@ -147,10 +147,9 @@ def handle_invoice_upcoming(event):
     invoice = event.data.object
     customer = User.objects.filter(stripe_id=invoice.customer).first()
     if not customer:
-        logger.error(
-            "Customer {} not found for invoice.upcoming webhook".format(invoice.customer)
-        )
-        rollbar.report_message("Customer {} not found for invoice.upcoming webhook".format(invoice.customer), "error")
+        custNotFoundMessage = "Customer {} not found for invoice.upcoming webhook".format(invoice.customer)
+        logger.error(custNotFoundMessage)
+        rollbar.report_message(custNotFoundMessage, "error")
         # return
 
 
