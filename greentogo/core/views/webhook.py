@@ -15,6 +15,10 @@ from templated_email import send_templated_mail
 
 import datetime
 
+import rollbar
+
+rollbar.init(settings.ROLLBAR_KEY, settings.ROLLBAR_ENV)
+
 endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
 logger = logging.getLogger('django')
 User = get_user_model()
@@ -146,7 +150,8 @@ def handle_invoice_upcoming(event):
         logger.error(
             "Customer {} not found for invoice.upcoming webhook".format(invoice.customer)
         )
-        return
+        rollbar.report_message("Customer {} not found for invoice.upcoming webhook".format(invoice.customer), "error")
+        # return
 
 
     # Send email to customer if invoice needs payment
@@ -178,4 +183,5 @@ def handle_invoice_upcoming(event):
                     }
             )
     except Exception as e:
+        rollbar.report_exc_info()
         raise e
