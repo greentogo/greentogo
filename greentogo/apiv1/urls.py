@@ -1,7 +1,8 @@
-from django.conf.urls import url
-from django.contrib.auth import views as auth_views
-from core.forms import EmailValidationOnForgotPassword
+from django.conf.urls import include, url
+# from django.contrib.auth import views as auth_views
+# from core.forms import EmailValidationOnForgotPassword
 import apiv1.views as views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     url(r'^tag/$', views.CheckinCheckoutView.as_view(), name="api_v1_tag"),
@@ -24,4 +25,5 @@ urlpatterns = [
         views.RfidView.as_view(),
         name="RfidView"
     ),
+    url(r'^password/reset/$',  views.PasswordReset.as_view(), name="PasswordReset"),
 ]

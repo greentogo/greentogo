@@ -52,5 +52,4 @@ def registration_form(request):
             }})
     else:
         form = UserSignupForm()
-    print(form)
     return render(request, "registration/registration_form.html", {'form':form})

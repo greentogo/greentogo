@@ -23,7 +23,7 @@ export class AppStore {
             this.authToken = token
         })
         simpleStore.get('user').then(user => {
-            console.log('successfully got user from store', user)
+            console.log('user store', user || 'not found')
             this.user = user
         })
         simpleStore.get('resturants').then(resturants => {
@@ -49,6 +49,7 @@ export class AppStore {
         console.log('clearing authToken')
         this.authToken = null
         simpleStore.save('authToken', null)
+        simpleStore.save('user', null)
     }
 
     @action getUserData() {

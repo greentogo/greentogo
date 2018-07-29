@@ -1,6 +1,10 @@
 from django.conf import settings
+from django.http import HttpRequest
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import render
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth import get_user_model
+import json
 
 from registration.models import RegistrationProfile
 from registration.signals import user_registered
@@ -78,8 +82,6 @@ class LocationView(GenericAPIView):
     action = 'retrieve'
 
     def get(self, request, location_code):
-        print("request")
-        print(request)
         try:
             location = Location.objects.get(code=location_code)
         except Location.DoesNotExist:
@@ -172,6 +174,41 @@ class Statistics(GenericAPIView):
             "total_active_subscriptions": Subscription.objects.active().count(),
             }
         return jsend_success(data)
+
+class PasswordReset(APIView):
+    """
+    Password Reset
+    """
+
+    def post(self, request):
+        try:
+            user = None
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
+            userString = body['userString']
+
+            user = User.objects.filter(email=userString).first() or User.objects.filter(username=userString).first()
+
+            if user is not None:
+
+                form = PasswordResetForm({'email': user.email})
+                if form.is_valid():
+                    request = HttpRequest()
+                    request.META['SERVER_NAME'] = 'www.mydomain.com'
+                    request.META['SERVER_PORT'] = '443'
+                    form.save(
+                        request= request,
+                        use_https=True,
+                        from_email="purchases@durhamgreentogo.com", 
+                        email_template_name='registration/password_reset_email.html')
+                return jsend_success("Success! Please check your email for password reset instructions.")
+
+            else:
+                return jsend_fail({"error": "User does not exist"}, status=404)
+
+        except Exception as ex:
+            return jsend_fail({"error": "Unable to reset password"}, status=500)
+            rollbar.report_exc_info(sys.exc_info(), request)
 
 class RfidView(APIView):
     """

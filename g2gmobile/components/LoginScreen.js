@@ -27,6 +27,7 @@ class LoginScreen extends React.Component {
             password: null,
             passwordConfirmation: null,
             error: [],
+            msg: null,
             loading: false,
             type: 'login',
             redirectToWeb: false
@@ -37,8 +38,6 @@ class LoginScreen extends React.Component {
         if (this.state.type !== 'login') {
             if (this.state.type === 'signUp') {
                 this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/accounts/register/', type: 'login' })
-            } else if (this.state.type === 'passwordReset') {
-                this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/accounts/password/reset/', type: 'login' })
             }
         }
     }
@@ -81,26 +80,25 @@ class LoginScreen extends React.Component {
                 if (error.response.data.non_field_errors) {
                     this.setState({ error: error.response.data.non_field_errors, loading: false });
                 } else if (error.response.data.password || error.response.data.username) {
-                    let tempErrors = [];
+                    let tempErrors = {};
                     if (error.response.data.username && error.response.data.username[0] === "This field may not be null.") {
-                        tempErrors.push("Username cannot be empty.");
+                        tempErrors.username = "Username cannot be empty.";
                     }
                     if (error.response.data.password && error.response.data.password[0] === "This field may not be null.") {
-                        tempErrors.push("Password cannot be empty.");
+                        tempErrors.password = "Password cannot be empty.";
                     }
                     this.setState({ error: tempErrors, loading: false });
                 } else {
-                    let tempErrors = ["We are sorry, we are having trouble processing your request. Please try again later."];
-                    this.setState({ error: tempErrors, loading: false });
+                    this.setState({ error: ["We are sorry, we are having trouble processing your request. Please try again later."], loading: false });
                 }
             });
         } else {
-            let tempErrors = [];
+            let tempErrors = {};
             if (!this.state.username) {
-                tempErrors.push("Username cannot be empty.");
+                tempErrors.username = "Username cannot be empty.";
             }
             if (!this.state.password) {
-                tempErrors.push("Password cannot be empty.");
+                tempErrors.password = "Password cannot be empty.";
             }
             this.setState({ error: tempErrors, loading: false });
         }
@@ -135,37 +133,35 @@ class LoginScreen extends React.Component {
     }
 
     attemptPasswordReset() {
-        // this.setState({ type: 'passwordResetSuccess' })
-        // axios({
-        //     method: 'post',
-        //     url: this.props.store.makeUrl('/auth/passwordReset/'),
-        //     headers: {
-        //         'Accept': 'application/json',
-        //         'Content-Type': 'application/json',
-        //     },
-        //     data: {
-        //         username: this.state.username
-        //     }
-        // }).then((json) => {
-        //     console.log(json.data.auth_token);
-        //     if (json.data.auth_token) {
-        //         this.setState({ loading: false });
-        //         return this.props.store.setAuthToken(json.data.auth_token);
-        //     }
-        // }).catch((error) => {
-        //     console.log(JSON.stringify(error.response.data.non_field_errors[0]))
-        //     this.setState({ error: error.response.data.non_field_errors, loading: false });
-        //     // console.log("State error: " + this.state.error)
-        // });
+        this.setState({ loading: true }, () =>{
+            axios({
+                method: 'post',
+                url: this.props.store.makeUrl('/password/reset/'),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                data: {
+                    'userString': this.state.username
+                }
+            }).then((response) => {
+                this.setState({ loading: false, type: 'passwordResetSuccess', username: null, msg: response.data.data });
+            }).catch((error) => {
+                this.setState({ loading: false, error: [error.response.data.data.error] });
+            });
+        })
     }
 
     render() {
         let loadingSpinner = this.state.loading ?
             <Spinner color={styles.primaryColor} />
             : null;
-        let errorMessages = this.state.error.map((error, index) => {
+        let errorMessages = null;
+        if (this.state.error[0] !== undefined){
+            errorMessages = this.state.error.map((error, index) => {
             return <Text key={index} style={{ color: 'red', textAlign: 'center' }}>{error}</Text>;
         });
+        }
         if (this.state.redirectToWeb) {
             let uri = this.state.redirectToWeb;
             return (
@@ -256,7 +252,7 @@ class LoginScreen extends React.Component {
                                 </Form>
                                 : this.state.type === 'passwordResetSuccess' ?
                                     <View style={{ flex: 1, paddingTop: 140, alignItems: 'center' }}>
-                                        <Text style={{ color: styles.primaryColor }}>The password was successfully reset</Text>
+                                        <Text style={{ color: styles.primaryColor }}>{this.state.msg}</Text>
                                         <Button style={{ backgroundColor: styles.primaryCream }} light full title="SignUp" onPress={() => { this.setState({ type: "login" }) }}>
                                             <Text style={{ fontWeight: 'bold', color: styles.primaryColor }}>Go to Login</Text>
                                         </Button>
@@ -265,11 +261,12 @@ class LoginScreen extends React.Component {
                                     // Password reset form
                                     : <Form>
                                         <Item>
-                                            <Input placeholder="Email"
+                                            <Input placeholder="Username or Email"
                                                 autoCapitalize="none"
                                                 autoCorrect={false}
                                                 keyboardType="email-address"
                                                 onChangeText={(text) => this.setState({ username: text })}
+                                                value={this.state.username}
                                             />
                                         </Item>
                                         {errorMessages}

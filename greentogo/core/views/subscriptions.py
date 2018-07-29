@@ -45,7 +45,6 @@ def add_subscription(request, code=False, *args, **kwargs):
             coupon_code = get_object_or_404(CouponCode, code=kwargs['code'])
 
     if request.method == "POST":
-        print(request.POST)
         
         if 'couponCode' in request.POST:
             try:
