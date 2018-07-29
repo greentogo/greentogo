@@ -15,6 +15,7 @@ from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.text import slugify
+from django.core.mail import send_mail, EmailMultiAlternatives
 from collections import Counter
 
 import shortuuid
@@ -431,10 +432,37 @@ class Subscription(models.Model):
         else:
             return self.can_checkout(number_of_boxes)
 
-    def tag_location(self, location, number_of_boxes=1):
+    def tag_location(self, location, number_of_boxes=1, user=False):
         tags = []
         for _ in range(number_of_boxes):
             tags.append(LocationTag.objects.create(subscription=self, location=location))
+        try: 
+            if location.notify and len(location.notifyEmail) > 1:
+                userEmail = 'N/A'
+                userName = 'N/A'
+                if user:
+                    userEmail = user.email
+                    userName = user.name
+                message_data = {
+                    'email': userEmail,
+                    'name': userName,
+                    'number_of_boxes': number_of_boxes,
+                    'action': location.service
+                }
+                message_txt = render_to_string('admin/notify_email.txt', message_data)
+                message_html = render_to_string('admin/notify_email.html', message_data)
+                email = EmailMultiAlternatives(
+                    subject='GreenToGo Box Notification',
+                    body=message_txt,
+                    from_email='greentogo@app.durhamgreentogo.com',
+                    to=[location.notifyEmail],
+                    reply_to=["amy@durhamgreentogo.com"]
+                )
+                email.attach_alternative(message_html, "text/html")
+                email.send()
+        except Exception as ex:
+            print(ex)
+            # rollbar.report_exc_info(sys.exc_info(), request)
         return tags
 
     def used_today(self):

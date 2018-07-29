@@ -2,9 +2,10 @@
 
 Hello,
 
-A user has checked {{ action }} box(s).
+A user has checked {{ action }} {{ number_of_boxes }} box(s).
 
-User email: {{ email }}
+User Email: {{ email }}
+User Name: {{ name }}
 
 
 Automated GreenToGo Email

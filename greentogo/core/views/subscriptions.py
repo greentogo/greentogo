@@ -45,6 +45,7 @@ def add_subscription(request, code=False, *args, **kwargs):
             coupon_code = get_object_or_404(CouponCode, code=kwargs['code'])
 
     if request.method == "POST":
+        print(request.POST)
         
         if 'couponCode' in request.POST:
             try:
@@ -69,7 +70,7 @@ def add_subscription(request, code=False, *args, **kwargs):
                 messages.error(request, "Error: That is not a valid coupon.")
                 rollbar.report_exc_info(sys.exc_info(), request)
 
-        if 'addSub' in request.POST:
+        else:
             form = NewSubscriptionForm(request.POST)
             if form.is_valid():
 
@@ -95,7 +96,7 @@ def add_subscription(request, code=False, *args, **kwargs):
                     sub_kwargs['coupon'] = corporate_code.code
                 elif coupon_code:
                     sub_kwargs['coupon'] = coupon_code.code
-                        
+
 
                 try:
                     if corporate_code:
@@ -117,14 +118,16 @@ def add_subscription(request, code=False, *args, **kwargs):
                     #     stripe_sub.delete(at_period_end = True)
                     #     subscription.cancelled = True
                     #     subscription.save()
-                    return redirect(reverse('subscriptions'))
+                    return redirect('/subscriptions/')
                 except stripe.error.CardError as ex:
+                    print(ex)
                     error = ex.json_body.get('error')
                     messages.error(
                         request, "We had a problem processing your card. {}".format(error['message'])
                     )
                     rollbar.report_exc_info(sys.exc_info(), request)
                 except Exception as ex:
+                    print(ex)
                     messages.error(
                         request, (
                             "We had a problem on our end processing your order. "
