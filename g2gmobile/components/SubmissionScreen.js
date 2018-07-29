@@ -2,9 +2,7 @@ import React from 'react';
 import axios from '../apiClient';
 import { Icon, Button } from 'native-base';
 import { inject, observer } from 'mobx-react';
-import { NavigationActions } from '@expo/ex-navigation';
 import {
-    StyleSheet,
     Text,
     View,
     Picker,
@@ -37,7 +35,7 @@ class SubmissionScreen extends React.Component {
             title: 'Check In/Out',
             headerLeft: (
                 <TouchableOpacity><Text style={styles.popToTopStyle} onPress={() => navigation.popToTop()}>X</Text></TouchableOpacity>
-            ),
+            )
         }
     };
 
@@ -206,7 +204,7 @@ class SubmissionScreen extends React.Component {
                                 <View>
                                     {this.state.error &&
                                         <View style={styles.centeredRow}>
-                                            <Text style={styles.headerText}>{this.state.error}</Text>
+                                            <Text style={styles.errorStyle}>{this.state.error}</Text>
                                         </View>
                                     }
                                     <View style={styles.centeredRow}>

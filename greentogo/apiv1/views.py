@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.models import User, Location, LocationTag, Plan, Restaurant, Subscription
+from core.forms import UserSignupForm
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription

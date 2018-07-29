@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, View } from 'react-native';
 
-class G2GTitleImage extends React.Component {
+class G2GTitleImage extends React.PureComponent {
     render() {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

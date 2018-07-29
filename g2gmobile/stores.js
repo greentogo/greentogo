@@ -1,7 +1,6 @@
 import { observable, action } from 'mobx';
 import { enableLogging } from 'mobx-logger';
 import simpleStore from 'react-native-simple-store';
-import { createNavigationEnabledStore, NavigationReducer } from '@expo/ex-navigation';
 import axios from './apiClient';
 
 enableLogging({

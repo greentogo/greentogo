@@ -10,8 +10,6 @@ import {
 } from 'react-native';
 import { inject, observer } from "mobx-react";
 import { Permissions } from 'expo';
-import Subscription from './SubscriptionScreen'
-// import { Text } from 'react-native';
 import styles from "../styles";
 import axios from '../apiClient';
 import {
@@ -43,6 +41,10 @@ class AccountScreen extends React.Component {
         title: 'Account',
     };
 
+    goToNameAndEmail = () => {
+        this.props.navigation.navigate('editnameemail');
+    }
+
     componentWillMount() {
         let authToken = this.props.appStore.authToken;
         axios.get(`stats/${this.props.appStore.user.username}/`, {
@@ -50,19 +52,33 @@ class AccountScreen extends React.Component {
                 'Authorization': `Token ${authToken}`
             }
         }).then((response) => {
-            if (response.data.data) {
-                this.setState({ totalUserBoxesReturned: response.data.data.total_user_boxes_returned, totalBoxesReturned: response.data.data.total_boxes_returned });
+            if (response.data && response.data.data) {
+                let userBoxes = false;
+                if (response.data.data.total_user_boxes_returned && response.data.data.total_user_boxes_returned > 0){
+                    userBoxes = response.data.data.total_user_boxes_returned;
+                }
+                this.setState({ totalUserBoxesReturned: userBoxes, totalBoxesReturned: response.data.data.total_boxes_returned });
             }
-            console.log(response.data.data)
         }).catch((error) => {
-            if (err.response.status === 401) {
+            if (error.response.status === 401) {
                 this.props.appStore.clearAuthToken();
             };
-            console.log(error);
         })
     }
 
     render() {
+        let availableBoxes = "";
+        let maxBoxes = "";
+        let boxesAvailableBanner = false;
+        if (this.props.appStore.user) {
+            availableBoxes = this.props.appStore.user.availableBoxes + "";
+            maxBoxes = this.props.appStore.user.maxBoxes + "";
+            if (this.props.appStore.user.subscriptions.length > 0) {
+                boxesAvailableBanner = `${availableBoxes} / ${maxBoxes} boxes available`;
+            } else {
+                boxesAvailableBanner = "You do not have a Subscription.";
+            }
+        }
         if (this.state.redirectToWeb) {
             let uri = this.state.redirectToWeb;
             return (
@@ -77,30 +93,33 @@ class AccountScreen extends React.Component {
                 />
             );
         } else {
-            console.log("Account State: ", this.state)
-            console.log(this.state.username)
             return (
                 <Content style={styles.container}>
-                    <Text style={styles.boldCenteredText}>Email: {this.state.email}</Text>
                     <List>
                         <ListMenuItem
-                            icon="log-out"
+                            icon="person"
+                            text="View/Edit Name and Email"
+                            onPress={this.goToNameAndEmail}
+                        />
+                        <ListMenuItem
+                            icon="card"
                             text="Change your default payment method"
                             onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/account/change_payment_method/' }) }}
                         />
                         <ListMenuItem
-                            icon="person"
+                            icon="document"
                             text="View/Edit Subscriptions"
                             onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/subscriptions/' }) }}
                         />
                         <ListMenuItem
-                            icon="unlock"
+                            icon="lock"
                             text="Change Password"
                             onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/account/change_password/' }) }}
                         />
                     </List>
-                    {/* <Subscription /> */}
-                    <Text style={{ alignSelf: 'center', color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>{this.state.availableBoxes}/ {this.state.maxBoxes} boxes available</Text>
+                    <Text style={styles.boldCenteredText}>
+                        {boxesAvailableBanner && boxesAvailableBanner}
+                    </Text>
                     {this.state.totalBoxesReturned &&
                         <View style={{ flex: 1, justifyContent: 'center', backgroundColor: styles.primaryCream, paddingTop: 10, }}>
                             <Text style={{ textAlign: 'center', color: styles.primaryColor, fontWeight: 'bold', fontSize: 26 }}>Our community</Text>

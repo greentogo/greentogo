@@ -32,8 +32,11 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center'
     },
+    errorStyle: {
+        color: 'red',
+        textAlign: 'center'
+    },
     boldCenteredText: {
-        alignSelf: 'center',
         paddingTop: 5,
         paddingBottom: 5,
         color: primaryColor,

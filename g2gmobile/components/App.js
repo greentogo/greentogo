@@ -10,6 +10,7 @@ import SubmissionScreen from "./SubmissionScreen";
 import ContainerSuccessScreen from "./ContainerSuccessScreen";
 import AccountScreen from "./AccountScreen";
 import SubscriptionScreen from "./SubscriptionScreen";
+import EditNameEmailScreen from "./EditNameEmailScreen";
 
 import { createStackNavigator } from 'react-navigation';
 
@@ -21,7 +22,8 @@ const RootStack = createStackNavigator(
         submission: SubmissionScreen,
         containerSuccessScreen: ContainerSuccessScreen,
         account: AccountScreen,
-        subscription: SubscriptionScreen
+        subscription: SubscriptionScreen,
+        editnameemail: EditNameEmailScreen
     },
     {
         initialRouteName: 'home',

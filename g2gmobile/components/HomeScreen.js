@@ -109,7 +109,7 @@ class HomeScreen extends React.Component {
     render() {
         let availableBoxes = "";
         let maxBoxes = "";
-        let boxesAvailableBanner = "";
+        let boxesAvailableBanner = false;
         if (this.props.appStore.user) {
             availableBoxes = this.props.appStore.user.availableBoxes + "";
             maxBoxes = this.props.appStore.user.maxBoxes + "";
@@ -138,16 +138,14 @@ class HomeScreen extends React.Component {
                         onPress={this.goToAccount}
                     />
                     <ListMenuItem
-                        icon="unlock"
+                        icon="lock"
                         text="Log out"
                         onPress={this.logOut}
                     />
                 </List>
-                <View style={{ flex: 1, alignItems: 'center' }}>
-                    <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>
-                        {boxesAvailableBanner}
+                    <Text style={styles.boldCenteredText}>
+                        {boxesAvailableBanner && boxesAvailableBanner}
                     </Text>
-                </View>
             </Content>
         )
     }

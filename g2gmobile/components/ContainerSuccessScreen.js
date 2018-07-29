@@ -24,7 +24,7 @@ class ContainerSuccessScreen extends React.Component {
             headerTitleStyle: { width: 300 },
             headerLeft: (
                 <TouchableOpacity><Text style={styles.popToTopStyle} onPress={() => navigation.popToTop()}>X</Text></TouchableOpacity>
-            ),
+            )
         }
     };
 

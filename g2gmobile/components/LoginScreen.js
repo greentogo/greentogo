@@ -210,7 +210,7 @@ class LoginScreen extends React.Component {
                                         value={this.state.username}
                                     />
                                 </Item>
-                                {this.state.error.username ? <Text style={{ color: 'red', textAlign: 'center' }}>{this.state.error.username}</Text> : <Text></Text>}
+                                {this.state.error.username ? <Text style={styles.errorStyle}>{this.state.error.username}</Text> : <Text></Text>}
                                 <Item last>
                                     <Input placeholder="Password"
                                         secureTextEntry={true}
@@ -220,7 +220,7 @@ class LoginScreen extends React.Component {
                                 </Item>
                                 {errorMessages}
                                 {loadingSpinner}
-                                {this.state.error.password ? <Text style={{ color: 'red', textAlign: 'center' }}>{this.state.error.password}</Text> : <Text></Text>}
+                                {this.state.error.password ? <Text style={styles.errorStyle}>{this.state.error.password}</Text> : <Text></Text>}
                                 <Button style={{ backgroundColor: styles.primaryCream }} light full title="Login" onPress={() => { this.attemptLogin() }}>
                                     <Text style={styles.boldCenteredText}>Login</Text>
                                 </Button>
