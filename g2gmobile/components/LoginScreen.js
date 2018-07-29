@@ -47,19 +47,17 @@ class LoginScreen extends React.Component {
     attemptLogin() {
         if (this.state.username && this.state.password) {
             this.setState({ error: [], loading: true });
-
-            axios({
-                method: 'post',
-                url: this.props.store.makeUrl('/auth/login/'),
+            let config = {
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                data: {
-                    username: this.state.username,
-                    password: this.state.password
+                    'Content-Type': 'application/json'
                 }
-            }).then((loginResponse) => {
+            };
+            let body = {
+                username: this.state.username,
+                password: this.state.password
+            };
+            axios.post('/auth/login/', body, config).then((loginResponse) => {
                 // Get the user data after successful login
                 axios.get('/me/', {
                     headers: {
@@ -138,17 +136,16 @@ class LoginScreen extends React.Component {
 
     attemptPasswordReset() {
         this.setState({ loading: true }, () => {
-            axios({
-                method: 'post',
-                url: this.props.store.makeUrl('/password/reset/'),
+            let config = {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
-                },
-                data: {
-                    'userString': this.state.username
                 }
-            }).then((response) => {
+            };
+            let body = {
+                userString: this.state.username
+            };
+            axios.post('/password/reset/', body, config).then((response) => {
                 this.setState({ loading: false, type: 'passwordResetSuccess', username: null, msg: response.data.data });
             }).catch((error) => {
                 this.setState({ loading: false, error: [error.response.data.data.error] });
