@@ -194,7 +194,7 @@ class PasswordReset(APIView):
                 form = PasswordResetForm({'email': user.email})
                 if form.is_valid():
                     request = HttpRequest()
-                    request.META['SERVER_NAME'] = 'www.mydomain.com'
+                    request.META['SERVER_NAME'] = 'app.durhamgreentogo.com'
                     request.META['SERVER_PORT'] = '443'
                     form.save(
                         request= request,
