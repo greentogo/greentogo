@@ -21,6 +21,7 @@ class SubmissionScreen extends React.Component {
         super(props)
         this.state = {
             loading: true,
+            loadingSubmit: false,
             error: false,
             subscriptions: [],
             subscriptionId: false,
@@ -126,21 +127,26 @@ class SubmissionScreen extends React.Component {
     }
 
     submit = () => {
-        let config = {
-            headers: {
-                'Authorization': `Token ${this.props.appStore.authToken}`
-            }
+        if (!this.state.loadingSubmit){
+            this.setState({ loadingSubmit: true }, () => {
+                let config = {
+                    headers: {
+                        'Authorization': `Token ${this.props.appStore.authToken}`
+                    }
+                }
+                axios.post('tag/', {
+                    subscription: this.state.subscriptionId,
+                    location: this.state.locationData.code,
+                    action: this.state.locationData.service,
+                    number_of_boxes: this.state.boxCount
+                }, config).then((response) => {
+                    this.props.navigation.navigate('containerSuccessScreen', { boxCount: this.state.boxCount, locationData: this.state.locationData });
+                }).catch((error) => {
+                    this.setState({ loadingSubmit: false })
+                    console.log(error.response);
+                });
+            })
         }
-        axios.post('tag/', {
-            subscription: this.state.subscriptionId,
-            location: this.state.locationData.code,
-            action: this.state.locationData.service,
-            number_of_boxes: this.state.boxCount
-        }, config).then((response) => {
-            this.props.navigation.navigate('containerSuccessScreen', { boxCount: this.state.boxCount, locationData: this.state.locationData });
-        }).catch((error) => {
-            console.log(error.response);
-        });
     }
 
     render() {
@@ -165,7 +171,7 @@ class SubmissionScreen extends React.Component {
                     </View>
                 ) : (
                         this.state.subscriptions.length > 0 ? (
-                            <ScrollView style={styles.container}>
+                            <View style={styles.submissionContainer}>
                                 {/* TODO: Add this back in once the tag/ endpoint accepts # of boxes */}
                                 <View>
                                     <Text style={styles.boldCenteredText}>{this.state.locationData.name}</Text>
@@ -213,21 +219,21 @@ class SubmissionScreen extends React.Component {
                                                 <Text style={styles.submissionSubmitTextStyle}>Cannot Check {this.state.locationData.service.toLowerCase()}</Text>
                                             </TouchableOpacity>
                                         ) : (
-                                                <TouchableOpacity style={styles.submissionSubmitButton} onPress={this.submit}>
-                                                    <Text style={styles.submissionSubmitTextStyle}>Check {this.state.locationData.service.toLowerCase()}</Text>
-                                                </TouchableOpacity>
+                                            <TouchableOpacity style={styles.submissionSubmitButton} onPress={this.submit}>
+                                                <Text style={styles.submissionSubmitTextStyle}>Check {this.state.locationData.service.toLowerCase()}</Text>
+                                            </TouchableOpacity>
                                             )}
                                     </View>
                                 </View>
-                            </ScrollView>
+                            </View>
                         ) : (
-                                <View>
-                                    <Button style={{ backgroundColor: styles.primaryCream }} light full onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/subscriptions/new/' }) }}>
-                                        <Text style={{ backgroundColor: styles.primaryCream, color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>
-                                            Your account has no subscriptions. Tap here to add a subscription.
-                            </Text>
-                                    </Button>
-                                </View>
+                            <View style={styles.container}>
+                                <Button light full onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/subscriptions/new/' }) }}>
+                                    <Text style={styles.boldCenteredText}>
+                                        Your account has no subscriptions. Tap here to add a subscription.
+                                    </Text>
+                                </Button>
+                            </View>
                             )
                     )
             )

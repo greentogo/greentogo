@@ -39,7 +39,6 @@ class EditNameEmailScreen extends React.Component {
     };
 
     render() {
-        console.log(this.props.appStore.user);
         return (
             <Content style={styles.container}>
                 <Text style={styles.boldCenteredText}>Email: {this.state.email}</Text>

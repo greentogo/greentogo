@@ -1,28 +1,20 @@
 import React from 'react';
 import {
-    StyleSheet,
-    TextInput,
     View,
-    Button,
     Image,
     WebView,
     Linking
 } from 'react-native';
 import { inject, observer } from "mobx-react";
-import { Permissions } from 'expo';
 import styles from "../styles";
 import axios from '../apiClient';
 import {
-    Header,
-    Body,
     Content,
     List,
-    ListItem,
-    Text,
-    Icon,
-    Left
+    Text
 } from "native-base";
 import ListMenuItem from './ListMenuItem';
+import SubscriptionBanner from './SubscriptionBanner';
 
 @inject("appStore")
 @observer
@@ -31,9 +23,7 @@ class AccountScreen extends React.Component {
         super(props)
         this.state = {
             ...this.props.appStore.user,
-            redirectToWeb: false,
-            totalBoxesReturned: false,
-            totalUserBoxesReturned: false
+            redirectToWeb: false
         }
     }
 
@@ -60,25 +50,13 @@ class AccountScreen extends React.Component {
                 this.setState({ totalUserBoxesReturned: userBoxes, totalBoxesReturned: response.data.data.total_boxes_returned });
             }
         }).catch((error) => {
-            if (error.response.status === 401) {
+            if ((error.status && error.status === 401) || (error.response && error.response.status && error.response.status === 401)) {
                 this.props.appStore.clearAuthToken();
             };
         })
     }
 
     render() {
-        let availableBoxes = "";
-        let maxBoxes = "";
-        let boxesAvailableBanner = false;
-        if (this.props.appStore.user) {
-            availableBoxes = this.props.appStore.user.availableBoxes + "";
-            maxBoxes = this.props.appStore.user.maxBoxes + "";
-            if (this.props.appStore.user.subscriptions.length > 0) {
-                boxesAvailableBanner = `${availableBoxes} / ${maxBoxes} boxes available`;
-            } else {
-                boxesAvailableBanner = "You do not have a Subscription.";
-            }
-        }
         if (this.state.redirectToWeb) {
             let uri = this.state.redirectToWeb;
             return (
@@ -117,9 +95,7 @@ class AccountScreen extends React.Component {
                             onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/account/change_password/' }) }}
                         />
                     </List>
-                    <Text style={styles.boldCenteredText}>
-                        {boxesAvailableBanner && boxesAvailableBanner}
-                    </Text>
+                    <SubscriptionBanner/>
                     {this.state.totalBoxesReturned &&
                         <View style={{ flex: 1, justifyContent: 'center', backgroundColor: styles.primaryCream, paddingTop: 10, }}>
                             <Text style={{ textAlign: 'center', color: styles.primaryColor, fontWeight: 'bold', fontSize: 26 }}>Our community</Text>

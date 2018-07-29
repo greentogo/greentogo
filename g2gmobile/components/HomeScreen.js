@@ -19,6 +19,7 @@ import {
 } from "native-base";
 import axios from '../apiClient';
 import ListMenuItem from './ListMenuItem';
+import SubscriptionBanner from './SubscriptionBanner';
 
 
 @inject("appStore")
@@ -27,6 +28,7 @@ class HomeScreen extends React.Component {
     constructor(props) {
         super(props)
         this.props.appStore.getUserData()
+        this.props.appStore.getResturantData()
     }
 
     static navigationOptions = {
@@ -34,6 +36,11 @@ class HomeScreen extends React.Component {
     };
 
     componentWillMount() {
+        console.log("THE APPLICATION HOME SCREEN IS BEING CONSTRUCTED");
+        console.log("@@@@@@@@@@@@");
+        console.log("@@@@@@@@@@@@");
+        console.log("@@@@@@@@@@@@");
+        console.log("@@@@@@@@@@@@");
         let authToken = this.props.appStore.authToken;
         axios.get('me/', {
             headers: {
@@ -41,13 +48,14 @@ class HomeScreen extends React.Component {
             }
         }).then((response) => {
             subscriptions = response.data.data.subscriptions;
-            if (response.data.data.email) this.props.appStore.email = response.data.data.email;
-            console.log(response.data.data)
+            if (response.data.data.email) {
+                this.props.appStore.email = response.data.data.email
+            };
             if (subscriptions.length > 0) {
                 this.subscriptionChange(subscriptions[0].id);
             }
         }).catch((error) => {
-            console.log('In the error! HOMESCREEN.JS');
+            console.log('ERROR HOMESCREEN.JS');
             console.log(error);
         })
     }
@@ -83,7 +91,6 @@ class HomeScreen extends React.Component {
         });
         switch (this.props.appStore.action) {
             case 'IN':
-                console.log(selectedSubscription);
                 if (selectedSubscription.available_boxes === selectedSubscription.max_boxes) {
                     boxCount = 0;
                 } else {
@@ -107,18 +114,6 @@ class HomeScreen extends React.Component {
     }
 
     render() {
-        let availableBoxes = "";
-        let maxBoxes = "";
-        let boxesAvailableBanner = false;
-        if (this.props.appStore.user) {
-            availableBoxes = this.props.appStore.user.availableBoxes + "";
-            maxBoxes = this.props.appStore.user.maxBoxes + "";
-            if (this.props.appStore.user.subscriptions.length > 0) {
-                boxesAvailableBanner = `${availableBoxes} / ${maxBoxes} boxes available`;
-            } else {
-                boxesAvailableBanner = "You do not have a Subscription.";
-            }
-        }
         return (
             <Content style={styles.container}>
                 <List>
@@ -143,9 +138,7 @@ class HomeScreen extends React.Component {
                         onPress={this.logOut}
                     />
                 </List>
-                    <Text style={styles.boldCenteredText}>
-                        {boxesAvailableBanner && boxesAvailableBanner}
-                    </Text>
+                <SubscriptionBanner/>
             </Content>
         )
     }

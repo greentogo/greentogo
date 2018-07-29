@@ -52,9 +52,10 @@ class MapScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            locations: [],
+            locations: this.props.appStore.resturants,
+            // locations: [],
             authToken: this.props.appStore.authToken,
-            currentLocation: false
+            currentLocation: false,
         }
     }
 
@@ -64,15 +65,7 @@ class MapScreen extends React.Component {
     };
 
     componentWillMount() {
-        axios.get('restaurants/', {
-            headers: {
-                'Authorization': `Token ${this.state.authToken}`
-            }
-        })
-            .then((json) => {
-                this.setState({ locations: json.data.data })
-            })
-            .catch((e) => console.log(e))
+        console.log(this.props.appStore.resturants);
         this._getCurrentLocation();
         // this._interval = setInterval(() => {
         //     this._getCurrentLocation();

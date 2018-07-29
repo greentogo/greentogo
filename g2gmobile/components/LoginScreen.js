@@ -70,11 +70,9 @@ class LoginScreen extends React.Component {
                 }
             }).then((json) => {
                 if (json.data.auth_token) {
-                    console.log("YEAH ITS TRUE")
                     this.setState({ loading: false });
                     this.props.store.setAuthToken(json.data.auth_token);
                 }
-                console.log("Still going")
                 // Get the user data after successful login
                 axios.get('/me/', {
                     headers: {

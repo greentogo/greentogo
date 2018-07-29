@@ -26,6 +26,9 @@ export class AppStore {
             console.log('successfully got user from store', user)
             this.user = user
         })
+        simpleStore.get('resturants').then(resturants => {
+            this.resturants = resturants
+        })
     }
 
     makeUrl(path) {
@@ -61,6 +64,15 @@ export class AppStore {
             console.log(err);
             console.log(this.clearAuthToken());
         })
+    }
+
+    @action getResturantData() {
+        // Get the restaurant data on load
+        axios.get('restaurants/')
+        .then((json) => {
+            simpleStore.save('resturants', json.data.data)
+        })
+        .catch((e) => console.log(e))
     }
     
     @action setUserData(data) {

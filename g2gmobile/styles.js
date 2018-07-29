@@ -44,6 +44,12 @@ const styles = {
         fontSize: 20,
         textAlign: 'center'
     },
+    submissionContainer: {
+        flex: 1,
+        backgroundColor: primaryCream,
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+    },
     submissionAddSubIcon: {
         fontSize: 30,
         fontWeight: '800',
