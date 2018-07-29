@@ -3,7 +3,6 @@ import {
     StyleSheet,
     TouchableHighlight
 } from 'react-native';
-import styles from "../styles";
 import {
     Body,
     ListItem,
@@ -11,6 +10,7 @@ import {
     Icon,
     Left
 } from "native-base";
+import styles from '../../styles';
 
 class ListMenuItem extends React.Component {
     render() {

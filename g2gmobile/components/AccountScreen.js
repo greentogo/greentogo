@@ -13,8 +13,8 @@ import {
     List,
     Text
 } from "native-base";
-import ListMenuItem from './ListMenuItem';
-import SubscriptionBanner from './SubscriptionBanner';
+import ListMenuItem from './subcomponents/ListMenuItem';
+import SubscriptionBanner from './subcomponents/SubscriptionBanner';
 
 @inject("appStore")
 @observer

@@ -1,12 +1,11 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { inject, observer } from "mobx-react";
-import axios from '../apiClient';
 import { Permissions, BarCodeScanner } from 'expo';
-
 import {
     Text,
 } from "native-base";
+import axios from '../../apiClient';
 
 @inject("appStore")
 @observer

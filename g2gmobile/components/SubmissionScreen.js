@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from '../apiClient';
-import { Icon, Button } from 'native-base';
+import { Button } from 'native-base';
 import { inject, observer } from 'mobx-react';
 import {
     Text,
@@ -10,7 +10,6 @@ import {
     Linking,
     TouchableOpacity,
     ActivityIndicator,
-    ScrollView
 } from 'react-native';
 import styles from "../styles";
 

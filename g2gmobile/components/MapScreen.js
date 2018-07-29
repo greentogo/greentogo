@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, Platform, Image, ImageBackground, Animated, Text, View } from 'react-native';
 import { inject, observer } from 'mobx-react';
-import axios from '../apiClient';
 import { MapView } from 'expo';
 import openMap from 'react-native-open-maps';
 

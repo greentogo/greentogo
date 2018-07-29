@@ -1,22 +1,14 @@
 import React from "react";
-import G2GTitleImage from "./G2GTitleImage";
 import { Constants } from 'expo';
 import axios from '../apiClient';
 import { WebView, Linking } from 'react-native';
-
 import {
     Text,
-    TextInput,
     View,
-    StyleSheet,
-    TouchableHighlight
 } from "react-native";
-
 import {
     Container,
     Header,
-    Body,
-    Title,
     Content,
     Form,
     Item,
@@ -24,10 +16,8 @@ import {
     Button,
     Spinner,
 } from "native-base";
-
-import { observer } from "mobx-react";
-
 import styles from "../styles";
+import G2GTitleImage from "./subcomponents/G2GTitleImage";
 
 class LoginScreen extends React.Component {
     constructor(props) {

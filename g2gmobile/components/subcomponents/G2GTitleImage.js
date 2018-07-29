@@ -6,7 +6,7 @@ class G2GTitleImage extends React.PureComponent {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <Image
-                    source={require('../assets/icons/g2g-white.png')}
+                    source={require('../../assets/icons/g2g-white.png')}
                     style={{ height: 45, width: 144 }}
                 />
             </View>

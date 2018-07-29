@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { inject, observer } from "mobx-react";
 import { Permissions } from 'expo';
-import BarCodeScannerReader from './BarCodeScannerReader';
+import BarCodeScannerReader from './subcomponents/BarCodeScannerReader';
 import { Text } from 'react-native';
 
 @inject("appStore")

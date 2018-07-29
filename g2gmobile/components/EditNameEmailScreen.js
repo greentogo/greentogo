@@ -9,18 +9,11 @@ import {
     Linking
 } from 'react-native';
 import { inject, observer } from "mobx-react";
-import { Permissions } from 'expo';
 import styles from "../styles";
 import axios from '../apiClient';
 import {
-    Header,
-    Body,
     Content,
-    List,
-    ListItem,
     Text,
-    Icon,
-    Left
 } from "native-base";
 
 @inject("appStore")

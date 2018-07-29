@@ -9,9 +9,9 @@ import {
     Linking
 } from 'react-native';
 import { inject, observer } from "mobx-react";
-import styles from "../styles";
-import axios from '../apiClient';
 import { Text } from "native-base";
+import axios from '../../apiClient';
+import styles from '../../styles';
 
 @inject("appStore")
 @observer

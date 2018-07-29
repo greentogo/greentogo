@@ -6,20 +6,13 @@ import {
 } from 'react-native';
 import { inject, observer } from "mobx-react";
 import styles from "../styles";
-import G2GTitleImage from "./G2GTitleImage";
 import {
-    Header,
-    Body,
     Content,
     List,
-    ListItem,
-    Text,
-    Icon,
-    Left
 } from "native-base";
-import axios from '../apiClient';
-import ListMenuItem from './ListMenuItem';
-import SubscriptionBanner from './SubscriptionBanner';
+import ListMenuItem from './subcomponents/ListMenuItem';
+import SubscriptionBanner from './subcomponents/SubscriptionBanner';
+import G2GTitleImage from "./subcomponents/G2GTitleImage";
 
 
 @inject("appStore")
