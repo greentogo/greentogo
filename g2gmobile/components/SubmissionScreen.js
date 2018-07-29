@@ -42,19 +42,18 @@ class SubmissionScreen extends React.Component {
 
     componentWillMount() {
         let authToken = this.props.appStore.authToken;
-        axios.get('me/', {
+        axios.get('/me/', {
             headers: {
                 'Authorization': `Token ${authToken}`
             }
         }).then((response) => {
-            if (response.data.data.email) this.props.appStore.email = response.data.data.email;
             this.setState({ subscriptions: response.data.data.subscriptions, loading: false }, () => {
                 if (this.state.subscriptions.length > 0) {
-                    this.subscriptionChange(subscriptions[0].id);
+                    this.subscriptionChange(this.state.subscriptions[0].id);
                 }
             })
         }).catch((error) => {
-            if (err.response.status === 401) {
+            if (error.response.status === 401) {
                 this.props.appStore.clearAuthToken();
             };
             console.log('In the error! SUBMISSIONSCREEN.JS');
@@ -134,7 +133,7 @@ class SubmissionScreen extends React.Component {
                         'Authorization': `Token ${this.props.appStore.authToken}`
                     }
                 }
-                axios.post('tag/', {
+                axios.post('/tag/', {
                     subscription: this.state.subscriptionId,
                     location: this.state.locationData.code,
                     action: this.state.locationData.service,

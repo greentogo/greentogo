@@ -60,15 +60,15 @@ export class AppStore {
         }).then((response) => {
             console.log("User data success")
             this.setUserData(response.data.data);
-        }).catch((err) => {
-            console.log(err);
+        }).catch((error) => {
+            console.log(error);
             console.log(this.clearAuthToken());
         })
     }
 
     @action getResturantData() {
         // Get the restaurant data on load
-        axios.get('restaurants/')
+        axios.get('/restaurants/')
         .then((json) => {
             simpleStore.save('resturants', json.data.data)
         })

@@ -25,7 +25,7 @@ class SubscriptionBanner extends React.Component {
 
     componentWillMount() {
         let authToken = this.props.appStore.authToken;
-        axios.get(`stats/${this.props.appStore.user.username}/`, {
+        axios.get(`/stats/${this.props.appStore.user.username}/`, {
             headers: {
                 'Authorization': `Token ${authToken}`
             }

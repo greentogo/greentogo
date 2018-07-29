@@ -35,31 +35,6 @@ class HomeScreen extends React.Component {
         headerTitle: <G2GTitleImage />,
     };
 
-    componentWillMount() {
-        console.log("THE APPLICATION HOME SCREEN IS BEING CONSTRUCTED");
-        console.log("@@@@@@@@@@@@");
-        console.log("@@@@@@@@@@@@");
-        console.log("@@@@@@@@@@@@");
-        console.log("@@@@@@@@@@@@");
-        let authToken = this.props.appStore.authToken;
-        axios.get('me/', {
-            headers: {
-                'Authorization': `Token ${authToken}`
-            }
-        }).then((response) => {
-            subscriptions = response.data.data.subscriptions;
-            if (response.data.data.email) {
-                this.props.appStore.email = response.data.data.email
-            };
-            if (subscriptions.length > 0) {
-                this.subscriptionChange(subscriptions[0].id);
-            }
-        }).catch((error) => {
-            console.log('ERROR HOMESCREEN.JS');
-            console.log(error);
-        })
-    }
-
     goToMap = () => {
         this.props.navigation.navigate('map');
     }
@@ -78,39 +53,6 @@ class HomeScreen extends React.Component {
 
     logOut = () => {
         this.props.appStore.clearAuthToken()
-    }
-
-    subscriptionChange = (subscriptionId) => {
-        let boxCount;
-        let selectedSubscription;
-        // find the selected subscription
-        subscriptions.forEach((subscription) => {
-            if (subscription.id === subscriptionId) {
-                selectedSubscription = subscription;
-            }
-        });
-        switch (this.props.appStore.action) {
-            case 'IN':
-                if (selectedSubscription.available_boxes === selectedSubscription.max_boxes) {
-                    boxCount = 0;
-                } else {
-                    boxCount = 1;
-                }
-                break;
-            case 'OUT':
-                if (selectedSubscription.available_boxes === 0) {
-                    boxCount = 0;
-                } else {
-                    boxCount = 1;
-                }
-                break;
-        }
-
-        this.setState({
-            subscriptionId,
-            boxCount,
-            selectedSubscription
-        });
     }
 
     render() {

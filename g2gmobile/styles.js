@@ -91,6 +91,8 @@ const styles = {
     successTopContainer: {
         backgroundColor: primaryColor,
         flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-around',
     },
     successText: {
         color: 'white',

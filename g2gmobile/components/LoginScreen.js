@@ -81,8 +81,8 @@ class LoginScreen extends React.Component {
                 }).then((response) => {
                     console.log(response.data)
                     this.props.store.setUserData(response.data.data);
-                }).catch((err) => {
-                    console.log(err);
+                }).catch((error) => {
+                    console.log(error);
                     this.props.appStore.clearAuthToken();
                 })
             }).catch((error) => {
