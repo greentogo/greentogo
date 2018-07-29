@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-// const url = 'https://app.durhamgreentogo.com/api/v1';
+// const url = 'https://app.durhamgreentogo.com/api/v1'; // Production
+// const url = 'https://g2g.dreisbach.us/api/v1'; // Staging
 const url = 'http://7f1107e4.ngrok.io/api/v1';
 
 const instance = axios.create({

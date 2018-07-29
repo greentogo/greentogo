@@ -13,8 +13,6 @@ enableLogging({
 export class AppStore {
     @observable authToken = ''
     @observable user = {}
-    // siteUrl = 'https://app.durhamgreentogo.com/api/v1'
-    siteUrl = 'http://7f1107e4.ngrok.io/api/v1'
 
     constructor() {
         console.log('appStore constructor')
@@ -29,10 +27,6 @@ export class AppStore {
         simpleStore.get('resturants').then(resturants => {
             this.resturants = resturants
         })
-    }
-
-    makeUrl(path) {
-        return this.siteUrl + path;
     }
 
     reduceBoxes(subscriptions, type) {
