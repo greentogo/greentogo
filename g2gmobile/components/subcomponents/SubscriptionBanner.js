@@ -18,15 +18,9 @@ import styles from '../../styles';
 class SubscriptionBanner extends React.Component {
     constructor(props) {
         super(props)
-        this.state = {
-            ...this.props.appStore.user
-        }
     }
 
     componentWillMount() {
-        console.log("START STATE");
-        console.log(this.state);
-        console.log("END STATE");
         // let authToken = this.props.appStore.authToken;
         // axios.get(`/stats/${this.props.appStore.user.username}/`, {
         //     headers: {
