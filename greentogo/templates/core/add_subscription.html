@@ -29,12 +29,21 @@
                 Click here to enter your corporate access code and get your free membership.
             </a>
         </p>
-        <p>
+        <!-- <p>
             Do you have a coupon?
             <a href="{% url 'coupon_subscription' %}">
                 Click here to redeem your coupon.
             </a>
-        </p>
+        </p> -->
+        <p> Do you have a coupon? Redeem it below!</p>
+        <form action="." method="POST">
+            {% csrf_token %}
+            <label for="coupon-code-field">Coupon code</label>
+            <input type="text" id="coupon-code-field" name="code" required/>
+            <div>
+                <input type="submit" id="coupon-button" class="button" name="couponCode" value="Redeem coupon" />
+            </div>
+        </form>
         {% endif %}
 
         <form action="." method="POST" id="new-subscription-form">
@@ -47,7 +56,7 @@
                 {% endfor %}
             </select>
             <div>
-                <button type="submit" id="subscribe-button" class="button">Add subscription</button>
+                <input type="submit" id="subscribe-button" class="button" name="addSub" value="Add subscription" />
                 <a href="{% url 'subscriptions' %}" class="secondary button">Go back to subscriptions</a>
             </div>
         </form>

@@ -30,12 +30,14 @@ def subscriptions_view(request):
 
 
 @login_required
-def add_subscription(request, *args, **kwargs):
+def add_subscription(request, code=False, *args, **kwargs):
     user = request.user
     if not user.stripe_id:
         user.create_stripe_customer()
     corporate_code = None
     coupon_code = None
+    if code:
+        coupon_code = get_object_or_404(CouponCode, code=code)
     if 'code' in kwargs and 'coupon_type' in kwargs:
         if kwargs['coupon_type'] == 'corporate':
             corporate_code = get_object_or_404(CorporateCode, code=kwargs['code'])
@@ -43,68 +45,93 @@ def add_subscription(request, *args, **kwargs):
             coupon_code = get_object_or_404(CouponCode, code=kwargs['code'])
 
     if request.method == "POST":
-        form = NewSubscriptionForm(request.POST)
-        if form.is_valid():
-
-            plan_stripe_id = form.cleaned_data['plan']
-            token = form.cleaned_data['token']
-
-            plan = Plan.objects.get(stripe_id=plan_stripe_id)
-            # TODO handle no plan
-            user = request.user
-
-            if not user.stripe_id:
-                user.create_stripe_customer()
-
-            sub_kwargs = {
-                "customer": user.stripe_id,
-                "source": token,
-                "items": [{
-                    "plan": plan_stripe_id
-                }]
-            }
-
-            if corporate_code:
-                sub_kwargs['coupon'] = corporate_code.code
-            elif coupon_code:
-                sub_kwargs['coupon'] = coupon_code.code
-                    
-
+        
+        if 'couponCode' in request.POST:
             try:
-                if corporate_code:
-                    sub_kwargs['billing'] = 'send_invoice'
-                    sub_kwargs['days_until_due'] = 30
-                # sub_kwargs
-                # {'customer': 'cus_Ck3yEqbljkn0Zp', 'source': 'tok_1CszGPDR4unvi416aLuq8bR5', 'items': [{'plan': '4-boxesC9MB77'}]}
-                stripe_subscription = stripe.Subscription.create(**sub_kwargs)
-                subscription = Subscription.create_from_stripe_sub(
-                    user=user,
-                    plan=plan,
-                    stripe_subscription=stripe_subscription,
-                    corporate_code=corporate_code,
-                    coupon_code=coupon_code
-                )
-                #'cancel' the subscription, so that the corporate plans do not auto renew
-                # if corporate_code:
-                #     stripe_sub = subscription.get_stripe_subscription()
-                #     stripe_sub.delete(at_period_end = True)
-                #     subscription.cancelled = True
-                #     subscription.save()
-                return redirect(reverse('subscriptions'))
-            except stripe.error.CardError as ex:
-                error = ex.json_body.get('error')
-                messages.error(
-                    request, "We had a problem processing your card. {}".format(error['message'])
-                )
-                rollbar.report_exc_info(sys.exc_info(), request)
+                coupon = CouponCode.objects.get(code=request.POST['code'])
+                #fail if the users email is not allowed by the coupon
+                if coupon.emails and request.user.email not in coupon.emails:
+                    raise Exception
+                #fail if none of the coupons plans are available
+                if coupon.plans.count() > 0 and not any([p.available for p in
+                    coupon.plans.all()]):
+                    raise Exception
+                #fail if there is a subscription with this coupon already attached
+                #to the user 
+                if request.user.subscriptions.filter(coupon_code=coupon).count() == 0:
+                    redirURL = "/subscriptions/new/{}/".format(coupon.code)
+                    return redirect(redirURL)
+                else:
+                    messages.error(request, "You have already used that coupon.")
+            except CouponCode.DoesNotExist:
+                messages.error(request, "That is not a valid coupon.")
             except Exception as ex:
-                messages.error(
-                    request, (
-                        "We had a problem on our end processing your order. "
-                        "You have not been charged. Our administrators have been notified."
-                    )
-                )
+                messages.error(request, "Error: That is not a valid coupon.")
                 rollbar.report_exc_info(sys.exc_info(), request)
+
+        if 'addSub' in request.POST:
+            form = NewSubscriptionForm(request.POST)
+            if form.is_valid():
+
+                plan_stripe_id = form.cleaned_data['plan']
+                token = form.cleaned_data['token']
+
+                plan = Plan.objects.get(stripe_id=plan_stripe_id)
+                # TODO handle no plan
+                user = request.user
+
+                if not user.stripe_id:
+                    user.create_stripe_customer()
+
+                sub_kwargs = {
+                    "customer": user.stripe_id,
+                    "source": token,
+                    "items": [{
+                        "plan": plan_stripe_id
+                    }]
+                }
+
+                if corporate_code:
+                    sub_kwargs['coupon'] = corporate_code.code
+                elif coupon_code:
+                    sub_kwargs['coupon'] = coupon_code.code
+                        
+
+                try:
+                    if corporate_code:
+                        sub_kwargs['billing'] = 'send_invoice'
+                        sub_kwargs['days_until_due'] = 30
+                    # sub_kwargs
+                    # {'customer': 'cus_Ck3yEqbljkn0Zp', 'source': 'tok_1CszGPDR4unvi416aLuq8bR5', 'items': [{'plan': '4-boxesC9MB77'}]}
+                    stripe_subscription = stripe.Subscription.create(**sub_kwargs)
+                    subscription = Subscription.create_from_stripe_sub(
+                        user=user,
+                        plan=plan,
+                        stripe_subscription=stripe_subscription,
+                        corporate_code=corporate_code,
+                        coupon_code=coupon_code
+                    )
+                    #'cancel' the subscription, so that the corporate plans do not auto renew
+                    # if corporate_code:
+                    #     stripe_sub = subscription.get_stripe_subscription()
+                    #     stripe_sub.delete(at_period_end = True)
+                    #     subscription.cancelled = True
+                    #     subscription.save()
+                    return redirect(reverse('subscriptions'))
+                except stripe.error.CardError as ex:
+                    error = ex.json_body.get('error')
+                    messages.error(
+                        request, "We had a problem processing your card. {}".format(error['message'])
+                    )
+                    rollbar.report_exc_info(sys.exc_info(), request)
+                except Exception as ex:
+                    messages.error(
+                        request, (
+                            "We had a problem on our end processing your order. "
+                            "You have not been charged. Our administrators have been notified."
+                        )
+                    )
+                    rollbar.report_exc_info(sys.exc_info(), request)
 
     available_plans = Plan.objects.available().order_by('name')
     if coupon_code and coupon_code.plans.count() > 0:
@@ -152,24 +179,8 @@ def renew_corporate(request, *args, **kwargs):
     return render(request, "core/renew_corporate.html")
 
 @login_required
-def corporate_subscription(request, *args, **kwargs):
-    """Check corporate code to see if valid."""
-    if request.method == "POST":
-        try:
-            code = CorporateCode.objects.get(code=request.POST['code'])
-            if request.user.subscriptions.filter(corporate_code=code).count() == 0:
-                return redirect(reverse('add_corporate_subscription',
-                    kwargs={'code': code.code,'coupon_type':'corporate'}))
-            else:
-                messages.error(request, "You have already used that corporate access code.")
-        except CorporateCode.DoesNotExist:
-            messages.error(request, "That is not a valid corporate access code.")
-
-    return render(request, "core/corporate_subscription.html")
-
-
-@login_required
 def coupon_subscription(request, *args, **kwargs):
+    # TODO CURRENTLY UNUSED, ALTHOUGH THE URL STILL EXISTS
     """Check coupon code to see if valid."""
     if request.method == "POST":
         try:
@@ -194,6 +205,22 @@ def coupon_subscription(request, *args, **kwargs):
             messages.error(request, "That is not a valid coupon.")
 
     return render(request, "core/coupon_subscription.html")
+
+@login_required
+def corporate_subscription(request, *args, **kwargs):
+    """Check corporate code to see if valid."""
+    if request.method == "POST":
+        try:
+            code = CorporateCode.objects.get(code=request.POST['code'])
+            if request.user.subscriptions.filter(corporate_code=code).count() == 0:
+                return redirect(reverse('add_corporate_subscription',
+                    kwargs={'code': code.code,'coupon_type':'corporate'}))
+            else:
+                messages.error(request, "You have already used that corporate access code.")
+        except CorporateCode.DoesNotExist:
+            messages.error(request, "That is not a valid corporate access code.")
+
+    return render(request, "core/corporate_subscription.html")
 
 
 @login_required

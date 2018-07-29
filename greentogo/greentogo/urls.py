@@ -51,6 +51,7 @@ subscriptions_patterns = [
         name='coupon_subscription'
     ),
     url(r'^new/$', core.views.subscriptions.add_subscription, name='add_subscription'),
+    url(r'^new/(?P<code>[A-Z0-9]+)/$', core.views.subscriptions.add_subscription, name='add_subscription'),
     url(
         r'^new/(?P<coupon_type>corporate)/(?P<code>[A-Z0-9]+)/$',
         core.views.subscriptions.add_subscription,
