@@ -10,11 +10,21 @@ import {
 } from 'react-native';
 import { inject, observer } from "mobx-react";
 import { Permissions } from 'expo';
-import BarCodeScannerReader from './BarCodeScannerReader'
 import Subscription from './SubscriptionScreen'
-import { Text } from 'react-native';
+// import { Text } from 'react-native';
 import styles from "../styles";
 import axios from '../apiClient';
+import {
+    Header,
+    Body,
+    Content,
+    List,
+    ListItem,
+    Text,
+    Icon,
+    Left
+} from "native-base";
+import ListMenuItem from './ListMenuItem';
 
 @inject("appStore")
 @observer
@@ -70,14 +80,29 @@ class AccountScreen extends React.Component {
             console.log("Account State: ", this.state)
             console.log(this.state.username)
             return (
-                <View style={{ flex: 1, alignItems: 'center', backgroundColor: styles.primaryCream, paddingTop: 30 }}>
-                    <Text style={{ paddingTop: 10, paddingBottom: 10, color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>Email: {this.state.email}</Text>
-                    <Text style={{ paddingTop: 5, paddingBottom: 10, color: '#0000EE', fontSize: 14 }} onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/account/change_password/' }) }}>Change Password</Text>
+                <Content style={styles.container}>
+                    <Text style={styles.boldCenteredText}>Email: {this.state.email}</Text>
+                    <List>
+                        <ListMenuItem
+                            icon="log-out"
+                            text="Change your default payment method"
+                            onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/account/change_payment_method/' }) }}
+                        />
+                        <ListMenuItem
+                            icon="person"
+                            text="View/Edit Subscriptions"
+                            onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/subscriptions/' }) }}
+                        />
+                        <ListMenuItem
+                            icon="unlock"
+                            text="Change Password"
+                            onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/account/change_password/' }) }}
+                        />
+                    </List>
                     {/* <Subscription /> */}
-                    <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>{this.state.availableBoxes}/ {this.state.maxBoxes} boxes available</Text>
-                    <Text style={{ paddingTop: 5, paddingBottom: 10, color: '#0000EE', fontSize: 14 }} onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/account/change_payment_method/' }) }}>Change your default payment method</Text>
+                    <Text style={{ alignSelf: 'center', color: styles.primaryColor, fontWeight: 'bold', fontSize: 20 }}>{this.state.availableBoxes}/ {this.state.maxBoxes} boxes available</Text>
                     {this.state.totalBoxesReturned &&
-                        <View style={{ flex: 1, justifyContent: 'center', backgroundColor: styles.primaryCream, paddingTop: 5, }}>
+                        <View style={{ flex: 1, justifyContent: 'center', backgroundColor: styles.primaryCream, paddingTop: 10, }}>
                             <Text style={{ textAlign: 'center', color: styles.primaryColor, fontWeight: 'bold', fontSize: 26 }}>Our community</Text>
                             <Text style={{ textAlign: 'center', color: styles.primaryColor, fontWeight: 'bold', fontSize: 26 }}>has saved</Text>
                             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
@@ -104,7 +129,7 @@ class AccountScreen extends React.Component {
                             </View>
                         </View>
                     }
-                </View>
+                </Content>
             )
         }
     }

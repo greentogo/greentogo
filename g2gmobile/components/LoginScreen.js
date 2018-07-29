@@ -222,10 +222,10 @@ class LoginScreen extends React.Component {
                                 {loadingSpinner}
                                 {this.state.error.password ? <Text style={{ color: 'red', textAlign: 'center' }}>{this.state.error.password}</Text> : <Text></Text>}
                                 <Button style={{ backgroundColor: styles.primaryCream }} light full title="Login" onPress={() => { this.attemptLogin() }}>
-                                    <Text style={{ fontWeight: 'bold', color: styles.primaryColor }}>Login</Text>
+                                    <Text style={styles.boldCenteredText}>Login</Text>
                                 </Button>
                                 <Button style={{ backgroundColor: styles.primaryCream }} light full title="SignUp" onPress={() => { this.setState({ type: "signUp" }) }}>
-                                    <Text style={{ fontWeight: 'bold', color: styles.primaryColor }}>Sign Up!</Text>
+                                    <Text style={styles.boldCenteredText}>Sign Up!</Text>
                                 </Button>
                                 <Button style={{ backgroundColor: styles.primaryCream }} light full title="passwordReset" onPress={() => { this.setState({ type: 'passwordReset' }) }}>
                                     <Text style={{ color: styles.primaryColor }}>Forgot Password?</Text>

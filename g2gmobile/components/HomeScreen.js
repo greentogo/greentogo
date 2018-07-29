@@ -18,24 +18,8 @@ import {
     Left
 } from "native-base";
 import axios from '../apiClient';
+import ListMenuItem from './ListMenuItem';
 
-class ListMenuItem extends React.Component {
-    render() {
-        const onPress = this.props.onPress || function () { };
-        return (
-            <TouchableHighlight>
-                <ListItem style={{ flex: 1, height: 100, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: styles.primaryColor, backgroundColor: styles.primaryCream }} icon onPress={onPress}>
-                    <Left>
-                        <Icon style={{ color: styles.primaryColor }} name={this.props.icon} />
-                    </Left>
-                    <Body style={{ borderBottomWidth: 0 }}>
-                        <Text>{this.props.text}</Text>
-                    </Body>
-                </ListItem>
-            </TouchableHighlight>
-        );
-    }
-}
 
 @inject("appStore")
 @observer
@@ -69,22 +53,18 @@ class HomeScreen extends React.Component {
     }
 
     goToMap = () => {
-        // this.props.navigator.push('map');
         this.props.navigation.navigate('map');
     }
 
     goToScanQRCode = () => {
-        // this.props.navigator.push('scanQRCode');
         this.props.navigation.navigate('scanQRCode');
     }
 
     goToReturn = () => {
-        // this.props.navigator.push('returnBox');
         this.props.navigation.navigate('returnBox');
     }
 
     goToAccount = () => {
-        // this.props.navigator.push('account');
         this.props.navigation.navigate('account');
     }
 
@@ -140,7 +120,7 @@ class HomeScreen extends React.Component {
             }
         }
         return (
-            <Content style={{ flex: 1, backgroundColor: styles.primaryCream }}>
+            <Content style={styles.container}>
                 <List>
                     <ListMenuItem
                         icon="log-out"

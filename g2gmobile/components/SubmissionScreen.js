@@ -36,12 +36,7 @@ class SubmissionScreen extends React.Component {
         return {
             title: 'Check In/Out',
             headerLeft: (
-                <TouchableOpacity><Text style={{
-                    fontSize: 50,
-                    color: 'white',
-                    paddingTop: 5,
-                    paddingLeft: 5
-                }} onPress={() => navigation.popToTop()} >X</Text></TouchableOpacity>
+                <TouchableOpacity><Text style={styles.popToTopStyle} onPress={() => navigation.popToTop()}>X</Text></TouchableOpacity>
             ),
         }
     };
@@ -151,57 +146,6 @@ class SubmissionScreen extends React.Component {
     }
 
     render() {
-        const styles = StyleSheet.create({
-            centeredRow: {
-                flexDirection: 'row',
-                justifyContent: 'center'
-            },
-            icon: {
-                fontSize: 20,
-                fontWeight: '800',
-                color: 'white',
-                textAlign: 'center',
-                width: 50,
-                alignSelf: 'center'
-            },
-            headerText: {
-                fontSize: 18,
-                fontWeight: '800',
-                textAlign: 'center'
-            },
-            submitButton: {
-                paddingRight: 20,
-                paddingLeft: 20,
-                paddingTop: 20,
-                paddingBottom: 20,
-                backgroundColor: '#5fb75f',
-                borderRadius: 10,
-                borderWidth: 1,
-                borderColor: '#fff'
-            },
-            submitButtonBlocked: {
-                paddingRight: 20,
-                paddingLeft: 20,
-                paddingTop: 20,
-                paddingBottom: 20,
-                backgroundColor: '#808080',
-                borderRadius: 10,
-                borderWidth: 1,
-                borderColor: '#fff'
-            },
-            pickerStyle: {
-                borderWidth: 1,
-                borderColor: '#000000'
-            },
-            loadingContainer: {
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center'
-            },
-            noSubText: {
-
-            }
-        });
         if (this.state.redirectToWeb) {
             let uri = this.state.redirectToWeb;
             return (
@@ -223,25 +167,24 @@ class SubmissionScreen extends React.Component {
                     </View>
                 ) : (
                         this.state.subscriptions.length > 0 ? (
-                            <ScrollView>
+                            <ScrollView style={styles.container}>
                                 {/* TODO: Add this back in once the tag/ endpoint accepts # of boxes */}
-                                <View style={{ marginBottom: 10 }}><Text style={styles.headerText}>{this.state.locationData.name}</Text></View>
-                                <View style={{ marginBottom: 10 }}><Text style={styles.headerText}>How many boxes to check {this.state.locationData.service.toLowerCase()}?</Text></View>
+                                <View>
+                                    <Text style={styles.boldCenteredText}>{this.state.locationData.name}</Text>
+                                    <Text style={styles.boldCenteredText}>How many boxes to do you want to check {this.state.locationData.service.toLowerCase()}?</Text>
+                                </View>
                                 <View style={styles.centeredRow}>
                                     <Button
                                         success
                                         onPress={this.subtract} >
-                                        <Text style={styles.icon}>-</Text>
+                                        <Text style={styles.submissionAddSubIcon}>-</Text>
                                     </Button>
-                                    <Text style={{ marginLeft: 10, marginRight: 10, fontSize: 20, alignSelf: 'center' }}>{this.state.boxCount}</Text>
+                                    <Text style={styles.submissionBoxCountStyle}>{this.state.boxCount}</Text>
                                     <Button
                                         success
                                         onPress={this.add} >
-                                        <Text style={styles.icon}>+</Text>
+                                        <Text style={styles.submissionAddSubIcon}>+</Text>
                                     </Button>
-                                </View>
-                                <View>
-                                    <Text style={styles.headerText}>Check {this.state.locationData.service.toLowerCase()} {this.state.boxCount === 1 ? `${this.state.boxCount} box` : `${this.state.boxCount} boxes`} on which subscription?</Text>
                                 </View>
                                 <View style={styles.pickerStyle}>
                                     <Picker
@@ -268,12 +211,12 @@ class SubmissionScreen extends React.Component {
                                     }
                                     <View style={styles.centeredRow}>
                                         {this.state.error ? (
-                                            <TouchableOpacity style={styles.submitButtonBlocked}>
-                                                <Text style={{ color: '#FFFFFF' }}>Cannot Submit</Text>
+                                            <TouchableOpacity style={styles.submissionSubmitButtonBlocked}>
+                                                <Text style={styles.submissionSubmitTextStyle}>Cannot Check {this.state.locationData.service.toLowerCase()}</Text>
                                             </TouchableOpacity>
                                         ) : (
-                                                <TouchableOpacity style={styles.submitButton} onPress={this.submit}>
-                                                    <Text style={{ color: '#FFFFFF' }}>Submit</Text>
+                                                <TouchableOpacity style={styles.submissionSubmitButton} onPress={this.submit}>
+                                                    <Text style={styles.submissionSubmitTextStyle}>Check {this.state.locationData.service.toLowerCase()}</Text>
                                                 </TouchableOpacity>
                                             )}
                                     </View>

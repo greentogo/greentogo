@@ -60,6 +60,7 @@ class MapScreen extends React.Component {
 
     static navigationOptions = {
         title: 'Participating Restaurants',
+        headerTitleStyle: { width: 300 }
     };
 
     componentWillMount() {
@@ -72,7 +73,7 @@ class MapScreen extends React.Component {
                 this.setState({ locations: json.data.data })
             })
             .catch((e) => console.log(e))
-        // this._getCurrentLocation();
+        this._getCurrentLocation();
         // this._interval = setInterval(() => {
         //     this._getCurrentLocation();
         // }, 5000);
@@ -84,16 +85,11 @@ class MapScreen extends React.Component {
 
     _getCurrentLocation() {
         navigator.geolocation.getCurrentPosition(((user) => {
-            console.log("Requesting Location");
-            console.log(user.coords);
             this.setState({ currentLocation: user.coords })
         }))
     }
 
     _goToLocation(latitude, longitude, title) {
-        console.log("Map Being Called");
-        console.log(latitude);
-        console.log(longitude);
         openMap({ latitude: latitude, longitude: longitude, query: title });
     }
 
