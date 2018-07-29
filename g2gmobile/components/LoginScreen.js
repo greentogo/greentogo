@@ -32,6 +32,8 @@ class LoginScreen extends React.Component {
             type: 'login',
             redirectToWeb: false
         }
+        this.attemptLogin = this.attemptLogin.bind(this);
+        this.attemptPasswordReset = this.attemptPasswordReset.bind(this);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -57,27 +59,25 @@ class LoginScreen extends React.Component {
                     username: this.state.username,
                     password: this.state.password
                 }
-            }).then((json) => {
-                if (json.data.auth_token) {
-                    this.setState({ loading: false });
-                    this.props.store.setAuthToken(json.data.auth_token);
-                }
+            }).then((loginResponse) => {
                 // Get the user data after successful login
                 axios.get('/me/', {
                     headers: {
-                        'Authorization': `Token ${json.data.auth_token}`
+                        'Authorization': `Token ${loginResponse.data.auth_token}`
                     }
-                }).then((response) => {
-                    console.log(response.data)
-                    this.props.store.setUserData(response.data.data);
+                }).then((meResponse) => {
+                    this.props.store.setUserData(meResponse.data.data);
+                    this.setState({ loading: false });
+                    this.props.store.setAuthToken(loginResponse.data.auth_token);
                 }).catch((error) => {
                     console.log(error);
-                    this.props.appStore.clearAuthToken();
+                    this.props.store.clearAuthToken();
                 })
             }).catch((error) => {
                 // TODO
                 // HANDLE THESE LOCALLY
-                if (error.response.data.non_field_errors) {
+                console.log(error);
+                if (error.response && error.response.data && error.response.data.non_field_errors) {
                     this.setState({ error: error.response.data.non_field_errors, loading: false });
                 } else if (error.response.data.password || error.response.data.username) {
                     let tempErrors = {};
@@ -132,8 +132,12 @@ class LoginScreen extends React.Component {
         // });
     }
 
+    switchType = (type) => () => {
+        this.setState({ type, error: [] });
+    }
+
     attemptPasswordReset() {
-        this.setState({ loading: true }, () =>{
+        this.setState({ loading: true }, () => {
             axios({
                 method: 'post',
                 url: this.props.store.makeUrl('/password/reset/'),
@@ -157,10 +161,10 @@ class LoginScreen extends React.Component {
             <Spinner color={styles.primaryColor} />
             : null;
         let errorMessages = null;
-        if (this.state.error[0] !== undefined){
+        if (this.state.error[0] !== undefined) {
             errorMessages = this.state.error.map((error, index) => {
-            return <Text key={index} style={{ color: 'red', textAlign: 'center' }}>{error}</Text>;
-        });
+                return <Text key={index} style={{ color: 'red', textAlign: 'center' }}>{error}</Text>;
+            });
         }
         if (this.state.redirectToWeb) {
             let uri = this.state.redirectToWeb;
@@ -191,6 +195,7 @@ class LoginScreen extends React.Component {
                                         autoCorrect={false}
                                         keyboardType="email-address"
                                         onChangeText={(text) => this.setState({ username: text })}
+                                        onSubmitEditing={this.attemptLogin}
                                         value={this.state.username}
                                     />
                                 </Item>
@@ -198,20 +203,20 @@ class LoginScreen extends React.Component {
                                 <Item last>
                                     <Input placeholder="Password"
                                         secureTextEntry={true}
-                                        onSubmitEditing={() => this.attemptLogin()}
+                                        onSubmitEditing={this.attemptLogin}
                                         onChangeText={(text) => this.setState({ password: text })}
                                     />
                                 </Item>
                                 {errorMessages}
                                 {loadingSpinner}
                                 {this.state.error.password ? <Text style={styles.errorStyle}>{this.state.error.password}</Text> : <Text></Text>}
-                                <Button style={{ backgroundColor: styles.primaryCream }} light full title="Login" onPress={() => { this.attemptLogin() }}>
+                                <Button style={styles.creamBackground} full title="Login" onPress={this.attemptLogin}>
                                     <Text style={styles.boldCenteredText}>Login</Text>
                                 </Button>
-                                <Button style={{ backgroundColor: styles.primaryCream }} light full title="SignUp" onPress={() => { this.setState({ type: "signUp" }) }}>
+                                <Button style={styles.creamBackground} full title="SignUp" onPress={this.switchType("signUp")}>
                                     <Text style={styles.boldCenteredText}>Sign Up!</Text>
                                 </Button>
-                                <Button style={{ backgroundColor: styles.primaryCream }} light full title="passwordReset" onPress={() => { this.setState({ type: 'passwordReset' }) }}>
+                                <Button style={styles.creamBackground} full title="passwordReset" onPress={this.switchType("passwordReset")}>
                                     <Text style={{ color: styles.primaryColor }}>Forgot Password?</Text>
                                 </Button>
                             </Form>
@@ -243,18 +248,18 @@ class LoginScreen extends React.Component {
                                     </Item>
                                     {errorMessages}
                                     {loadingSpinner}
-                                    <Button style={{ backgroundColor: styles.primaryCream }} light full title="Login" onPress={() => { this.attemptLogin }}>
-                                        <Text style={{ fontWeight: 'bold', color: styles.primaryColor }}>Sign Up</Text>
+                                    <Button style={styles.creamBackground} full title="Login" onPress={this.attemptSignUp}>
+                                        <Text style={styles.boldCenteredText}>Sign Up</Text>
                                     </Button>
-                                    <Button style={{ backgroundColor: styles.primaryCream }} light full title="SignUp" onPress={() => { this.setState({ type: "login" }) }}>
-                                        <Text style={{ fontWeight: 'bold', color: styles.primaryColor }}>Go to Login</Text>
+                                    <Button style={styles.creamBackground} full title="SignUp" onPress={this.switchType("login")}>
+                                        <Text style={styles.boldCenteredText}>Go to Login</Text>
                                     </Button>
                                 </Form>
                                 : this.state.type === 'passwordResetSuccess' ?
                                     <View style={{ flex: 1, paddingTop: 140, alignItems: 'center' }}>
                                         <Text style={{ color: styles.primaryColor }}>{this.state.msg}</Text>
-                                        <Button style={{ backgroundColor: styles.primaryCream }} light full title="SignUp" onPress={() => { this.setState({ type: "login" }) }}>
-                                            <Text style={{ fontWeight: 'bold', color: styles.primaryColor }}>Go to Login</Text>
+                                        <Button style={styles.creamBackground} full title="SignUp" onPress={this.switchType("login")}>
+                                            <Text style={styles.boldCenteredText}>Go to Login</Text>
                                         </Button>
                                     </View>
 
@@ -266,16 +271,17 @@ class LoginScreen extends React.Component {
                                                 autoCorrect={false}
                                                 keyboardType="email-address"
                                                 onChangeText={(text) => this.setState({ username: text })}
+                                                onSubmitEditing={this.attemptPasswordReset}
                                                 value={this.state.username}
                                             />
                                         </Item>
                                         {errorMessages}
                                         {loadingSpinner}
-                                        <Button style={{ backgroundColor: styles.primaryCream }} light full title="resetPassword" onPress={() => { this.attemptPasswordReset() }}>
-                                            <Text style={{ fontWeight: 'bold', color: styles.primaryColor }}>Reset Password</Text>
+                                        <Button style={styles.creamBackground} light full title="resetPassword" onPress={this.attemptPasswordReset}>
+                                            <Text style={styles.boldCenteredText}>Reset Password</Text>
                                         </Button>
-                                        <Button style={{ backgroundColor: styles.primaryCream }} light full title="SignUp" onPress={() => { this.setState({ type: "login" }) }}>
-                                            <Text style={{ fontWeight: 'bold', color: styles.primaryColor }}>Go to Login</Text>
+                                        <Button style={styles.creamBackground} light full title="SignUp" onPress={this.switchType("login")}>
+                                            <Text style={styles.boldCenteredText}>Go to Login</Text>
                                         </Button>
                                     </Form>
                         }

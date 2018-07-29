@@ -59,7 +59,6 @@ export class AppStore {
                 'Authorization': `Token ${this.authToken}`
             }
         }).then((response) => {
-            console.log("User data success")
             this.setUserData(response.data.data);
         }).catch((error) => {
             console.log(error);
@@ -77,12 +76,11 @@ export class AppStore {
     }
     
     @action setUserData(data) {
-        this.user = data
+        this.user = data;
         if (data.subscriptions) {
-            this.user.maxBoxes = this.reduceBoxes(data.subscriptions, "max_boxes")
-            this.user.availableBoxes = this.reduceBoxes(data.subscriptions, "available_boxes")
+            this.user.maxBoxes = this.reduceBoxes(data.subscriptions, "max_boxes");
+            this.user.availableBoxes = this.reduceBoxes(data.subscriptions, "available_boxes");
         }
-        simpleStore.save('user', data)
-        console.log("User data: ", this.user)
+        simpleStore.save('user', data);
     }
 }

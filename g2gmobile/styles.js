@@ -7,6 +7,9 @@ const primaryCream = '#F8F8F4';
 const styles = {
     primaryColor: primaryColor,
     primaryCream: primaryCream,
+    creamBackground: {
+        backgroundColor: primaryCream
+    },
     container: {
         flex: 1,
         backgroundColor: primaryCream 
