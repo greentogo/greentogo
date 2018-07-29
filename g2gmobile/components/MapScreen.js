@@ -1,48 +1,9 @@
 import React from 'react';
-import { StyleSheet, Platform, Image, ImageBackground, Animated, Text, View } from 'react-native';
+import { StyleSheet, Platform, ImageBackground, Text } from 'react-native';
 import { inject, observer } from 'mobx-react';
 import { MapView } from 'expo';
 import openMap from 'react-native-open-maps';
-
-class FadeInView extends React.Component {
-    state = {
-        fadeAnim: new Animated.Value(0),  // Initial value for opacity: 0
-    }
-
-    componentDidMount() {
-        this.cycleAnimation();
-    }
-
-    cycleAnimation() {
-        Animated.sequence([
-            Animated.timing(this.state.fadeAnim, { // Animate over time
-                toValue: 1,                 // Animate to opacity: 1 (opaque)
-                duration: 500              // Make it take a while
-            }),
-            Animated.timing(this.state.fadeAnim, {  // The animated value to drive
-                toValue: 0,
-                duration: 500,
-                delay: 500                // Make it last for a little
-            })
-        ]).start(() => {                // Starts the animation
-            this.cycleAnimation();
-        });
-    }
-
-    render() {
-        let { fadeAnim } = this.state;
-        return (
-            <Animated.View                 // Special animatable View
-                style={{
-                    ...this.props.style,
-                    opacity: fadeAnim,         // Bind opacity to animated value
-                }}
-            >
-                {this.props.children}
-            </Animated.View>
-        );
-    }
-}
+import Flashing from './subcomponents/Flashing';
 
 
 @inject('appStore')
@@ -52,7 +13,6 @@ class MapScreen extends React.Component {
         super(props);
         this.state = {
             locations: this.props.appStore.resturants,
-            // locations: [],
             authToken: this.props.appStore.authToken,
             currentLocation: false,
         }
@@ -64,7 +24,6 @@ class MapScreen extends React.Component {
     };
 
     componentWillMount() {
-        console.log(this.props.appStore.resturants);
         this._getCurrentLocation();
         // this._interval = setInterval(() => {
         //     this._getCurrentLocation();
@@ -111,9 +70,6 @@ class MapScreen extends React.Component {
                         latitude: marker.latitude,
                         longitude: marker.longitude
                     }}
-                    // title={marker.name}
-                    // description={marker.address}
-                    // key={marker.name}
                     key={i}
                     ref={comp => this['callout-' + i] = comp}
                     zIndex={0}
@@ -159,13 +115,13 @@ class MapScreen extends React.Component {
                         title={"You"}
                         key={"You"}
                     >
-                        <FadeInView>
+                        <Flashing>
                             <ImageBackground
                                 source={require('../assets/icons/you.png')}
                                 style={{ height: 15, width: 15 }}
                             >
                             </ImageBackground>
-                        </FadeInView>
+                        </Flashing>
                     </MapView.Marker>
                 }
                 {markers}
