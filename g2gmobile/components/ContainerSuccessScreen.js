@@ -3,10 +3,12 @@ import {
     Text,
     View,
     Image,
-    TouchableOpacity
+    TouchableOpacity,
+    ScrollView,
 } from 'react-native';
 import styles from "../styles";
 import { inject } from "mobx-react";
+import CommunityBoxes from "./subcomponents/CommunityBoxes";
 
 @inject("appStore")
 class ContainerSuccessScreen extends React.Component {
@@ -32,7 +34,7 @@ class ContainerSuccessScreen extends React.Component {
 
     render() {
         return (
-            <View style={styles.successTopContainer}>
+            <ScrollView style={styles.successTopContainer}>
                 <View>
                     <Text style={styles.successText}>
                         Checked {this.state.service.toLowerCase()}
@@ -58,7 +60,8 @@ class ContainerSuccessScreen extends React.Component {
                         />
                     </View>
                 </View>
-            </View>
+                <CommunityBoxes color={'white'} background={styles.primaryColor} />
+            </ScrollView>
         )
     }
 }

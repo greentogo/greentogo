@@ -2,7 +2,9 @@ import { StyleSheet, Dimensions } from 'react-native';
 import { Constants } from 'expo';
 
 const primaryColor = '#628E86';
-const primaryCream = '#F8F8F4';
+// const primaryCream = '#F8F8F4';
+const primaryCream = '#f9f9e8';
+// const primaryCream = 'rgb(248, 248, 244)';
 
 const styles = {
     primaryColor: primaryColor,
@@ -95,7 +97,6 @@ const styles = {
         backgroundColor: primaryColor,
         flex: 1,
         flexDirection: 'column',
-        justifyContent: 'space-around',
     },
     successText: {
         color: 'white',

@@ -15,6 +15,7 @@ import {
 } from "native-base";
 import ListMenuItem from './subcomponents/ListMenuItem';
 import SubscriptionBanner from './subcomponents/SubscriptionBanner';
+import CommunityBoxes from "./subcomponents/CommunityBoxes";
 
 @inject("appStore")
 @observer
@@ -96,34 +97,7 @@ class AccountScreen extends React.Component {
                         />
                     </List>
                     <SubscriptionBanner/>
-                    {this.state.totalBoxesReturned &&
-                        <View style={{ flex: 1, justifyContent: 'center', backgroundColor: styles.primaryCream, paddingTop: 10, }}>
-                            <Text style={{ textAlign: 'center', color: styles.primaryColor, fontWeight: 'bold', fontSize: 26 }}>Our community</Text>
-                            <Text style={{ textAlign: 'center', color: styles.primaryColor, fontWeight: 'bold', fontSize: 26 }}>has saved</Text>
-                            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 40, paddingRight: 10 }}>{this.state.totalBoxesReturned}</Text>
-                                <Image
-                                    source={require('../assets/icons/GTG-Box-App.png')}
-                                    style={{ height: 35, width: 35 }}
-                                />
-                                <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 40, paddingLeft: 10 }}>s</Text>
-                            </View>
-                            <Text style={{ textAlign: 'center', color: styles.primaryColor, fontWeight: 'bold', fontSize: 26 }}>from a landfill</Text>
-                        </View>
-                    }
-                    {this.state.totalUserBoxesReturned &&
-                        <View style={{ flex: 1, justifyContent: 'center', backgroundColor: styles.primaryCream, paddingTop: 10 }}>
-                            <Text style={{ textAlign: 'center', color: styles.primaryColor, fontWeight: 'bold', fontSize: 26 }}>You've saved</Text>
-                            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                                <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 40, paddingRight: 10 }}>{this.state.totalUserBoxesReturned}</Text>
-                                <Image
-                                    source={require('../assets/icons/GTG-Box-App.png')}
-                                    style={{ height: 35, width: 35 }}
-                                />
-                                <Text style={{ color: styles.primaryColor, fontWeight: 'bold', fontSize: 40, paddingLeft: 10 }}>s</Text>
-                            </View>
-                        </View>
-                    }
+                    <CommunityBoxes/>
                 </Content>
             )
         }

@@ -13,8 +13,7 @@ class BarCodeScannerReader extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            barCodeScanned: false,
-            error: false
+            barCodeScanned: false
         }
     }
 
@@ -27,7 +26,7 @@ class BarCodeScannerReader extends React.Component {
         if (!this.state.barCodeScanned) {
             let authToken = this.props.appStore.authToken;
             let url = JSON.stringify(data.data);
-            this.setState({ barCodeScanned: true, error: false }, () => {
+            this.setState({ barCodeScanned: true }, () => {
                 let locationUrl = /(\/locations\/)([A-Z0-9]{6})/.exec(url);
                 if (locationUrl && locationUrl[1] && locationUrl[2]) {
                     axios.get(locationUrl[1] + locationUrl[2], {
