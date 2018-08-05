@@ -69,6 +69,7 @@ class LoginScreen extends React.Component {
                     this.props.store.setAuthToken(loginResponse.data.auth_token);
                 }).catch((error) => {
                     console.log(error);
+                    this.setState({ error: ["We are sorry, we are having trouble processing your request. Please try again later. ERROR IN ME ENDPOINT"], loading: false });
                     this.props.store.clearAuthToken();
                 })
             }).catch((error) => {
@@ -87,7 +88,7 @@ class LoginScreen extends React.Component {
                     }
                     this.setState({ error: tempErrors, loading: false });
                 } else {
-                    this.setState({ error: ["We are sorry, we are having trouble processing your request. Please try again later."], loading: false });
+                    this.setState({ error: ["We are sorry, we are having trouble processing your request. Please try again later. ERROR IN LOGIN"], loading: false });
                 }
             });
         } else {

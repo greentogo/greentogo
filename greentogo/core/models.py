@@ -734,6 +734,7 @@ class LocationStockReport(models.Model):
 class Restaurant(models.Model):
     name = models.CharField(max_length=255)
     address = models.CharField(max_length=1023)
+    website = models.CharField(max_length=1023, null=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
     phase = models.PositiveIntegerField(default=1)
