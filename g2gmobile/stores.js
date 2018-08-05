@@ -55,7 +55,7 @@ export class AppStore {
         }).then((response) => {
             this.setUserData(response.data.data);
         }).catch((error) => {
-            console.log(error);
+            axios.post('/log/', error);
             console.log(this.clearAuthToken());
         })
     }

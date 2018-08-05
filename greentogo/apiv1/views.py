@@ -151,15 +151,11 @@ class RestaurantsView(APIView):
         return jsend_success(serializer.data)
 
 class Log(APIView):
-    """Returns list of active restaurants"""
+    """Logs Errors"""
 
     def post(self, request, format=None):
         print(request.body)
-        # serializer = RestaurantSerializer(Restaurant.objects.filter(active=True), many=True)
-        data = {
-            "total_boxes_returned": "LocationTag.objects.checkin().count()"
-            }
-        return jsend_success(data)
+        return jsend_success({"data": "received"})
 
 
 class Statistics(GenericAPIView):

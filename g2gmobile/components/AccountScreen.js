@@ -51,6 +51,7 @@ class AccountScreen extends React.Component {
                 this.setState({ totalUserBoxesReturned: userBoxes, totalBoxesReturned: response.data.data.total_boxes_returned });
             }
         }).catch((error) => {
+            axios.post('/log/', error);
             if ((error.status && error.status === 401) || (error.response && error.response.status && error.response.status === 401)) {
                 this.props.appStore.clearAuthToken();
             };

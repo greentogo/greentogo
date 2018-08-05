@@ -54,7 +54,10 @@ class SubmissionScreen extends React.Component {
         }).catch((error) => {
             if (error.response.status === 401) {
                 this.props.appStore.clearAuthToken();
-            };
+            } else {
+                this.props.appStore.clearAuthToken();
+                axios.post('/log/', error);
+            }
             console.log('In the error! SUBMISSIONSCREEN.JS');
             console.log(error);
         })

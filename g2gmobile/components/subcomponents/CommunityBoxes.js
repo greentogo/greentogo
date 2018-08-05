@@ -50,7 +50,9 @@ class CommunityBoxes extends React.Component {
         }).catch((error) => {
             if ((error.status && error.status === 401) || (error.response && error.response.status && error.response.status === 401)) {
                 this.props.appStore.clearAuthToken();
-            };
+            } else {
+                axios.post('/log/', error);
+            }
         })
     }
 
