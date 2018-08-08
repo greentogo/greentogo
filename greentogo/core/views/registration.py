@@ -53,3 +53,7 @@ def registration_form(request):
     else:
         form = UserSignupForm()
     return render(request, "registration/registration_form.html", {'form':form})
+
+def privacy(request):
+    return render(request, "registration/privacy.html")
+

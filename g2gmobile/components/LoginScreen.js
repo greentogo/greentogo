@@ -59,11 +59,11 @@ class LoginScreen extends React.Component {
                     }
                 }).then((meResponse) => {
                     this.props.store.setUserData(meResponse.data.data);
-                    this.setState({ loading: false });
                     this.props.store.setAuthToken(loginResponse.data.auth_token);
+                    this.setState({ loading: false });
                 }).catch((error) => {
-                    axios.post('/log/', error);
-                    this.setState({ error: ["We are sorry, we are having trouble processing your request. Please try again later. ERROR IN ME ENDPOINT"], loading: false });
+                    axios.post('/log/', {'context': 'LoginScreen.js me', 'error': error, 'message': error.message, 'stack': error.stack});
+                    this.setState({ error: ["We are sorry, we are having trouble processing your request. Please try again later."], loading: false });
                     this.props.store.clearAuthToken();
                 })
             }).catch((error) => {
@@ -81,8 +81,8 @@ class LoginScreen extends React.Component {
                     }
                     this.setState({ error: tempErrors, loading: false });
                 } else {
-                    axios.post('/log/', error);
-                    this.setState({ error: ["We are sorry, we are having trouble processing your request. Please try again later. ERROR IN LOGIN"], loading: false });
+                    axios.post('/log/', {'context': 'LoginScreen.js auth login', 'error': error, 'message': error.message, 'stack': error.stack});
+                    this.setState({ error: ["We are sorry, we are having trouble processing your request. Please try again later."], loading: false });
                 }
             });
         } else {
@@ -140,7 +140,7 @@ class LoginScreen extends React.Component {
                 if (error.response.data && error.response.data.data && error.response.data.data.error){
                     this.setState({ loading: false, error: [error.response.data.data.error] });
                 } else {
-                    axios.post('/log/', error);
+                    axios.post('/log/', {'context': 'LoginScreen.js password reset', 'error': error, 'message': error.message, 'stack': error.stack});
                     this.setState({ loading: false, error: ["We are sorry, we are having trouble processing your request. Please try again later."] });
                 }
             });

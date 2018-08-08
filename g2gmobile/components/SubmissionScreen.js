@@ -52,14 +52,8 @@ class SubmissionScreen extends React.Component {
                 }
             })
         }).catch((error) => {
-            if (error.response.status === 401) {
-                this.props.appStore.clearAuthToken();
-            } else {
-                this.props.appStore.clearAuthToken();
-                axios.post('/log/', error);
-            }
-            console.log('In the error! SUBMISSIONSCREEN.JS');
-            console.log(error);
+            this.props.appStore.clearAuthToken();
+            axios.post('/log/', {'context': 'SubmissionScreen.js ComponentWillMount', 'error': error, 'message': error.message, 'stack': error.stack});
         })
     }
 
@@ -144,8 +138,8 @@ class SubmissionScreen extends React.Component {
                 axios.post('/tag/', body, config).then((response) => {
                     this.props.navigation.navigate('containerSuccessScreen', { boxCount: this.state.boxCount, locationData: this.state.locationData });
                 }).catch((error) => {
-                    this.setState({ loadingSubmit: false })
-                    console.log(error.response);
+                    axios.post('/log/', {'context': 'SubmissionScreen.js Submit Tag', 'error': error, 'message': error.message, 'stack': error.stack});
+                    this.setState({ loadingSubmit: false });
                 });
             })
         }

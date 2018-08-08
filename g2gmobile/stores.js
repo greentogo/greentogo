@@ -4,10 +4,10 @@ import simpleStore from 'react-native-simple-store';
 import axios from './apiClient';
 
 enableLogging({
-    action: true,
-    // reaction: true,
-    // transaction: true,
-    // compute: true
+    action: false,
+    reaction: false,
+    transaction: false,
+    compute: false
 });
 
 export class AppStore {
@@ -15,13 +15,13 @@ export class AppStore {
     @observable user = {}
 
     constructor() {
-        console.log('appStore constructor')
+        // console.log('appStore constructor')
         simpleStore.get('authToken').then(token => {
-            console.log('stored token', token || 'not found')
+            // console.log('stored token', token || 'not found')
             this.authToken = token
         })
         simpleStore.get('user').then(user => {
-            console.log('user store', user || 'not found')
+            // console.log('user store', user || 'not found')
             this.user = user
         })
         simpleStore.get('resturants').then(resturants => {
@@ -34,13 +34,13 @@ export class AppStore {
     }
 
     @action setAuthToken(token) {
-        console.log('setting authToken', token)
+        // console.log('setting authToken', token)
         this.authToken = token
         simpleStore.save('authToken', token)
     }
 
     @action clearAuthToken() {
-        console.log('clearing authToken')
+        // console.log('clearing authToken')
         this.authToken = null
         simpleStore.save('authToken', null)
         simpleStore.save('user', null)
@@ -55,8 +55,9 @@ export class AppStore {
         }).then((response) => {
             this.setUserData(response.data.data);
         }).catch((error) => {
-            axios.post('/log/', error);
-            console.log(this.clearAuthToken());
+            axios.post('/log/', {'context': 'stores.js getUserData', 'error': error, 'message': error.message, 'stack': error.stack});
+            this.clearAuthToken();
+            // console.log(this.clearAuthToken());
         })
     }
 
@@ -65,8 +66,9 @@ export class AppStore {
         axios.get('/restaurants/')
         .then((json) => {
             simpleStore.save('resturants', json.data.data)
+        }).catch((error) => {
+            axios.post('/log/', {'context': 'stores.js getResturantData', 'error': error, 'message': error.message, 'stack': error.stack});
         })
-        .catch((e) => console.log(e))
     }
     
     @action setUserData(data) {

@@ -21,6 +21,9 @@
       "bundleIdentifier": "com.greentogo.greentogoapp",
       "buildNumber": "0.50.0",
       "icon": "./assets/icons/GTG-Box-App-1024.png"
+    },
+    "android": {
+      "package": "com.greentogo.greentogoapp"
     }
   }
 }

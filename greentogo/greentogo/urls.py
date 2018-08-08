@@ -118,7 +118,8 @@ urlpatterns = [
     url(r'^api/v1/auth/', include('djoser.urls.authtoken')),
     url(r'^api/v1/', include('apiv1.urls')),
     url(r'^$', core_views.index),
-    url(r'^accidental_checkout/$', core.views.reporting.accidental_checkout, name='accidental_checkout')
+    url(r'^accidental_checkout/$', core.views.reporting.accidental_checkout, name='accidental_checkout'),
+    url(r'^privacy/$', core.views.registration.privacy, name='privacy')
 ] + static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
 )
