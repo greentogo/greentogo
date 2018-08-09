@@ -174,6 +174,8 @@ def handle_invoice_upcoming(event):
                 ).strftime('%B %d')
 
             site = Site.objects.get_current()
+
+            amountDue = int(invoice.amount_due) / 100
             
             send_templated_mail(
                 template_name='upcoming_invoice',
@@ -181,7 +183,7 @@ def handle_invoice_upcoming(event):
                 recipient_list=[customer.email,],
                 context={
                         'renew_date': renew_date,
-                        'amount_due': invoice.amount_due,
+                        'amount_due': amountDue,
                         'site': site
                     }
             )
