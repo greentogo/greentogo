@@ -15,6 +15,7 @@ from rest_framework.views import APIView
 
 from core.models import User, Location, LocationTag, Plan, Restaurant, Subscription
 from core.forms import UserSignupForm
+import rollbar
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
@@ -154,10 +155,13 @@ class Log(APIView):
     """Logs Errors"""
 
     def post(self, request, format=None):
-        body_unicode = request.body.decode('utf-8')
-        body = json.loads(body_unicode)
+        request.body = {
+            "AHHH":"OH NO"
+        }
+        # body_unicode = request.body.decode('utf-8')
+        # body = json.loads(body_unicode)
         # print(body)
-        rollbar.report_message(body, "error")
+        rollbar.report_message(request.body, "error")
         return jsend_success({"data": "received"})
 
 
