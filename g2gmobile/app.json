@@ -5,7 +5,7 @@
     "slug": "GreenToGo",
     "privacy": "public",
     "sdkVersion": "23.0.0",
-    "version": "0.50.0",
+    "version": "0.50.1",
     "orientation": "portrait",
     "primaryColor": "#F8F8F4",
     "icon": "./assets/icons/GTG-Box-App.png",
@@ -19,11 +19,16 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.greentogo.greentogoapp",
-      "buildNumber": "0.50.0",
+      "buildNumber": "0.50.1",
       "icon": "./assets/icons/GTG-Box-App-1024.png"
     },
     "android": {
-      "package": "com.greentogo.greentogoapp"
+      "package": "com.greentogo.greentogoapp",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyA8f-lwu4sdv3PmLXfOyHXR-1iBAeWMf08"
+        }
+      }
     }
   }
 }

@@ -154,13 +154,10 @@ class Log(APIView):
     """Logs Errors"""
 
     def post(self, request, format=None):
-        print("START LOG")
-        print(request.body)
-        # print("DECODED")
-        # body_unicode = request.body.decode('utf-8')
-        # body = json.loads(body_unicode)
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
         # print(body)
-        print("END LOG")
+        rollbar.report_message(body, "error")
         return jsend_success({"data": "received"})
 
 
