@@ -66,8 +66,7 @@ def send_the_email(request):
     if request.method == 'POST':
         try:
             dt = date(2018, 8, 15)
-            # subscriptions = Subscription.objects.filter(stripe_id__isnull=True, ends_at__month__gte=dt.month)
-            subscriptions = Subscription.objects.filter(user_id=38)
+            subscriptions = Subscription.objects.filter(stripe_id__isnull=True, ends_at__month__gte=dt.month)
             for sub in subscriptions:
                 expireDate = sub.ends_at.date()
                 print(expireDate)
@@ -85,6 +84,7 @@ def send_the_email(request):
                 )
                 email.attach_alternative(html, "text/html")
                 email.send()
+            return redirect('/subscriptions/')
         except Exception as ex:
             return render(request, "registration/privacy.html")
     return render(request, "registration/send_email.html")
