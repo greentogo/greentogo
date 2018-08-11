@@ -23,6 +23,7 @@
       "icon": "./assets/icons/GTG-Box-App-1024.png"
     },
     "android": {
+      "versionCode": 2,
       "package": "com.greentogo.greentogoapp",
       "config": {
         "googleMaps": {
