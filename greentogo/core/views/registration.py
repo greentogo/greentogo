@@ -66,10 +66,9 @@ def send_the_email(request):
     if request.method == 'POST':
         try:
             dt = date(2018, 8, 15)
-            subscriptions = Subscription.objects.filter(stripe_id__isnull=True, ends_at__month__gte=dt.month)
+            subscriptions = Subscription.objects.filter(stripe_id__isnull=True, ends_at__month__gte=dt.month, ends_at__year__gte=dt.year)
             for sub in subscriptions:
                 expireDate = sub.ends_at.date()
-                print(expireDate)
                 message_data = {
                     'expire': expireDate
                 }
