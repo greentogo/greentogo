@@ -155,9 +155,6 @@ class Log(APIView):
     """Logs Errors"""
 
     def post(self, request, format=None):
-        request.body = {
-            "AHHH":"OH NO"
-        }
         # body_unicode = request.body.decode('utf-8')
         # body = json.loads(body_unicode)
         # print(body)
