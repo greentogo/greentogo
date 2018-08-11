@@ -12,13 +12,6 @@ from django.contrib.sites.shortcuts import get_current_site
 from core.models import Location, Subscription, LocationTag, User
 from core.forms import UserSignupForm
 
-
-from django.contrib.admin.views.decorators import staff_member_required
-from datetime import date
-
-
-
-
 def registration_form(request):
     if request.method == 'POST':
         form = UserSignupForm(request.POST)
@@ -60,33 +53,6 @@ def registration_form(request):
     else:
         form = UserSignupForm()
     return render(request, "registration/registration_form.html", {'form':form})
-
-@staff_member_required()
-def send_the_email(request):
-    if request.method == 'POST':
-        try:
-            dt = date(2018, 8, 15)
-            subscriptions = Subscription.objects.filter(stripe_id__isnull=True, ends_at__month__gte=dt.month, ends_at__year__gte=dt.year)
-            for sub in subscriptions:
-                expireDate = sub.ends_at.date()
-                message_data = {
-                    'expire': expireDate
-                }
-                txt = render_to_string('registration/sub_expire.txt', message_data)
-                html = render_to_string('registration/sub_expire.html', message_data)
-                email = EmailMultiAlternatives(
-                    subject='GreenToGo Subscription Expiring Soon!',
-                    body=txt,
-                    from_email='amy@durhamgreentogo.com',
-                    to=[sub.user.email],
-                    reply_to=["amy@durhamgreentogo.com"]
-                )
-                email.attach_alternative(html, "text/html")
-                email.send()
-            return redirect('/subscriptions/')
-        except Exception as ex:
-            return render(request, "registration/privacy.html")
-    return render(request, "registration/send_email.html")
 
 def privacy(request):
     return render(request, "registration/privacy.html")
