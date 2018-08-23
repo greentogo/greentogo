@@ -34,7 +34,7 @@ class SubscriptionBanner extends React.Component {
             }
         }
         return (
-            <Text style={styles.boldCenteredText}>
+            <Text style={styles.subscriptionBanner}>
                 {boxesAvailableBanner && boxesAvailableBanner}
             </Text>
         )

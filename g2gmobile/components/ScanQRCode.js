@@ -23,6 +23,14 @@ class ScanQRCode extends React.Component {
         this.props.navigation.navigate('submission', { locationData: locationData });
     };
 
+    // componentDidMount() {
+    //     this.props.navigation.navigate('submission', { locationData: {
+    //         code: 'GW6VRU',
+    //         service: 'IN',
+    //         name: "Rose's Noodles, Dumplings & Sweets"
+    //     } });
+    // }
+
     render() {
         return (
             <View style={{ flex: 1 }}>

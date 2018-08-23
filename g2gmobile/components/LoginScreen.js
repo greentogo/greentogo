@@ -58,9 +58,9 @@ class LoginScreen extends React.Component {
                         'Authorization': `Token ${loginResponse.data.auth_token}`
                     }
                 }).then((meResponse) => {
+                    this.setState({ loading: false });
                     this.props.store.setUserData(meResponse.data.data);
                     this.props.store.setAuthToken(loginResponse.data.auth_token);
-                    this.setState({ loading: false });
                 }).catch((error) => {
                     axios.post('/log/', {'context': 'LoginScreen.js me', 'error': error, 'message': error.message, 'stack': error.stack});
                     this.setState({ error: ["We are sorry, we are having trouble processing your request. Please try again later."], loading: false });

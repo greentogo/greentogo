@@ -17,7 +17,7 @@ class ListMenuItem extends React.Component {
         const onPress = this.props.onPress || function () { };
         return (
             <TouchableHighlight>
-                <ListItem style={{ flex: 1, height: 100, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: styles.primaryColor, backgroundColor: styles.primaryCream }} icon onPress={onPress}>
+                <ListItem style={{ flex: 1, height: 80, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: styles.primaryColor, backgroundColor: styles.primaryCream }} icon onPress={onPress}>
                     <Left>
                         <Icon style={{ color: styles.primaryColor }} name={this.props.icon} />
                     </Left>

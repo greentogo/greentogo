@@ -20,7 +20,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.greentogo.greentogoapp",
       "buildNumber": "0.50.1",
-      "icon": "./assets/icons/GTG-Box-App-1024.png"
+      "icon": "./assets/icons/GTG-Box-App-noAlpha.png"
     },
     "android": {
       "versionCode": 2,

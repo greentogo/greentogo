@@ -14,7 +14,7 @@ const styles = {
     },
     container: {
         flex: 1,
-        backgroundColor: primaryCream 
+        backgroundColor: primaryCream
     },
     popToTopStyle: {
         fontSize: 40,
@@ -48,6 +48,14 @@ const styles = {
         fontWeight: '800',
         fontSize: 20,
         textAlign: 'center'
+    },
+    subscriptionBanner: {
+        paddingTop: 10,
+        paddingBottom: 10,
+        backgroundColor: primaryColor,
+        color: primaryCream,
+        textAlign: 'center',
+        fontSize: 20,
     },
     submissionContainer: {
         flex: 1,
