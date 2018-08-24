@@ -1,5 +1,12 @@
 # GreenToGo
 
+[![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/ansicolortags.svg)](https://pypi.python.org/pypi/ansicolortags/)
+[![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://app.durhamgreentogo.com/)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/greentogo/greentogo/graphs/commit-activity)
+[![GitHub issues](https://img.shields.io/github/issues/greentogo/greentogo.svg)](https://github.com/greentogo/greentogo/issues)
+
+
 This project contains both the GreenToGo mobile app and the Django web application with an API.
 
 The files are laid out in accordance with recommendations from Two Scoops of Django.
