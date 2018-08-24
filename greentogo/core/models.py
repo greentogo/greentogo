@@ -15,7 +15,7 @@ from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.text import slugify
-from django.core.mail import send_mail, EmailMultiAlternatives
+from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
 from collections import Counter
 
 import shortuuid
@@ -460,9 +460,23 @@ class Subscription(models.Model):
                 )
                 email.attach_alternative(message_html, "text/html")
                 email.send()
+
+            if location.service == "OUT" and not location.admin_location and location.get_estimated_stock() < 7:
+                message_data = {
+                    'location': location,
+                    'count': location.get_estimated_stock(),
+                }
+                message_txt = render_to_string('admin/low_stock.txt', message_data)
+                email = EmailMessage(
+                    subject='Low Stock At {}'.format(location.name),
+                    body=message_txt,
+                    from_email='database@app.durhamgreentogo.com',
+                    to=['amy@durhamgreentogo.com', 'crystaldreisbach@gmail.com', 'veronica@durhamgreentogo.com'],
+                )
+                email.send()
+
         except Exception as ex:
-            print(ex)
-            # rollbar.report_exc_info(sys.exc_info(), request)
+            rollbar.report_exc_info(sys.exc_info(), request)
         return tags
 
     def used_today(self):
