@@ -6,6 +6,7 @@
   "private": true,
   "main": "main.js",
   "dependencies": {
+    "@expo/videoplayer": "^0.4.0",
     "axios": "^0.18.0",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-preset-react-native-stage-0": "^1.0.1",
@@ -21,6 +22,7 @@
     "react-native-push-notification": "^3.0.2",
     "react-native-simple-store": "^1.3.0",
     "react-native-video": "^3.2.0",
+    "react-native-video-controls": "^2.2.3",
     "react-navigation": "^2.6.2",
     "rollbar-react-native": "^0.3.1"
   }

@@ -16,8 +16,7 @@ import {
 import ListMenuItem from './subcomponents/ListMenuItem';
 import SubscriptionBanner from './subcomponents/SubscriptionBanner';
 import G2GTitleImage from "./subcomponents/G2GTitleImage";
-// import { Video } from 'react-native-video';
-import { Video } from 'expo';
+import G2GVideo from "./subcomponents/G2GVideo";
 
 
 @inject("appStore")
@@ -54,35 +53,10 @@ class HomeScreen extends React.Component {
     }
 
     render() {
-        const win = Dimensions.get('window');
         return (
             <View style={styles.container}>
                 <ScrollView>
-                    <Video
-                        resizeMode="cover"
-                        shouldPlay
-                        style={{
-                            alignSelf: 'stretch',
-                            width: win.width,
-                            height: win.width / 2
-                        }}
-                        source={require('../assets/icons/how-2-gtg.mp4')}
-                        // source={{ uri: '../assets/icons/how-2-gtg' }}
-                    // ref={(ref) => {
-                    //     this.player = ref
-                    // }}                                      // Store reference
-                    // onBuffer={this.onBuffer}                // Callback when remote video is buffering
-                    // onEnd={this.onEnd}                      // Callback when playback finishes
-                    // onError={this.videoError}               // Callback when video cannot be loaded
-                    // style={{
-                    //     position: 'absolute',
-                    //     top: 0,
-                    //     left: 0,
-                    //     bottom: 0,
-                    //     right: 0,
-                    //   }}
-                    />
-                    <View style={styles.controlBar}></View>
+                    <G2GVideo />
                     <List>
                         <ListMenuItem
                             icon="log-out"
