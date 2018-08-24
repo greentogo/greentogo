@@ -16,6 +16,7 @@
                 <button type="submit" class="button">
                     Continue
                 </button>
+                <p>Don’t have a subscription? We’ll let’s fix that! <a href="https://app.durhamgreentogo.com/accounts/register/">Join now.</a></p>
             </form>
         </div>
     </div>

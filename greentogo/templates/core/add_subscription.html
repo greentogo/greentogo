@@ -45,7 +45,17 @@
             </div>
         </form>
         {% endif %}
-
+        <h4>Choose the plan that suites your billing preferences!</h4>
+        <p>
+            <strong>ANNUAL PLANS</strong> auto-renew one year from the date of purchase and save you some money.
+            These are our most popular plans! 
+        </p>
+        <p>
+            <strong>MONTHLY PLANS</strong> renew every month, allowing you to test GreenToGo for shorter amounts of time with
+            less financial commitment.  You can cancel anytime before your monthly renewal. You can choose
+            to cancel and switch to an annual plan any time as well. There is no “contract” beyond one month, 
+            but your credit card will be automatically charged monthly unless you cancel the subscription. 
+        </p>
         <form action="." method="POST" id="new-subscription-form">
             {% csrf_token %}
             {{ form.token }}
@@ -60,6 +70,13 @@
                 <a href="{% url 'subscriptions' %}" class="secondary button">Go back to subscriptions</a>
             </div>
         </form>
+        <p>
+            <strong>REFUND POLICY</strong> We only offer refunds in special circumstances. If you need to request a refund, email
+            info@durhamgreentogo.com with an explanation of why you would like a refund. We do NOT offer pro-rated
+            refunds if you cancel before the end of your subscription. Cancelling your subscription will turn off
+            auto-renew so that you will not be charged on the renewal date, but your GreenToGo subscription
+            will remain active until that expiration date. We appreciate your understanding of this policy. 
+        </p>
     </div>
 </div>
 {% endblock %}
