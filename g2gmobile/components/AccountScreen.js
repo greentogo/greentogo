@@ -57,7 +57,8 @@ class AccountScreen extends React.Component {
                         <ListMenuItem
                             icon="person"
                             text="View/Edit Name and Email"
-                            onPress={this.goToNameAndEmail}
+                            // onPress={this.goToNameAndEmail}
+                            onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/account/' }) }}
                         />
                         <ListMenuItem
                             icon="card"

@@ -54,7 +54,7 @@ class HomeScreen extends React.Component {
 
     render() {
         return (
-            <View style={styles.container}>
+            <View style={{ ...styles.container, paddingBottom: 50 }}>
                 <ScrollView>
                     <G2GVideo />
                     <List>
