@@ -12,28 +12,9 @@ If you haven’t yet added a subscription to your GreenToGo membership, go ahead
 
 Then you’ll be ready to use GreenToGo at any of the participating restaurants: 
 
-Alpaca Peruvian Chicken | 703a 9th St, Durham, NC 27705
-Bagel Bar  | 104 City Hall Plaza #101, Durham, NC 27701
-Bull City Burger and Brewery |  107 E Parrish St, Durham, NC 27701
-Bull McCabes  | 427 W Main St, Durham, NC 27701
-Durham Co-Op Market  |  1111 W Chapel Hill St, Durham, NC 27701
-Geer St. Garden  |  644 Foster St, Durham, NC 27701
-Ko Kyu Na’Mean |  4823 Meadow Dr, Durham, NC 27713
-Luna Rotisserie  |  112 W Main St, Durham, NC 27701
-Monuts  |  1002 9th St, Durham, NC 27705
-NanaTaco  |  2512 University Dr, Durham, NC 277707
-Ninth St. Bakery | 136 E Chapel Hill St, Durham, NC 27701
-Pie Pushers  |  117A W Main St, Durham, NC 27701
-Pompieri Pizza  |  102 City Hall Plaza, Durham, NC 27701
-Rose’s Noodles, Dumplings, and Sweets |  121 N Gregson St, Durham, NC 27701
-Saltbox Seafood Joint |  2637 Durham-Chapel Hill Blvd.
-Saltbox Seafood Joint | 608 N Mangum St, Durham, NC 27701
-Souly Vegan | 306 W Franklin St, Chapel Hill, NC 27516
-The Boot | 2501 University Dr, Durham, NC 27707
-The Original Q-Shack |  2510 University Dr, Durham, NC 27707
-Toast  |  345 W Main St, Durham, NC 27701
-Vegan Flava Cafe |  1720 Guess Rd #18, Durham, NC 27701
-Zenfish |  810 9th St, Durham, NC 27705
+{% for restaurant in restaurants %}
+{{ restaurant.name }}  |  {{ restaurant.address }}
+{% endfor %}
 
 Using GreenToGo at the Restaurants: 
 

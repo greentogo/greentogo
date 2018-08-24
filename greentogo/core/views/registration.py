@@ -9,7 +9,7 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 
-from core.models import Location, Subscription, LocationTag, User
+from core.models import Location, Subscription, LocationTag, User, Restaurant
 from core.forms import UserSignupForm
 
 def registration_form(request):
@@ -23,8 +23,10 @@ def registration_form(request):
             current_site = get_current_site(request)
             communityBoxesCheckedIn = int((LocationTag.objects.all()).count()/2) + 100
             to_email = form.cleaned_data.get('email')
+            restaurants = Restaurant.objects.filter(active=True)
             message_data = {
                 'user': user,
+                'restaurants': restaurants,
                 'communityBoxesCheckedIn': communityBoxesCheckedIn,
                 'domain': current_site.domain,
             }
