@@ -4,7 +4,7 @@
     "description": "GreenToGo is a service that makes returnable and reusable takeout containers a reality! Our goal is to help the community reduce waste by making reusable takeout containers a convenient part of the Durham infrastructure.",
     "slug": "GreenToGo",
     "privacy": "public",
-    "sdkVersion": "23.0.0",
+    "sdkVersion": "25.0.0",
     "version": "0.50.1",
     "orientation": "portrait",
     "primaryColor": "#F8F8F4",

@@ -11,7 +11,7 @@ const store = new AppStore();
 @observer class GreenToGo extends React.Component {
     state = { fontsAreLoaded: false };
 
-    async componentWillMount() {
+    async componentDidMount() {
         await Expo.Font.loadAsync({
             'Roboto': require('native-base/Fonts/Roboto.ttf'),
             'Roboto_medium': require('native-base/Fonts/Roboto_medium.ttf'),
