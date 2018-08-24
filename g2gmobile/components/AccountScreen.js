@@ -36,28 +36,6 @@ class AccountScreen extends React.Component {
         this.props.navigation.navigate('editnameemail');
     }
 
-    componentWillMount() {
-        let authToken = this.props.appStore.authToken;
-        axios.get(`/stats/${this.props.appStore.user.username}/`, {
-            headers: {
-                'Authorization': `Token ${authToken}`
-            }
-        }).then((response) => {
-            if (response.data && response.data.data) {
-                let userBoxes = false;
-                if (response.data.data.total_user_boxes_returned && response.data.data.total_user_boxes_returned > 0){
-                    userBoxes = response.data.data.total_user_boxes_returned;
-                }
-                this.setState({ totalUserBoxesReturned: userBoxes, totalBoxesReturned: response.data.data.total_boxes_returned });
-            }
-        }).catch((error) => {
-            axios.post('/log/', {'context': 'AccountScreen.js', 'error': error, 'message': error.message, 'stack': error.stack});
-            if ((error.status && error.status === 401) || (error.response && error.response.status && error.response.status === 401)) {
-                this.props.appStore.clearAuthToken();
-            };
-        })
-    }
-
     render() {
         if (this.state.redirectToWeb) {
             let uri = this.state.redirectToWeb;

@@ -39,7 +39,7 @@ class SubmissionScreen extends React.Component {
         }
     };
 
-    componentWillMount() {
+    componentDidMount() {
         let authToken = this.props.appStore.authToken;
         axios.get('/me/', {
             headers: {
@@ -53,7 +53,7 @@ class SubmissionScreen extends React.Component {
             })
         }).catch((error) => {
             this.props.appStore.clearAuthToken();
-            axios.post('/log/', {'context': 'SubmissionScreen.js ComponentWillMount', 'error': error, 'message': error.message, 'stack': error.stack});
+            axios.post('/log/', {'context': 'SubmissionScreen.js componentDidMount', 'error': error, 'message': error.message, 'stack': error.stack});
         })
     }
 

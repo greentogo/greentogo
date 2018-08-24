@@ -25,7 +25,7 @@ class CommunityBoxes extends React.Component {
         }
     }
 
-    componentWillMount() {
+    componentDidMount() {
         let color = styles.primaryColor;
         let background = styles.primaryCream;
         if (this.props.color){

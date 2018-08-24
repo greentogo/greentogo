@@ -46,7 +46,7 @@ class G2GVideo extends React.Component {
         const win = Dimensions.get('window');
         return (
             <View>
-                <VideoPlayer
+                {/* <VideoPlayer
                     videoProps={{
                         resizeMode:"cover",
                         shouldPlay: this.state.shouldPlay,
@@ -63,7 +63,7 @@ class G2GVideo extends React.Component {
                     }}
                     showControlsOnLoad={true}
                     isPortrait={true}
-                />
+                /> */}
                 <Video
                     resizeMode="cover"
                     shouldPlay={this.state.shouldPlay}

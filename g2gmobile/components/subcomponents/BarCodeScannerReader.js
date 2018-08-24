@@ -17,7 +17,7 @@ class BarCodeScannerReader extends React.Component {
         }
     }
 
-    async componentWillMount() {
+    async componentDidMount() {
         const { status } = await Permissions.askAsync(Permissions.CAMERA);
         this.setState({ hasCameraPermission: status === 'granted' });
     }

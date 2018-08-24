@@ -23,7 +23,7 @@ class MapScreen extends React.Component {
         headerTitleStyle: { width: 300 }
     };
 
-    componentWillMount() {
+    componentDidMount() {
         this._getCurrentLocation();
         // this._interval = setInterval(() => {
         //     this._getCurrentLocation();
