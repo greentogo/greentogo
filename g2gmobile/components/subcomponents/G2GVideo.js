@@ -12,16 +12,12 @@ import {
     List,
     Text
 } from "native-base";
-// import Video from 'react-native-video';
-// import VideoPlayer from 'react-native-video-controls';
 import { Video } from 'expo';
-import VideoPlayer from '@expo/videoplayer';
+import VideoPlayer from './VideoPlayer';
+import BaseScreen from './BaseScreen';
 
 
-import { MaterialIcons, Octicons } from '@expo/vector-icons';
-
-
-class G2GVideo extends React.Component {
+class G2GVideo extends BaseScreen {
     constructor(props) {
         super(props)
         this.state = {
@@ -42,29 +38,34 @@ class G2GVideo extends React.Component {
         }));
     }
 
+
+    changeRate(rate) {
+        this._playbackInstance.setStatusAsync({
+            rate: rate,
+            shouldCorrectPitch: true,
+        });
+    }
+
     render() {
         const win = Dimensions.get('window');
         return (
             <View>
-                {/* <VideoPlayer
+                <VideoPlayer
                     videoProps={{
-                        resizeMode:"cover",
-                        shouldPlay: this.state.shouldPlay,
-                        isMuted: this.state.mute,
-                        // style:{
-                        //     alignSelf: 'stretch',
-                        //     width: win.width,
-                        //     height: win.width / 2
-                        // },
-                        ignoreSilentSwitch:"ignore",
-                        source: {
-                            uri: '../../assets/icons/how-2-gtg.mp4'
-                        }
+                        shouldPlay: false,
+                        resizeMode: Video.RESIZE_MODE_CONTAIN,
+                        isMuted: false,
+                        ref: component => {
+                            this._playbackInstance = component;
+                        },
                     }}
                     showControlsOnLoad={true}
-                    isPortrait={true}
-                /> */}
-                <Video
+                    isPortrait={this.state.isPortrait}
+                    switchToLandscape={this.switchToLandscape.bind(this)}
+                    switchToPortrait={this.switchToPortrait.bind(this)}
+                    playFromPositionMillis={0}
+                />
+                {/* <Video
                     resizeMode="cover"
                     shouldPlay={this.state.shouldPlay}
                     isMuted={this.state.mute}
@@ -75,30 +76,7 @@ class G2GVideo extends React.Component {
                     }}
                     ignoreSilentSwitch="ignore"
                     source={require('../../assets/icons/how-2-gtg.mp4')}
-                />
-                <View style={{
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: 45,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: "rgba(0, 0, 0, 0.5)",
-                }}>
-                    <MaterialIcons
-                        name={this.state.mute ? "volume-mute" : "volume-up"}
-                        size={45}
-                        color="white"
-                        onPress={this.handleVolume}
-                    />
-                    <MaterialIcons
-                        name={this.state.shouldPlay ? "pause" : "play-arrow"}
-                        size={45}
-                        color="white"
-                        onPress={this.handlePlayAndPause}
-                    />
-                </View>
+                /> */}
             </View>
         )
     }
