@@ -32,7 +32,7 @@ export default class BaseScreen extends React.Component {
         const { width, height } = dims.window;
         const isLandscape = width > height;
         this.setState({ isPortrait: !isLandscape });
-        this.props.navigation.setParams({ tabBarHidden: isLandscape });
+        // this.props.navigation.setParams({ tabBarHidden: isLandscape });
         ScreenOrientation.allow(ScreenOrientation.Orientation.ALL);
     }
 
