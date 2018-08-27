@@ -14,13 +14,21 @@
       "hideExponentText": false
     },
     "packagerOpts": {
-      "assetExts": ["ttf", "mp4"]
+      "assetExts": [
+        "ttf",
+        "mp4"
+      ]
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.greentogo.greentogoapp",
       "buildNumber": "0.51.0",
-      "icon": "./assets/icons/GTG-Box-App-noAlpha.png"
+      "icon": "./assets/icons/GTG-Box-App-noAlpha.png",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Location is used in the map view screen to allow users to see where they are in relation to locations that use the GreenToGo service",
+        "NSLocationAlwaysUsageDescription": "Location is used in the map view screen to allow users to see where they are in relation to locations that use the GreenToGo service",
+        "NSCameraUsageDescription": "The camera is used to capture relevant QR codes that our service uses to check in and check out containers"
+      }
     },
     "android": {
       "versionCode": 3,
