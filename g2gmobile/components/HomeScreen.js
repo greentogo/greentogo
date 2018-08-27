@@ -80,7 +80,7 @@ class HomeScreen extends React.Component {
                         />
                     </List>
                 </ScrollView>
-                <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
+                <View style={styles.bottomFixed}>
                     <SubscriptionBanner />
                 </View>
             </View>

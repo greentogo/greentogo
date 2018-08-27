@@ -49,6 +49,27 @@ const styles = {
         fontSize: 20,
         textAlign: 'center'
     },
+    bottomFixed: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0
+    },
+    mapCalloutTitle: {
+        flex: 1,
+        textAlign: 'left',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    mapCalloutText: {
+        flex: 1,
+        textAlign: 'left'
+    },
+    mapCalloutDirections: {
+        flex: 1,
+        textAlign: 'left',
+        fontWeight: 'bold'
+    },
     subscriptionBanner: {
         paddingTop: 10,
         paddingBottom: 10,
