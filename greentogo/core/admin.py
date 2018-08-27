@@ -60,7 +60,7 @@ class UnclaimedSubscriptionAdmin(admin.ModelAdmin):
 
 
 class LocationAdmin(admin.ModelAdmin):
-    fields = ('name', 'code', 'service', 'address', 'latitude', 'longitude', 'admin_location', 'headquarters', 'washing_location', 'dumping_location', 'notify', 'notifyEmail', 'retired')
+    fields = ('name', 'code', 'service', 'address', 'website', 'latitude', 'longitude', 'admin_location', 'headquarters', 'washing_location', 'dumping_location', 'notify', 'notifyEmail', 'retired')
     readonly_fields = ('code', 'latitude', 'longitude', )
     list_display = ('name', 'code', 'service', )
     actions = [
