@@ -4,7 +4,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import render
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth import get_user_model
-import json
+import json, re
 
 from registration.models import RegistrationProfile
 from registration.signals import user_registered
@@ -148,7 +148,11 @@ class RestaurantsView(APIView):
     """Returns list of active restaurants"""
 
     def get(self, request, format=None):
-        serializer = RestaurantSerializer(Restaurant.objects.filter(active=True), many=True)
+        # serializer = RestaurantSerializer(Restaurant.objects.filter(active=True), many=True)
+        serializer = RestaurantSerializer(Location.objects.filter(retired=False, admin_location=False), many=True)
+        for location in serializer.data:
+            filtered = re.sub('(- )?(check)?(-)?(in|out)(?:\s|$)', '', location['name'], flags=re.IGNORECASE)
+            location['name'] = filtered
         return jsend_success(serializer.data)
 
 class Log(APIView):

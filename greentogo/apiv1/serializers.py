@@ -67,11 +67,11 @@ class LocationTagSerializer(serializers.Serializer):
 
 class RestaurantSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Restaurant
-        fields = ('name', 'address', 'latitude', 'longitude', 'phase')
+        model = Location
+        fields = ('name', 'address', 'latitude', 'longitude', 'service')
 
     name = serializers.CharField()
     address = serializers.CharField()
     latitude = serializers.FloatField()
     longitude = serializers.FloatField()
-    phase = serializers.IntegerField()
+    service = serializers.CharField()
