@@ -575,6 +575,7 @@ class Location(models.Model):
     website = models.CharField(max_length=1023, null=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
+    phase = models.PositiveIntegerField(default=1)
 
     notify = models.BooleanField(
         default=False,

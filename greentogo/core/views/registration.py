@@ -23,7 +23,7 @@ def registration_form(request):
             current_site = get_current_site(request)
             communityBoxesCheckedIn = int((LocationTag.objects.all()).count()/2) + 100
             to_email = form.cleaned_data.get('email')
-            restaurants = Restaurant.objects.filter(active=True)
+            restaurants = Location.objects.filter(retired=False, admin_location=False, service='OUT')
             message_data = {
                 'user': user,
                 'restaurants': restaurants,
