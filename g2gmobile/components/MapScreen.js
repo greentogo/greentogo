@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, Platform, ImageBackground, Text } from 'react-native';
+import { Platform, ImageBackground, Text, View, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { inject, observer } from 'mobx-react';
 import { MapView } from 'expo';
 import openMap from 'react-native-open-maps';
 import Flashing from './subcomponents/Flashing';
+import styles from '../styles';
 
 
 @inject('appStore')
@@ -12,19 +13,26 @@ class MapScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            locations: this.props.appStore.resturants,
-            authToken: this.props.appStore.authToken,
+            mapType: "OUT",
             currentLocation: false,
         }
     }
 
-    static navigationOptions = {
-        title: 'Participating Restaurants',
-        headerTitleStyle: { width: 300 }
+    static navigationOptions = ({ navigation }) => {
+        const { state } = navigation;
+        let titleText = "Participating Restaurants";
+        if (state.params && state.params.title){
+            titleText = state.params.title;
+        }
+        return {
+            title: `${titleText}`,
+            headerTitleStyle: { width: 300 }
+        }
     };
 
     componentDidMount() {
         this._getCurrentLocation();
+        this.props.appStore.getResturantData();
         // this._interval = setInterval(() => {
         //     this._getCurrentLocation();
         // }, 5000);
@@ -44,92 +52,89 @@ class MapScreen extends React.Component {
         openMap({ latitude: latitude, longitude: longitude, query: title });
     }
 
+    _switchService = (type, titleText) => () => {
+        this.setState({ mapType: type })
+        const { setParams } = this.props.navigation;
+        setParams({ title: titleText })
+    }
+
     render() {
-        const styles = StyleSheet.create({
-            calloutTitle: {
-                flex: 1,
-                textAlign: 'left',
-                fontSize: 20,
-                fontWeight: 'bold',
-            },
-            calloutText: {
-                flex: 1,
-                textAlign: 'left'
-            },
-            calloutDirections: {
-                flex: 1,
-                textAlign: 'left',
-                fontWeight: 'bold'
-            }
-        });
-        let markers = []
-        if (this.state.locations) {
-            this.state.locations.map((marker, i) => {
-                markers.push(
-                    <MapView.Marker
-                        coordinate={{
-                            latitude: marker.latitude,
-                            longitude: marker.longitude
-                        }}
-                        key={i}
-                        ref={comp => this['callout-' + i] = comp}
-                        zIndex={0}
-                        onPress={() => {
-                            markers.map((mark, index) => {
-                                this['callout-' + index].setNativeProps({ zIndex: 0 })
-                            })
-                            this['callout-' + i].setNativeProps({ zIndex: 9999 })
-                        }}
-                    >
-                        {Platform.OS === 'ios' && <ImageBackground
-                            source={require('../assets/icons/Drop-Pin_Box.png')}
-                            style={{ height: 75, width: 75, zIndex: 1 }}
-                        >
-                            <Text style={{ width: 0, height: 0 }}>{Math.random()}</Text>
-                        </ImageBackground>}
-                        <MapView.Callout
-                            style={{ width: 300, zIndex: 9999 }}
-                            onPress={() => this._goToLocation(marker.latitude, marker.longitude, marker.name)}
-                        >
-                            <Text numberOfLines={1} style={styles.calloutTitle}>{marker.name}</Text>
-                            <Text numberOfLines={1} style={styles.calloutText}>{marker.address}</Text>
-                            <Text numberOfLines={1} style={styles.calloutDirections}>Tap for directions!</Text>
-                        </MapView.Callout>
-                    </MapView.Marker>
-                )
-            })
-            return (
-                <MapView
-                    style={{ flex: 1 }}
-                    initialRegion={{
-                        latitude: 35.9940,
-                        longitude: -78.8986,
-                        latitudeDelta: 0.05,
-                        longitudeDelta: 0.05
-                    }}>
-                    {this.state.currentLocation &&
+        let markers = [];
+        if (this.props.appStore.resturants) {
+            this.props.appStore.resturants.map((marker, i) => {
+                if (marker.address && marker.latitude && marker.longitude && marker.service === this.state.mapType) {
+                    markers.push(
                         <MapView.Marker
                             coordinate={{
-                                latitude: this.state.currentLocation.latitude,
-                                longitude: this.state.currentLocation.longitude
+                                latitude: marker.latitude,
+                                longitude: marker.longitude
                             }}
-                            title={"You"}
-                            key={"You"}
+                            key={i}
+                            ref={comp => this['callout-' + i] = comp}
                         >
-                            <Flashing>
-                                <ImageBackground
-                                    source={require('../assets/icons/you.png')}
-                                    style={{ height: 15, width: 15 }}
-                                >
-                                </ImageBackground>
-                            </Flashing>
+                            {Platform.OS === 'ios' && <ImageBackground
+                                source={require('../assets/icons/Drop-Pin_Box.png')}
+                                style={{ height: 75, width: 75, zIndex: 1 }}
+                            >
+                            </ImageBackground>}
+                            <MapView.Callout
+                                style={{ width: 300, zIndex: 9999 }}
+                                onPress={() => this._goToLocation(marker.latitude, marker.longitude, marker.name)}
+                            >
+                                <Text numberOfLines={1} style={styles.mapCalloutTitle}>{marker.name}</Text>
+                                <Text numberOfLines={1} style={styles.mapCalloutText}>{marker.address}</Text>
+                                <Text numberOfLines={1} style={styles.mapCalloutDirections}>Tap for directions!</Text>
+                            </MapView.Callout>
                         </MapView.Marker>
-                    }
-                    {markers}
-                </MapView>
+                    )
+                }
+            })
+            return (
+                <View style={{ flex: 1 }}>
+                    <MapView
+                        style={{ flex: 1 }}
+                        initialRegion={{
+                            latitude: 35.9940,
+                            longitude: -78.8986,
+                            latitudeDelta: 0.05,
+                            longitudeDelta: 0.05
+                        }}>
+                        {this.state.currentLocation &&
+                            <MapView.Marker
+                                coordinate={{
+                                    latitude: this.state.currentLocation.latitude,
+                                    longitude: this.state.currentLocation.longitude
+                                }}
+                                title={"You"}
+                                key={"You"}
+                            >
+                                <Flashing>
+                                    <ImageBackground
+                                        source={require('../assets/icons/you.png')}
+                                        style={{ height: 15, width: 15 }}
+                                    >
+                                    </ImageBackground>
+                                </Flashing>
+                            </MapView.Marker>
+                        }
+                        {markers}
+                    </MapView>
+                    <View style={styles.bottomFixed}>
+                        <TouchableOpacity onPress={this._switchService("OUT", "Participating Restaurants")}>
+                            <Text style={styles.subscriptionBanner}>Participating Restaurants</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={this._switchService("IN", "Return A Box")}>
+                            <Text style={styles.subscriptionBanner}>Return Box</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
             )
         } else {
-            this.props.appStore.getResturantData();
+            return (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+            )
         }
     }
 }
