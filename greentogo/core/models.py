@@ -572,6 +572,7 @@ class Location(models.Model):
     service = models.CharField(max_length=25, choices=SERVICE_CHOICES)
     name = models.CharField(max_length=255)
     address = models.CharField(max_length=1023)
+    website = models.CharField(max_length=1023, null=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
 
