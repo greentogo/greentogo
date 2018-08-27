@@ -54,13 +54,13 @@ class G2GVideo extends BaseScreen {
         return (
             <TouchableOpacity onPress={() => {
                 if (!this.state.videoStarted) {
-                    this.setState({ videoStarted: true });
+                    this.setState({ videoStarted: true, shouldPlay: true });
                 }
             }}>
                 {this.state.videoStarted ? (
                     <VideoPlayer
                         videoProps={{
-                            shouldPlay: false,
+                            shouldPlay: this.state.shouldPlay,
                             resizeMode: Video.RESIZE_MODE_CONTAIN,
                             isMuted: false,
                             style: {
