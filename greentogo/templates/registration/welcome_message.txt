@@ -1,8 +1,8 @@
 {% load i18n %}
 
-Dear {{ user.username }},
+Welcome to GreenToGo!
 
-Welcome to GreenToGo! 
+Your username is: {{ user.username }},
 
 Thank you for taking action toward curing the single-use container epidemic. Together, our community has already averted {{ communityBoxesCheckedIn }} single-use containers from the landfill! We’re grateful for your help as we strive toward our first short-term goal of averting 10,000 containers ASAP! 
 
