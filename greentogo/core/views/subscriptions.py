@@ -20,6 +20,10 @@ from core.utils import decode_id, encode_nums
 rollbar.init(settings.ROLLBAR_KEY, settings.ROLLBAR_ENV)
 
 
+class CouponExpired(Exception):
+   """Raised when the coupon is expired"""
+   pass
+
 @login_required
 def subscriptions_view(request):
     user = request.user
@@ -38,6 +42,9 @@ def add_subscription(request, code=False, *args, **kwargs):
     coupon_code = None
     if code:
         coupon_code = get_object_or_404(CouponCode, code=code)
+        if coupon_code.redeem_by < datetime.now().date():
+            messages.error(request, "That coupon has expired")
+            return redirect('/subscriptions/new/')
     if 'code' in kwargs and 'coupon_type' in kwargs:
         if kwargs['coupon_type'] == 'corporate':
             corporate_code = get_object_or_404(CorporateCode, code=kwargs['code'])
