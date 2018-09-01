@@ -26,5 +26,6 @@ urlpatterns = [
         name="RfidView"
     ),
     url(r'^password/reset/$',  views.PasswordReset.as_view(), name="PasswordReset"),
+    url(r'^register/', views.Register.as_view(), name="Register"),
     url(r'^log/$',  views.Log.as_view(), name="Log"),
 ]

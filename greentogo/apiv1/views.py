@@ -19,7 +19,7 @@ import rollbar
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
-from .serializers import CheckinCheckoutSerializer, LocationTagSerializer, UserSerializer, LocationSerializer, RestaurantSerializer
+from .serializers import CheckinCheckoutSerializer, LocationTagSerializer, UserSerializer, LocationSerializer, RestaurantSerializer, UserRegistrationSerializer
 
 
 class CheckinCheckoutView(GenericAPIView):
@@ -222,8 +222,77 @@ class PasswordReset(APIView):
                 return jsend_fail({"error": "User does not exist"}, status=404)
 
         except Exception as ex:
-            return jsend_fail({"error": "Unable to reset password"}, status=500)
             rollbar.report_exc_info(sys.exc_info(), request)
+            return jsend_fail({"error": "Unable to reset password"}, status=500)
+
+class Register(GenericAPIView):
+    """
+    User Registration
+    """
+
+    serializer_class = UserRegistrationSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        print(request.data)
+        print(serializer)
+        stuff = {
+            'username':request.data.get('username'),
+            'email':request.data['email'],
+            'email2':request.data['email2'],
+            'password1':request.data['password1'],
+            'password2':request.data['password2'],
+            'tos': ['on']
+        }
+        print(stuff)
+        try:
+            form = UserSignupForm(stuff)
+            if form.is_valid():
+                print("FORM IS VALID")
+                user = form.save(commit=False)
+                user.is_active = True
+                user.create_stripe_customer()
+                user.email = form.cleaned_data.get('email')
+                current_site = get_current_site(request)
+                communityBoxesCheckedIn = int((LocationTag.objects.all()).count()/2) + 100
+                to_email = form.cleaned_data.get('email')
+                restaurants = Location.objects.filter(retired=False, admin_location=False, service='OUT')
+                message_data = {
+                    'user': user,
+                    'restaurants': restaurants,
+                    'communityBoxesCheckedIn': communityBoxesCheckedIn,
+                    'domain': current_site.domain,
+                }
+                welcome_message_txt = render_to_string('registration/welcome_message.txt', message_data)
+                welcome_message_html = render_to_string('registration/welcome_message.html', message_data)
+                user.save()
+                email = EmailMultiAlternatives(
+                    subject='Welcome to GreenToGo!',
+                    body=welcome_message_txt,
+                    from_email='greentogo@app.durhamgreentogo.com',
+                    to=[to_email],
+                    reply_to=["amy@durhamgreentogo.com"]
+                )
+                email.attach_alternative(welcome_message_html, "text/html")
+                email.send()
+                new_user = authenticate(username=form.cleaned_data['username'],
+                                        password=form.cleaned_data['password1'],
+                                        )
+                login(request, new_user)
+                messages.add_message(request, messages.INFO, "Your account has been registered successfully, {username}! Now you just need a subscription in order to start using GreenToGo. Your email address is {email}. If this is incorrect, change your email in 'My Settings'".format(username=form.cleaned_data['username'], email=form.cleaned_data['email']))
+                return redirect('/subscriptions/new/', {'newly_registered_user':{
+                    'new':True,
+                    'username':form.cleaned_data['username'],
+                    'email':form.cleaned_data['email']
+                }})
+                return jsend_success("Success! Please check your email for password reset instructions.")
+            else:
+                return jsend_fail(form.errors, status=401)
+
+        except Exception as ex:
+            print(ex)
+            # rollbar.report_exc_info(sys.exc_info(), request)
+            return jsend_fail({"error": "ERROR"}, status=500)
 
 class RfidView(APIView):
     """

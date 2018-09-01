@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 from rest_framework.validators import UniqueValidator
+from core.forms import UserSignupForm
 
 from core.models import Location, LocationTag, Restaurant, Subscription, User
 
@@ -75,3 +76,10 @@ class RestaurantSerializer(serializers.ModelSerializer):
     latitude = serializers.FloatField()
     longitude = serializers.FloatField()
     service = serializers.CharField()
+
+class UserRegistrationSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=255)
+    email = serializers.CharField(max_length=255)
+    email2 = serializers.CharField(max_length=255)
+    password1 = serializers.CharField(max_length=255)
+    password2 = serializers.CharField(max_length=255)
