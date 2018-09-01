@@ -24,8 +24,10 @@ class LoginScreen extends React.Component {
         super(props)
         this.state = {
             username: null,
-            password: null,
-            passwordConfirmation: null,
+            email: null,
+            email2: null,
+            password1: null,
+            password2: null,
             error: [],
             msg: null,
             loading: false,
@@ -33,15 +35,8 @@ class LoginScreen extends React.Component {
             redirectToWeb: false
         }
         this.attemptLogin = this.attemptLogin.bind(this);
+        this.attemptSignUp = this.attemptSignUp.bind(this);
         this.attemptPasswordReset = this.attemptPasswordReset.bind(this);
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if (this.state.type !== 'login') {
-            if (this.state.type === 'signUp') {
-                this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/accounts/register/', type: 'login' })
-            }
-        }
     }
 
     attemptLogin() {
@@ -62,7 +57,7 @@ class LoginScreen extends React.Component {
                     this.props.store.setUserData(meResponse.data.data);
                     this.props.store.setAuthToken(loginResponse.data.auth_token);
                 }).catch((error) => {
-                    axios.post('/log/', {'context': 'LoginScreen.js me', 'error': error, 'message': error.message, 'stack': error.stack});
+                    axios.post('/log/', { 'context': 'LoginScreen.js me', 'error': error, 'message': error.message, 'stack': error.stack });
                     this.setState({ error: ["We are sorry, we are having trouble processing your request. Please try again later."], loading: false });
                     this.props.store.clearAuthToken();
                 })
@@ -81,7 +76,7 @@ class LoginScreen extends React.Component {
                     }
                     this.setState({ error: tempErrors, loading: false });
                 } else {
-                    axios.post('/log/', {'context': 'LoginScreen.js auth login', 'error': error, 'message': error.message, 'stack': error.stack});
+                    axios.post('/log/', { 'context': 'LoginScreen.js auth login', 'error': error, 'message': error.message, 'stack': error.stack });
                     this.setState({ error: ["We are sorry, we are having trouble processing your request. Please try again later."], loading: false });
                 }
             });
@@ -98,31 +93,25 @@ class LoginScreen extends React.Component {
     }
 
     attemptSignUp() {
-        // this.setState({ error: [], loading: true });
-
-        // axios({
-        //     method: 'post',
-        //     url: this.props.store.makeUrl('/auth/signup/'),
-        //     headers: {
-        //         'Accept': 'application/json',
-        //         'Content-Type': 'application/json',
-        //     },
-        //     data: {
-        //         username: this.state.username,
-        //         password: this.state.password,
-        //         passwordConfirmation: this.state.passwordConfirmation
-        //     }
-        // }).then((json) => {
-        //     console.log(json.data.auth_token);
-        //     if (json.data.auth_token) {
-        //         this.setState({ loading: false });
-        //         return this.props.store.setAuthToken(json.data.auth_token);
-        //     }
-        // }).catch((error) => {
-        //     console.log(JSON.stringify(error.response.data.non_field_errors[0]))
-        //     this.setState({ error: error.response.data.non_field_errors, loading: false });
-        //     // console.log("State error: " + this.state.error)
-        // });
+        this.setState({ error: [], loading: true }, () => {
+            let body = {
+                username: this.state.username,
+                password1: this.state.password1,
+                password2: this.state.password2,
+                email: this.state.email,
+                email2: this.state.email2,
+            }
+            axios.post('/register/', body).then((response) => {
+                console.log(response);
+            }).catch((error) => {
+                if (error.response.data.data) {
+                    this.setState({ error: error.response.data.data, loading: false });
+                } else {
+                    axios.post('/log/', { 'context': 'LoginScreen.js attemptSignUp', 'error': error, 'message': error.message, 'stack': error.stack });
+                    this.setState({ error: ["We are sorry, we are having trouble processing your request. Please try again later."], loading: false });
+                }
+            });
+        });
     }
 
     switchType = (type) => () => {
@@ -137,10 +126,10 @@ class LoginScreen extends React.Component {
             axios.post('/password/reset/', body).then((response) => {
                 this.setState({ loading: false, type: 'passwordResetSuccess', username: null, msg: response.data.data });
             }).catch((error) => {
-                if (error.response.data && error.response.data.data && error.response.data.data.error){
+                if (error.response.data && error.response.data.data && error.response.data.data.error) {
                     this.setState({ loading: false, error: [error.response.data.data.error] });
                 } else {
-                    axios.post('/log/', {'context': 'LoginScreen.js password reset', 'error': error, 'message': error.message, 'stack': error.stack});
+                    axios.post('/log/', { 'context': 'LoginScreen.js password reset', 'error': error, 'message': error.message, 'stack': error.stack });
                     this.setState({ loading: false, error: ["We are sorry, we are having trouble processing your request. Please try again later."] });
                 }
             });
@@ -215,28 +204,50 @@ class LoginScreen extends React.Component {
                                 // Sign up form below
                                 <Form>
                                     <Item>
-                                        <Input placeholder="Email"
+                                        <Input placeholder="Username"
                                             autoCapitalize="none"
+                                            secureTextEntry={false}
                                             autoCorrect={false}
-                                            keyboardType="email-address"
                                             onChangeText={(text) => this.setState({ username: text })}
                                         />
                                     </Item>
+                                    {this.state.error.username ? <Text style={styles.errorStyle}>{this.state.error.username}</Text> : <Text></Text>}
+                                    <Item>
+                                        <Input placeholder="Email"
+                                            autoCapitalize="none"
+                                            secureTextEntry={false}
+                                            autoCorrect={false}
+                                            keyboardType="email-address"
+                                            onChangeText={(text) => this.setState({ email: text })}
+                                        />
+                                    </Item>
+                                    {this.state.error.email ? <Text style={styles.errorStyle}>{this.state.error.email}</Text> : <Text></Text>}
+                                    <Item>
+                                        <Input placeholder="Confirm Email"
+                                            autoCapitalize="none"
+                                            secureTextEntry={false}
+                                            autoCorrect={false}
+                                            keyboardType="email-address"
+                                            onChangeText={(text) => this.setState({ email2: text })}
+                                        />
+                                    </Item>
+                                    {this.state.error.email2 ? <Text style={styles.errorStyle}>{this.state.error.email2}</Text> : <Text></Text>}
                                     <Item>
                                         <Input placeholder="Password"
                                             secureTextEntry={true}
                                             onSubmitEditing={() => this.attemptSignUp()}
-                                            onChangeText={(text) => this.setState({ password: text })}
+                                            onChangeText={(text) => this.setState({ password1: text })}
                                         />
                                     </Item>
+                                    {this.state.error.password1 ? <Text style={styles.errorStyle}>{this.state.error.password1}</Text> : <Text></Text>}
                                     <Item last>
                                         <Input placeholder="Confirm Password"
                                             secureTextEntry={true}
                                             onSubmitEditing={() => this.attemptSignUp()}
-                                            onChangeText={(text) => this.setState({ passwordConfirmation: text })}
-                                            value={this.state.passwordConfirmation}
+                                            onChangeText={(text) => this.setState({ password2: text })}
                                         />
                                     </Item>
+                                    {this.state.error.password2 ? <Text style={styles.errorStyle}>{this.state.error.password2}</Text> : <Text></Text>}
                                     {errorMessages}
                                     {loadingSpinner}
                                     <Button style={styles.creamBackground} full title="Login" onPress={this.attemptSignUp}>
