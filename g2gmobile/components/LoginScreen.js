@@ -26,6 +26,7 @@ class LoginScreen extends React.Component {
             username: null,
             email: null,
             email2: null,
+            password: null,
             password1: null,
             password2: null,
             error: [],
@@ -102,7 +103,7 @@ class LoginScreen extends React.Component {
                 email2: this.state.email2,
             }
             axios.post('/register/', body).then((response) => {
-                console.log(response);
+                this.setState({ loading: false, type: 'signUpSuccess', username: null, msg: response.data.data });
             }).catch((error) => {
                 if (error.response.data.data) {
                     this.setState({ error: error.response.data.data, loading: false });
@@ -112,10 +113,6 @@ class LoginScreen extends React.Component {
                 }
             });
         });
-    }
-
-    switchType = (type) => () => {
-        this.setState({ type, error: [] });
     }
 
     attemptPasswordReset() {
@@ -134,6 +131,10 @@ class LoginScreen extends React.Component {
                 }
             });
         })
+    }
+
+    switchType = (type) => () => {
+        this.setState({ type, error: [] });
     }
 
     render() {
@@ -257,35 +258,46 @@ class LoginScreen extends React.Component {
                                         <Text style={styles.boldCenteredText}>Go to Login</Text>
                                     </Button>
                                 </Form>
-                                : this.state.type === 'passwordResetSuccess' ?
+                                : this.state.type === 'signUpSuccess' ?
+                                    // Sign up form below
                                     <View style={{ flex: 1, paddingTop: 140, alignItems: 'center' }}>
-                                        <Text style={{ color: styles.primaryColor }}>{this.state.msg}</Text>
+                                        <Text style={{ color: styles.primaryColor }}>Sign Up successful! Now sign in at our secure web portal and purchase a subscription so that you can use the GreenToGo service!</Text>
+                                        <Button style={styles.creamBackground} full onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/subscriptions/new/' }) }}>
+                                            <Text style={styles.boldCenteredText}>Purchase a subscription</Text>
+                                        </Button>
                                         <Button style={styles.creamBackground} full title="SignUp" onPress={this.switchType("login")}>
                                             <Text style={styles.boldCenteredText}>Go to Login</Text>
                                         </Button>
                                     </View>
+                                    : this.state.type === 'passwordResetSuccess' ?
+                                        <View style={{ flex: 1, paddingTop: 140, alignItems: 'center' }}>
+                                            <Text style={{ color: styles.primaryColor }}>{this.state.msg}</Text>
+                                            <Button style={styles.creamBackground} full title="SignUp" onPress={this.switchType("login")}>
+                                                <Text style={styles.boldCenteredText}>Go to Login</Text>
+                                            </Button>
+                                        </View>
 
-                                    // Password reset form
-                                    : <Form>
-                                        <Item>
-                                            <Input placeholder="Username or Email"
-                                                autoCapitalize="none"
-                                                autoCorrect={false}
-                                                keyboardType="email-address"
-                                                onChangeText={(text) => this.setState({ username: text })}
-                                                onSubmitEditing={this.attemptPasswordReset}
-                                                value={this.state.username}
-                                            />
-                                        </Item>
-                                        {errorMessages}
-                                        {loadingSpinner}
-                                        <Button style={styles.creamBackground} light full title="resetPassword" onPress={this.attemptPasswordReset}>
-                                            <Text style={styles.boldCenteredText}>Reset Password</Text>
-                                        </Button>
-                                        <Button style={styles.creamBackground} light full title="SignUp" onPress={this.switchType("login")}>
-                                            <Text style={styles.boldCenteredText}>Go to Login</Text>
-                                        </Button>
-                                    </Form>
+                                        // Password reset form
+                                        : <Form>
+                                            <Item>
+                                                <Input placeholder="Username or Email"
+                                                    autoCapitalize="none"
+                                                    autoCorrect={false}
+                                                    keyboardType="email-address"
+                                                    onChangeText={(text) => this.setState({ username: text })}
+                                                    onSubmitEditing={this.attemptPasswordReset}
+                                                    value={this.state.username}
+                                                />
+                                            </Item>
+                                            {errorMessages}
+                                            {loadingSpinner}
+                                            <Button style={styles.creamBackground} light full title="resetPassword" onPress={this.attemptPasswordReset}>
+                                                <Text style={styles.boldCenteredText}>Reset Password</Text>
+                                            </Button>
+                                            <Button style={styles.creamBackground} light full title="SignUp" onPress={this.switchType("login")}>
+                                                <Text style={styles.boldCenteredText}>Go to Login</Text>
+                                            </Button>
+                                        </Form>
                         }
                     </Content>
                 </Container>
