@@ -276,8 +276,7 @@ class Register(GenericAPIView):
                 return jsend_fail(form.errors, status=401)
 
         except Exception as ex:
-            print(ex)
-            # rollbar.report_exc_info(sys.exc_info(), request)
+            rollbar.report_exc_info(sys.exc_info(), request)
             return jsend_fail({"error": "ERROR"}, status=500)
 
 class RfidView(APIView):
