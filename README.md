@@ -64,3 +64,7 @@ https://stripe.com/docs/testing#cards
 ## Other docs
 
 Are you a server administrator? [Check out our admin docs.](./docs/server-admin.md)
+
+Kanban Board:
+
+https://trello.com/b/Ie0XvutP/greentogo-kanban-board
