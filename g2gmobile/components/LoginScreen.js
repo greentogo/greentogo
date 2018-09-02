@@ -261,7 +261,7 @@ class LoginScreen extends React.Component {
                                 : this.state.type === 'signUpSuccess' ?
                                     // Sign up form below
                                     <View style={{ flex: 1, paddingTop: 140, alignItems: 'center' }}>
-                                        <Text style={{ color: styles.primaryColor }}>Sign Up successful! Now sign in at our secure web portal and purchase a subscription so that you can use the GreenToGo service!</Text>
+                                        <Text style={{ color: styles.primaryColor }}>Sign Up successful! Now, sign in at our secure web portal and purchase a subscription so that you can use the GreenToGo service!</Text>
                                         <Button style={styles.creamBackground} full onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/subscriptions/new/' }) }}>
                                             <Text style={styles.boldCenteredText}>Purchase a subscription</Text>
                                         </Button>

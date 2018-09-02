@@ -3,7 +3,9 @@ from django.http import HttpRequest
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import render
 from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth import get_user_model
+from django.template.loader import render_to_string
+from django.contrib.auth import get_user_model, authenticate, login
+from django.core.mail import send_mail, EmailMultiAlternatives
 import json, re
 
 from registration.models import RegistrationProfile
@@ -234,8 +236,6 @@ class Register(GenericAPIView):
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
-        print(request.data)
-        print(serializer)
         stuff = {
             'username':request.data.get('username'),
             'email':request.data['email'],
@@ -244,16 +244,14 @@ class Register(GenericAPIView):
             'password2':request.data['password2'],
             'tos': ['on']
         }
-        print(stuff)
         try:
             form = UserSignupForm(stuff)
             if form.is_valid():
-                print("FORM IS VALID")
                 user = form.save(commit=False)
                 user.is_active = True
                 user.create_stripe_customer()
                 user.email = form.cleaned_data.get('email')
-                current_site = get_current_site(request)
+                user.save()
                 communityBoxesCheckedIn = int((LocationTag.objects.all()).count()/2) + 100
                 to_email = form.cleaned_data.get('email')
                 restaurants = Location.objects.filter(retired=False, admin_location=False, service='OUT')
@@ -261,11 +259,9 @@ class Register(GenericAPIView):
                     'user': user,
                     'restaurants': restaurants,
                     'communityBoxesCheckedIn': communityBoxesCheckedIn,
-                    'domain': current_site.domain,
                 }
                 welcome_message_txt = render_to_string('registration/welcome_message.txt', message_data)
                 welcome_message_html = render_to_string('registration/welcome_message.html', message_data)
-                user.save()
                 email = EmailMultiAlternatives(
                     subject='Welcome to GreenToGo!',
                     body=welcome_message_txt,
@@ -275,17 +271,7 @@ class Register(GenericAPIView):
                 )
                 email.attach_alternative(welcome_message_html, "text/html")
                 email.send()
-                new_user = authenticate(username=form.cleaned_data['username'],
-                                        password=form.cleaned_data['password1'],
-                                        )
-                login(request, new_user)
-                messages.add_message(request, messages.INFO, "Your account has been registered successfully, {username}! Now you just need a subscription in order to start using GreenToGo. Your email address is {email}. If this is incorrect, change your email in 'My Settings'".format(username=form.cleaned_data['username'], email=form.cleaned_data['email']))
-                return redirect('/subscriptions/new/', {'newly_registered_user':{
-                    'new':True,
-                    'username':form.cleaned_data['username'],
-                    'email':form.cleaned_data['email']
-                }})
-                return jsend_success("Success! Please check your email for password reset instructions.")
+                return jsend_success("Sign Up successful! Now, sign in at our secure web portal and purchase a subscription so that you can use the GreenToGo service!")
             else:
                 return jsend_fail(form.errors, status=401)
 

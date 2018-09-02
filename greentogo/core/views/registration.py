@@ -20,7 +20,6 @@ def registration_form(request):
             user.is_active = True
             user.create_stripe_customer()
             user.email = form.cleaned_data.get('email')
-            current_site = get_current_site(request)
             communityBoxesCheckedIn = int((LocationTag.objects.all()).count()/2) + 100
             to_email = form.cleaned_data.get('email')
             restaurants = Location.objects.filter(retired=False, admin_location=False, service='OUT')
@@ -28,7 +27,6 @@ def registration_form(request):
                 'user': user,
                 'restaurants': restaurants,
                 'communityBoxesCheckedIn': communityBoxesCheckedIn,
-                'domain': current_site.domain,
             }
             welcome_message_txt = render_to_string('registration/welcome_message.txt', message_data)
             welcome_message_html = render_to_string('registration/welcome_message.html', message_data)
