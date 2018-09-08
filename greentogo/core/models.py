@@ -471,7 +471,7 @@ class Subscription(models.Model):
                     subject='Low Stock At {}'.format(location.name),
                     body=message_txt,
                     from_email='database@app.durhamgreentogo.com',
-                    to=['amy@durhamgreentogo.com', 'crystaldreisbach@gmail.com', 'veronica@durhamgreentogo.com'],
+                    to=['amy@durhamgreentogo.com', 'crystaldreisbach@gmail.com', 'quackenbushrs@gmail.com'],
                 )
                 email.send()
 
