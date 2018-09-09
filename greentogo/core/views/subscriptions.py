@@ -41,10 +41,20 @@ def add_subscription(request, code=False, *args, **kwargs):
     corporate_code = None
     coupon_code = None
     if code:
-        coupon_code = get_object_or_404(CouponCode, code=code)
-        if coupon_code.redeem_by < datetime.now().date():
-            messages.error(request, "That coupon has expired")
-            return redirect('/subscriptions/new/')
+        try:
+            coupon_code = CouponCode.objects.get(code=code)
+            if coupon_code.redeem_by < datetime.now().date():
+                messages.error(request, "That coupon has expired")
+                return redirect('/subscriptions/new/')
+        except CouponCode.DoesNotExist:
+            coupon_code = None
+        try:
+            corporate_code = CorporateCode.objects.get(code=code)
+            if corporate_code.redeem_by < datetime.now().date():
+                messages.error(request, "That corporate code has expired")
+                return redirect('/subscriptions/new/')
+        except CouponCode.DoesNotExist:
+            corporate_code = None
     if 'code' in kwargs and 'coupon_type' in kwargs:
         if kwargs['coupon_type'] == 'corporate':
             corporate_code = get_object_or_404(CorporateCode, code=kwargs['code'])
