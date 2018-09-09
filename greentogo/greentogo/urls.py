@@ -41,7 +41,7 @@ subscriptions_patterns = [
         name='corporate_subscription'
     ),
         url(
-        r'^renew_corporate/$',
+        r'^(?P<sub_id>[A-Za-z0-9]+)/renew_corporate/$',
         core.views.subscriptions.renew_corporate,
         name='renew_corporate'
     ),

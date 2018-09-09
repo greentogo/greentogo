@@ -183,14 +183,23 @@ def add_subscription(request, code=False, *args, **kwargs):
     )
 
 @login_required
-def renew_corporate(request, *args, **kwargs):
-    # TODO UNUSED, NEEDS TO ADD CUPON TO CORP PLAN AND CHARGE CUSTOMER IMMEDIATELY
+def renew_corporate(request, sub_id):
+    real_id = decode_id(sub_id)[0]
+    user = request.user
+    subscription = user.subscriptions.get(id=real_id)
     if request.method == "POST":
         try:
             code = CorporateCode.objects.get(code=request.POST['code'])
             if request.user.subscriptions.filter(corporate_code=code).count() == 0:
-                print(code)
-                    # kwargs={'code': code.code,'coupon_type':'corporate'}))
+                subscription.corporate_code = code
+                subscription.cancelled = False
+                subscription.save()
+                stripeSub = stripe.Subscription.retrieve(subscription.stripe_id)
+                stripeSub.coupon = code.code
+                stripeSub.cancel_at_period_end = False
+                stripeSub.save()
+                messages.add_message(request, messages.INFO, "Successfully renewed corporate subscription!")
+                return redirect('/subscriptions/')
             else:
                 messages.error(request, "You have already used that corporate access code.")
         except CorporateCode.DoesNotExist:
