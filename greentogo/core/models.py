@@ -475,6 +475,20 @@ class Subscription(models.Model):
                 )
                 email.send()
 
+            if location.service == "IN" and not location.admin_location and location.get_estimated_stock() > 6:
+                message_data = {
+                    'location': location,
+                    'count': location.get_estimated_stock(),
+                }
+                message_txt = render_to_string('admin/high_stock.txt', message_data)
+                email = EmailMessage(
+                    subject='Please Empty {}'.format(location.name),
+                    body=message_txt,
+                    from_email='database@app.durhamgreentogo.com',
+                    to=['amy@durhamgreentogo.com', 'crystaldreisbach@gmail.com', 'quackenbushrs@gmail.com'],
+                )
+                email.send()
+
         except Exception as ex:
             rollbar.report_exc_info(sys.exc_info(), request)
         return tags
