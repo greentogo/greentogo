@@ -50,6 +50,11 @@
         </div>
         {% endif %}
         <div>
+            {% if subscriptions %}
+            <a href="{% url 'change_payment_method' %}" class="button large">Update payment method</a>
+            {% endif %}
+        </div>
+        <div>
             <a href="{% url 'add_subscription' %}" class="button large">Buy a GreenToGo Subscription</a>
         </div>
         {% endwith %}

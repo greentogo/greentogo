@@ -62,7 +62,7 @@ class AccountScreen extends React.Component {
                         />
                         <ListMenuItem
                             icon="card"
-                            text="Change your default payment method"
+                            text="Update payment method"
                             onPress={() => { this.setState({ redirectToWeb: 'https://app.durhamgreentogo.com/account/change_payment_method/' }) }}
                         />
                         <ListMenuItem
