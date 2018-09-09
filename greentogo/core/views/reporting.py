@@ -41,6 +41,7 @@ def stock_shelve(request):
             new_hq_count = hqlocation.get_estimated_stock() + int(stock_count)
             hqlocation.stock_counts.create(count=new_hq_count)
             messages.info(request,"{} clean boxes successfully shelved at GreenToGo HQ!".format(stock_count))
+            return redirect('/stock/')
         except:
             messages.error(request,"There are no headquarter locations! Add one by assigning a headquarters location")
 
@@ -59,6 +60,7 @@ def stock_add_to_shelf(request):
             new_count = estimated_amount + int(stock_count)
             hqlocation.stock_counts.create(count=new_count)
             messages.info(request,"{} boxes successfully added and shelved at GreenToGo HQ!".format(stock_count))
+            return redirect('/stock/')
         except:
             messages.error(request,"There are no headquarter locations! Add one by assigning a headquarters location")
 
