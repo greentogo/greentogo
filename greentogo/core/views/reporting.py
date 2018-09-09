@@ -96,6 +96,7 @@ def stock_report(request, stock_action):
         except:
             pass
         messages.success(request,"Successfully stocked and submitted a report for {}".format(location))
+        return redirect('/stock/')
 
     if stock_action == 'restock':
         locations = Location.objects.checkout()
