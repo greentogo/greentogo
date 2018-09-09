@@ -12,7 +12,7 @@ from core.models import (
     User, CouponCode, LocationStockReport
 )
 from core.views.admin import (
-    activity_report, empty_location, empty_locations, restock_location, restock_locations,
+    activity_report, empty_location, empty_locations, restock_location, restock_locations, user_report, 
     stock_report, export_data, unclaimed_subscription_status_csv, export_total_check_out, 
     export_total_check_in, export_check_out_by_user, export_check_in_by_user, 
     export_check_out_by_location, export_check_in_by_location, export_user_reports, export_subscriptions
@@ -226,6 +226,15 @@ admin_site.register_view(
     section="Reports",
     name="View GreenToGo Container Status",
     urlname="stock_report",
+    only_superusers=True,
+)
+
+admin_site.register_view(
+    path='user_report/',
+    view=user_report,
+    section="Reports",
+    name="User Reports",
+    urlname="user_report",
     only_superusers=True,
 )
 

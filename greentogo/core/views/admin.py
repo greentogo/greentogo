@@ -119,6 +119,12 @@ def stock_report(request, *args, **kwargs):
     )
 
 
+def user_report(request,*args, **kwargs):
+    data = User.objects.all()
+    view_data = {"data": data}
+    return render(request, 'admin/user_report.html', view_data)
+
+
 def activity_report(request, days=30, *args, **kwargs):
     data = activity_data(days)
     data_json = json.dumps(data, cls=DjangoJSONEncoder)
