@@ -78,8 +78,8 @@
                 </form>
                 {% else %}
                     <p>
-                    You do not have any current subscriptions.
-                    <!--<a href="{% url 'add_subscription' %}">Go add one now.</a>-->
+                    Looks like you don't have an active subscription! Let's fix that! 
+                    <a class="button large" href="{% url 'add_subscription' %}">Subscribe or Renew Now!</a>
                     </p>
                 {% endif %}
             {% endif %}
