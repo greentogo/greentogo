@@ -53,7 +53,7 @@ def add_subscription(request, code=False, *args, **kwargs):
             if corporate_code.redeem_by < datetime.now().date():
                 messages.error(request, "That corporate code has expired")
                 return redirect('/subscriptions/new/')
-        except CouponCode.DoesNotExist:
+        except CorporateCode.DoesNotExist:
             corporate_code = None
     if 'code' in kwargs and 'coupon_type' in kwargs:
         if kwargs['coupon_type'] == 'corporate':

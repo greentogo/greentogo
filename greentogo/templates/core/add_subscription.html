@@ -9,12 +9,12 @@
         <h2>Buy a GreenToGo Subscription</h2>
         
         {% if corporate_code %}
-        <p>
+        <p class="callout success">
             Your employer, {{ corporate_code.company_name }}, is a member. You receive a ${{ corporate_code.amount_off }} discount on this GreenToGo subscription.
         </p>
         {% elif coupon_code %}
-        <p>
-            Your coupon <strong> </strong> has been applied. It's good for
+        <p class="callout success">
+            Your coupon has been applied. It's good for
             {% if coupon_code.is_percentage %}
             {{ coupon_code.value }}% 
             {% else %}
