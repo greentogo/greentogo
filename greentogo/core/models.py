@@ -1,5 +1,4 @@
-import re, rollbar, shortuuid, logging
-# import sys
+import re, rollbar, shortuuid, logging, sys
 
 from datetime import date, datetime, timedelta
 
@@ -177,6 +176,18 @@ class User(AbstractUser):
 
         customer = stripe.Customer.retrieve(self.stripe_id)
         return customer
+
+    def total_boxes_checkedin(self):
+        count = 0
+        for sub in self.subscriptions.all():
+            count = count + sub.total_checkins()
+        return count
+
+    def total_boxes_checkedout(self):
+        count = 0
+        for sub in self.subscriptions.all():
+            count = count + sub.total_checkouts()
+        return count
     
     def add_to_mailchimp(self):
         if settings.DJANGO_ENV == 'development':
@@ -419,10 +430,10 @@ class Subscription(models.Model):
 
     @property
     def available_boxes(self):
-        return self.number_of_boxes - (self.boxes_checked_out or 0)
+        return self.number_of_boxes - (self.boxes_currently_checked_out or 0)
 
     @property
-    def boxes_checked_out(self):
+    def boxes_currently_checked_out(self):
         checked_out = LocationTag.objects.filter(subscription=self).aggregate(
                 checked_out=Sum(
                     Case(
@@ -523,6 +534,15 @@ class Subscription(models.Model):
     def used_on_date(self, date):
         tag_count = LocationTag.objects.filter(subscription=self, created_at__date=date).count()
         return tag_count > 0
+
+    def last_used(self):
+        return LocationTag.objects.filter(subscription_id=self.id).latest('created_at').created_at
+
+    def total_checkins(self):
+        return LocationTag.objects.filter(subscription_id=self.id, location__service="IN").count()
+
+    def total_checkouts(self):
+        return LocationTag.objects.filter(subscription_id=self.id, location__service="OUT").count()
 
     def will_auto_renew(self):
         return self.has_stripe_subscription() and self.is_stripe_active() and not self.cancelled

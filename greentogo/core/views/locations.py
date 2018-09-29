@@ -32,17 +32,12 @@ def locations(request):
 
 @login_required
 def location(request, location_code):
-    boxesCheckedIn = 0
-    communityBoxesCheckedIn = 0
     user = request.user
     location = get_object_or_404(Location, code=location_code.upper())
     complete = False
 
     if request.method == "POST":
         subscription_id = request.POST.get('subscription_id')
-        for sub in user.get_subscriptions():
-            boxesCheckedIn = boxesCheckedIn + int((LocationTag.objects.filter(subscription_id=sub.id)).count()/2)
-        communityBoxesCheckedIn = int((LocationTag.objects.all()).count()/2) + 100
         try:
             subscription = user.subscriptions.active().get(pk=subscription_id)
         except Subscription.DoesNotExist as ex:
@@ -107,8 +102,8 @@ def location(request, location_code):
         request, "core/location.djhtml", {
             "location": location,
             "subscriptions": subscriptions,
-            "boxesCheckedIn": boxesCheckedIn,
-            "communityBoxesCheckedIn": communityBoxesCheckedIn,
+            "boxesCheckedIn": user.total_boxes_checkedin(),
+            "communityBoxesCheckedIn": int((LocationTag.objects.all()).count()/2) + 100,
             "complete": complete,
         }
     )

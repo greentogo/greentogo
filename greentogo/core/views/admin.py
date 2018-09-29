@@ -78,7 +78,7 @@ def stock_report(request, *args, **kwargs):
         return count
 
     def get_estimated_checkedout():
-        count = sum([s.boxes_checked_out for s in
+        count = sum([s.boxes_currently_checked_out for s in
             Subscription.objects.active()])
         return count
 

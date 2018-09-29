@@ -122,7 +122,7 @@ class SubscriptionView(APIView):
         plan = pinax_models.Plan.objects.get(stripe_id=request.data.get('plan'))
         plandict = plan.as_dict()
 
-        if plandict['boxes'] < subscription.boxes_checked_out():
+        if plandict['boxes'] < subscription.boxes_currently_checked_out():
             return jsend_fail({"plan": "plan_not_enough_boxes"})
 
         subscriptions.update(
@@ -178,16 +178,14 @@ class Statistics(GenericAPIView):
     action = 'retrieve'
 
     def get(self, request, username):
-        boxesCheckedIn = 0
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             return jsend_fail({"error:": "User does not exist"}, status=404)
-        for sub in user.get_subscriptions():
-            boxesCheckedIn = boxesCheckedIn + int((LocationTag.objects.filter(subscription_id=sub.id)).count()/2)
+
         data = {
             "total_boxes_returned": LocationTag.objects.checkin().count(),
-            "total_user_boxes_returned": boxesCheckedIn,
+            "total_user_boxes_returned": user.total_boxes_checkedin(),
             "total_active_subscriptions": Subscription.objects.active().count(),
             }
         return jsend_success(data)
@@ -252,13 +250,12 @@ class Register(GenericAPIView):
                 user.create_stripe_customer()
                 user.email = form.cleaned_data.get('email')
                 user.save()
-                communityBoxesCheckedIn = int((LocationTag.objects.all()).count()/2) + 100
                 to_email = form.cleaned_data.get('email')
                 restaurants = Location.objects.filter(retired=False, admin_location=False, service='OUT')
                 message_data = {
                     'user': user,
                     'restaurants': restaurants,
-                    'communityBoxesCheckedIn': communityBoxesCheckedIn,
+                    'communityBoxesCheckedIn': int((LocationTag.objects.all()).count()/2) + 100,
                 }
                 welcome_message_txt = render_to_string('registration/welcome_message.txt', message_data)
                 welcome_message_html = render_to_string('registration/welcome_message.html', message_data)
