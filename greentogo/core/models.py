@@ -112,10 +112,18 @@ class AdminSettings(models.Model):
     lowStockEmails = models.TextField(
             max_length=1024,
             blank=False,
-            help_text="List of emails separated by commas (no spaces) for who should recieve alerts when stock is low at restaurants or high at return stations")
+            help_text="List of emails separated by commas for who should recieve alerts when stock is low at restaurants")
 
-    def get_stock_emails_list(self):
+    highStockEmails = models.TextField(
+            max_length=1024,
+            blank=False,
+            help_text="List of emails separated by commas for who should recieve alerts when stock is high at return stations")
+
+    def get_restaurant_low_stock_emails_list(self):
         return re.sub(",", " ",  self.lowStockEmails).split()
+
+    def get_return_high_stock_emails_list(self):
+        return re.sub(",", " ",  self.highStockEmails).split()
 
     def save(self, *args, **kwargs):
         if AdminSettings.objects.exists() and not self.pk:
@@ -487,7 +495,7 @@ class Subscription(models.Model):
                     subject='Low Stock At {}'.format(location.name),
                     body=message_txt,
                     from_email='database@app.durhamgreentogo.com',
-                    to=AdminSettings.objects.first().get_stock_emails_list(),
+                    to=AdminSettings.objects.first().get_restaurant_low_stock_emails_list(),
                 )
                 email.send()
 
@@ -501,7 +509,7 @@ class Subscription(models.Model):
                     subject='Please Empty {}'.format(location.name),
                     body=message_txt,
                     from_email='database@app.durhamgreentogo.com',
-                    to=AdminSettings.objects.first().get_stock_emails_list(),
+                    to=AdminSettings.objects.first().get_return_high_stock_emails_list(),
                 )
                 email.send()
 
