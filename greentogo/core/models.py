@@ -1,3 +1,6 @@
+import re, rollbar, shortuuid, logging
+# import sys
+
 from datetime import date, datetime, timedelta
 
 from django.conf import settings
@@ -5,6 +8,7 @@ from django.contrib.auth import hashers
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.models import Site
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
@@ -18,15 +22,12 @@ from django.utils.text import slugify
 from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
 from collections import Counter
 
-import shortuuid
 from django_geocoder.wrapper import get_cached as geocode
 from postgres_stats import DateTrunc
 from templated_email import send_templated_mail
 
 from core.stripe import stripe
 from core.utils import decode_id, encode_nums
-
-import logging
 
 
 logger = logging.getLogger('django')
@@ -106,6 +107,21 @@ def export_chart_data(start_date=False, end_date=False):
 
 def total_boxes_returned():
     return LocationTag.objects.checkin().count()
+
+class AdminSettings(models.Model):
+    lowStockEmails = models.TextField(
+            max_length=1024,
+            blank=False,
+            help_text="List of emails separated by commas (no spaces) for who should recieve alerts when stock is low at restaurants or high at return stations")
+
+    def get_stock_emails_list(self):
+        return re.sub(",", " ",  self.lowStockEmails).split()
+
+    def save(self, *args, **kwargs):
+        if AdminSettings.objects.exists() and not self.pk:
+            raise ValidationError('There is can be only one AdminSettings instance')
+        return super(AdminSettings, self).save(*args, **kwargs)
+
 
 class User(AbstractUser):
     name = models.CharField(max_length=255, blank=True, null=True)
@@ -471,7 +487,7 @@ class Subscription(models.Model):
                     subject='Low Stock At {}'.format(location.name),
                     body=message_txt,
                     from_email='database@app.durhamgreentogo.com',
-                    to=['amy@durhamgreentogo.com', 'crystaldreisbach@gmail.com', 'quackenbushrs@gmail.com'],
+                    to=AdminSettings.objects.first().get_stock_emails_list(),
                 )
                 email.send()
 
@@ -485,7 +501,7 @@ class Subscription(models.Model):
                     subject='Please Empty {}'.format(location.name),
                     body=message_txt,
                     from_email='database@app.durhamgreentogo.com',
-                    to=['amy@durhamgreentogo.com', 'crystaldreisbach@gmail.com', 'quackenbushrs@gmail.com'],
+                    to=AdminSettings.objects.first().get_stock_emails_list(),
                 )
                 email.send()
 

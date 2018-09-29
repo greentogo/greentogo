@@ -9,7 +9,7 @@ from core.admin import LocationAdmin, UnclaimedSubscriptionAdmin, GroupAdmin,\
                         SubscriptionAdmin, PlanAdmin, CustomUserAdmin
 from core.models import (
     CorporateCode, Location, LocationTag, Plan, Restaurant, Subscription, UnclaimedSubscription,
-    User, CouponCode, LocationStockReport
+    User, CouponCode, LocationStockReport, AdminSettings
 )
 from core.views.admin import (
     activity_report, empty_location, empty_locations, restock_location, restock_locations, user_report, 
@@ -268,6 +268,7 @@ admin_site.register(CorporateCode)
 admin_site.register(CouponCode)
 admin_site.register(LocationTag)
 admin_site.register(LocationStockReport)
+admin_site.register(AdminSettings)
 
 
 # export tools
@@ -283,6 +284,7 @@ admin.site.register(CorporateCode)
 admin.site.register(CouponCode)
 admin.site.register(LocationTag)
 admin.site.register(LocationStockReport)
+admin.site.register(AdminSettings)
 
 #Add the export action to the custom admin site
 admin_site.add_action(export_selected_objects)
