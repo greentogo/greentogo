@@ -234,7 +234,7 @@ class Register(GenericAPIView):
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
-        stuff = {
+        signupData = {
             'username':request.data.get('username'),
             'email':request.data['email'],
             'email2':request.data['email2'],
@@ -243,7 +243,7 @@ class Register(GenericAPIView):
             'tos': ['on']
         }
         try:
-            form = UserSignupForm(stuff)
+            form = UserSignupForm(signupData)
             if form.is_valid():
                 user = form.save(commit=False)
                 user.is_active = True
