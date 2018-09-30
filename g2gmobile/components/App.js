@@ -54,7 +54,11 @@ class App extends React.Component {
         } else {
             return (
                 <Provider appStore={store}>
-                    <RootStack />
+                    <RootStack
+                        onNavigationStateChange={(prevState, newState) => {
+                            store.setCurrentRoute(newState)
+                        }}
+                    />
                 </Provider>
             );
         }

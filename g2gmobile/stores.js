@@ -13,6 +13,7 @@ enableLogging({
 export class AppStore {
     @observable authToken = ''
     @observable user = {}
+    @observable currentRoute = 'home'
 
     constructor() {
         // console.log('appStore constructor')
@@ -46,6 +47,12 @@ export class AppStore {
         simpleStore.save('user', null)
     }
 
+    @action setCurrentRoute(navState) {
+        if (navState.hasOwnProperty('routes') && navState.hasOwnProperty('index') && navState.routes[navState.index].hasOwnProperty('routeName')) {
+            this.currentRoute = navState.routes[navState.index].routeName;
+        }
+    }
+
     @action getUserData() {
         // Get the user data after successful login
         axios.get('/me/', {
@@ -55,7 +62,7 @@ export class AppStore {
         }).then((response) => {
             this.setUserData(response.data.data);
         }).catch((error) => {
-            axios.post('/log/', {'context': 'stores.js getUserData', 'error': error, 'message': error.message, 'stack': error.stack});
+            axios.post('/log/', { 'context': 'stores.js getUserData', 'error': error, 'message': error.message, 'stack': error.stack });
             this.clearAuthToken();
             // console.log(this.clearAuthToken());
         })
@@ -64,13 +71,13 @@ export class AppStore {
     @action getResturantData() {
         // Get the restaurant data on load
         axios.get('/restaurants/')
-        .then((json) => {
-            simpleStore.save('resturants', json.data.data)
-        }).catch((error) => {
-            axios.post('/log/', {'context': 'stores.js getResturantData', 'error': error, 'message': error.message, 'stack': error.stack});
-        })
+            .then((json) => {
+                simpleStore.save('resturants', json.data.data)
+            }).catch((error) => {
+                axios.post('/log/', { 'context': 'stores.js getResturantData', 'error': error, 'message': error.message, 'stack': error.stack });
+            })
     }
-    
+
     @action setUserData(data) {
         this.user = data;
         if (data.subscriptions) {
