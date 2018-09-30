@@ -1,13 +1,10 @@
 import React from 'react';
 import {
-    StyleSheet,
-    View,
     Image,
-    TouchableHighlight,
     TouchableOpacity,
-    ScrollView,
     Dimensions
 } from 'react-native';
+import { inject, observer } from 'mobx-react';
 import styles from "../../styles";
 import {
     Content,
@@ -18,7 +15,8 @@ import { Video } from 'expo';
 import VideoPlayer from './VideoPlayer';
 import BaseScreen from './BaseScreen';
 
-
+@inject('appStore')
+@observer
 class G2GVideo extends BaseScreen {
     constructor(props) {
         super(props)
@@ -72,6 +70,7 @@ class G2GVideo extends BaseScreen {
                                 this._playbackInstance = component;
                             },
                         }}
+                        currentRoute={this.props.appStore.currentRoute}
                         showControlsOnLoad={true}
                         isPortrait={this.state.isPortrait}
                         switchToLandscape={this.switchToLandscape.bind(this)}

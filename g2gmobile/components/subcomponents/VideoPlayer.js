@@ -217,6 +217,12 @@ export default class VideoPlayer extends React.Component {
         );
     }
 
+    componentDidUpdate(prevProps) {
+        if (prevProps.currentRoute !== this.props.currentRoute && prevProps.currentRoute === 'home' && this.state.shouldPlay == true) {
+            this._playbackInstance.setStatusAsync({ shouldPlay: false });
+        }
+    }
+
     _onConnectionChange(connectionInfo) {
         this.props.debug && console.log('[networkState]', connectionInfo.type);
         this.setState({ networkState: connectionInfo.type });
