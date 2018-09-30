@@ -76,11 +76,6 @@ def update_restaurant_inventory(request):
         location = Location.objects.get(pk=request.POST.get('location'))
         actual_count = request.POST.get('actual_count')
         location.stock_counts.create(count=actual_count)
-        # hqlocation = Location.objects.checkin().get(headquarters=True)
-        # stock_count = request.POST.get('stock_count')
-        # estimated_amount = hqlocation.get_estimated_stock()
-        # new_count = estimated_amount + int(stock_count)
-        # hqlocation.stock_counts.create(count=new_count)
         messages.info(request,"Restaurant {} set to have {} boxes.".format(location, actual_count))
         return redirect('/stock/')
 
