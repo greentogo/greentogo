@@ -16,7 +16,7 @@ export default class BaseScreen extends React.Component {
     };
 
     componentDidMount() {
-        ScreenOrientation.allow(ScreenOrientation.Orientation.ALL);
+        ScreenOrientation.allow(ScreenOrientation.Orientation.PORTRAIT_UP); // Use This to get it to work: // ScreenOrientation.allow(ScreenOrientation.Orientation.ALL);
         Dimensions.addEventListener(
             'change',
             this.orientationChangeHandler.bind(this)
