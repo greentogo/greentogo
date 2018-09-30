@@ -26,8 +26,8 @@
 {% block extrahead %}
 <style type="text/css">
 </style>
-<script src="{% static 'jquery/dist/jquery.js' %}"></script>
-<script src="{% static 'chart.js/dist/Chart.bundle.min.js' %}"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
 <script>
 $(function () {
     var data = {{ data_json|safe }};

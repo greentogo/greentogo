@@ -16,6 +16,7 @@
         {% endcompress %}
         <!-- <link rel='stylesheet' id='resonar-fonts-css' href='https://fonts.googleapis.com/css?family=Libre+Baskerville%3A400%2C700%2C400italic%7CLato%3A400%2C700%2C900%2C400italic%2C700italic%2C900italic%7CPlayfair+Display%3A400%2C700%2C400italic%2C700italic%7CInconsolata%3A400&#038;subset=latin%2Clatin-ext' type='text/css' media='all' /> -->
         <link href="https://fonts.googleapis.com/css?family=Arvo|Inconsolata|Lato" rel="stylesheet">
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     </head>
     <body data-env="{{ DJANGO_ENV }}">
         <div class="row">
@@ -89,8 +90,7 @@
         {% endblock %}
 
         {% compress js %}
-        <script src="{% static 'jquery/dist/jquery.js' %}"></script>
-        <script src="{% static 'js-cookie/src/js.cookie.js' %}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
         <script src="{% static 'foundation-sites/dist/js/foundation.js' %}"></script>
         {% endcompress %}
         <script src="https://checkout.stripe.com/checkout.js"></script>
