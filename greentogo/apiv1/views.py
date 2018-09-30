@@ -6,7 +6,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model, authenticate, login
 from django.core.mail import send_mail, EmailMultiAlternatives
-import json, re
+import json, re, rollbar, urllib.parse
 
 from registration.models import RegistrationProfile
 from registration.signals import user_registered
@@ -16,8 +16,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.models import User, Location, LocationTag, Plan, Restaurant, Subscription
-from core.forms import UserSignupForm
-import rollbar
+from core.forms import UserSignupForm\
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
@@ -180,8 +179,11 @@ class Statistics(GenericAPIView):
     def get(self, request, username):
         try:
             user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            return jsend_fail({"error:": "User does not exist"}, status=404)
+        except:
+            try:
+                user = User.objects.get(email=urllib.parse.unquote(username))
+            except:
+                return jsend_fail({"error:": "User does not exist"}, status=404)
 
         data = {
             "total_boxes_returned": LocationTag.objects.checkin().count(),

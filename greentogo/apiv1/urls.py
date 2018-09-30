@@ -7,7 +7,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     url(r'^tag/$', views.CheckinCheckoutView.as_view(), name="api_v1_tag"),
     url(r'^me/$', views.UserView.as_view(), name="api_v1_user"),
-    url(r'^stats/(?P<username>[A-Za-z0-9]+)/$', views.Statistics.as_view(), name="api_v1_stats"),
+    url(r'^stats/(?P<username>.*)/$', views.Statistics.as_view(), name="api_v1_stats"),
     url(r'^locations/(?P<location_code>[A-Za-z0-9]+)/$', views.LocationView.as_view(), name="api_v1_location"),
     url(
         r'^subscriptions/plans/$',
