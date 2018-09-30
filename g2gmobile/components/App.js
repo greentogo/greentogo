@@ -44,6 +44,9 @@ const RootStack = createStackNavigator(
 
 @observer
 class App extends React.Component {
+    componentDidMount() {
+        Expo.ScreenOrientation.allow(Expo.ScreenOrientation.Orientation.PORTRAIT_UP);
+    }
     render() {
         const store = this.props.store;
         if (!store.authToken) {
