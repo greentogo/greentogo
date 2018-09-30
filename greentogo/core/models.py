@@ -502,11 +502,16 @@ class Subscription(models.Model):
                     'count': location.get_estimated_stock(),
                 }
                 message_txt = render_to_string('admin/low_stock.txt', message_data)
+                toList = None
+                if AdminSettings.objects.first() == None:
+                    toList = []
+                else:
+                    toList = AdminSettings.objects.first().get_restaurant_low_stock_emails_list()
                 email = EmailMessage(
                     subject='Low Stock At {}'.format(location.name),
                     body=message_txt,
                     from_email='database@app.durhamgreentogo.com',
-                    to=AdminSettings.objects.first().get_restaurant_low_stock_emails_list(),
+                    to=toList,
                 )
                 email.send()
 
@@ -516,11 +521,16 @@ class Subscription(models.Model):
                     'count': location.get_estimated_stock(),
                 }
                 message_txt = render_to_string('admin/high_stock.txt', message_data)
+                toList = None
+                if AdminSettings.objects.first() == None:
+                    toList = []
+                else:
+                    toList = AdminSettings.objects.first().get_return_high_stock_emails_list()
                 email = EmailMessage(
                     subject='Please Empty {}'.format(location.name),
                     body=message_txt,
                     from_email='database@app.durhamgreentogo.com',
-                    to=AdminSettings.objects.first().get_return_high_stock_emails_list(),
+                    to=toList,
                 )
                 email.send()
 
