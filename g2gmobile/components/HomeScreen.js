@@ -1,17 +1,12 @@
 import React from 'react';
 import {
-    StyleSheet,
     View,
-    TouchableHighlight,
     ScrollView,
-    Dimensions
 } from 'react-native';
 import { inject, observer } from "mobx-react";
 import styles from "../styles";
 import {
-    Content,
     List,
-    Text
 } from "native-base";
 import ListMenuItem from './subcomponents/ListMenuItem';
 import SubscriptionBanner from './subcomponents/SubscriptionBanner';
