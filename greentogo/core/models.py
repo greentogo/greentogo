@@ -49,7 +49,12 @@ def activity_data(days=30):
         return data
 
     def _get_user_data():
-        # filter this to only count active subscriptions
+        # TODO filter this to only count active subscriptions
+        # TODO filter this to only count active subscriptions
+        # TODO filter this to only count active subscriptions
+        # TODO filter this to only count active subscriptions
+        # TODO filter this to only count active subscriptions
+        # TODO filter this to only count active subscriptions
         total_active_subs = Subscription.objects.all().count()
 
         data = LocationTag.objects.filter(created_at__gte=begin_datetime_start_of_day) \
@@ -402,6 +407,20 @@ class Subscription(models.Model):
     def hashed_id(self):
         return encode_nums(self.id)
 
+    # @property
+    # def active(self):
+        # return encode_nums(self.id)
+        # Return String Active/Expired
+
+    # @property
+    # def is_active(self):
+        # self.filter(Q(ends_at=None) | Q(ends_at__gt=timezone.now()))
+        # print(self.filter(Q(ends_at=None) | Q(ends_at__gt=timezone.now())))
+        # print(self.ends_at__gt)
+        # return self.ends_at__gt=timezone.now()
+        # return True
+        # Return Bool True/False
+
     @property
     def display_name(self):
         return self.name or self.plan_display()
@@ -421,7 +440,6 @@ class Subscription(models.Model):
     def number_of_boxes(self):
         if self.plan:
             return self.plan.number_of_boxes
-
         return 0
 
     @property
@@ -430,10 +448,10 @@ class Subscription(models.Model):
 
     @property
     def available_boxes(self):
-        return self.number_of_boxes - (self.boxes_currently_checked_out or 0)
+        return self.number_of_boxes - (self.boxes_currently_out or 0)
 
     @property
-    def boxes_currently_checked_out(self):
+    def boxes_currently_out(self):
         checked_out = LocationTag.objects.filter(subscription=self).aggregate(
                 checked_out=Sum(
                     Case(

@@ -17,7 +17,7 @@ def checkin_all_boxes(modeladmin, request, queryset):
         #Check if subscription can check in at least 1 box
         if sub.can_checkin():
             #Create checkin tags equal to number of boxes currently checked out
-            for i in range(sub.boxes_currently_checked_out()):
+            for i in range(sub.boxes_currently_out()):
                 # Use the first admin Location, failing that use first location
                 checkin_location = Location.objects.filter(admin_location=True).first() \
                     or Location.objects.checkin().first()
@@ -29,8 +29,8 @@ checkin_all_boxes.short_description = "Return all boxes for selected users"
 class SubscriptionInline(admin.TabularInline):
     model = Subscription
     extra = 0
-    fields = ('inline_display_name','plan', 'stripe_id', 'boxes_currently_checked_out', 'available_boxes', 'max_boxes', )
-    readonly_fields = ('inline_display_name', 'plan', 'stripe_id', 'boxes_currently_checked_out', 'available_boxes', 'max_boxes', )
+    fields = ('inline_display_name','plan', 'stripe_id', 'boxes_currently_out', 'available_boxes', 'max_boxes', )
+    readonly_fields = ('inline_display_name', 'plan', 'stripe_id', 'boxes_currently_out', 'available_boxes', 'max_boxes', )
     can_delete = False
     view_on_site = False
     show_change_link = True
@@ -45,9 +45,9 @@ class CustomUserAdmin(UserAdmin):
     inlines = [SubscriptionInline,]
 
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('stripe_id', 'user', 'plan', 'boxes_currently_checked_out', 'available_boxes', 'max_boxes', )
+    list_display = ('stripe_id', 'user', 'plan', 'boxes_currently_out', 'available_boxes', 'max_boxes', )
     search_fields = ('name', 'user__name', 'user__username', 'stripe_id', )
-    readonly_fields = ('boxes_currently_checked_out', 'available_boxes', 'max_boxes', 'last_used', 'total_checkins', 'total_checkouts', )
+    readonly_fields = ('boxes_currently_out', 'available_boxes', 'max_boxes', 'last_used', 'total_checkins', 'total_checkouts', )
 
     actions = [checkin_all_boxes]
 

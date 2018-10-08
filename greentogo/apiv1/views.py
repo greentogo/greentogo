@@ -121,7 +121,7 @@ class SubscriptionView(APIView):
         plan = pinax_models.Plan.objects.get(stripe_id=request.data.get('plan'))
         plandict = plan.as_dict()
 
-        if plandict['boxes'] < subscription.boxes_currently_checked_out():
+        if plandict['boxes'] < subscription.boxes_currently_out():
             return jsend_fail({"plan": "plan_not_enough_boxes"})
 
         subscriptions.update(
