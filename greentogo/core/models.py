@@ -412,14 +412,15 @@ class Subscription(models.Model):
         # return encode_nums(self.id)
         # Return String Active/Expired
 
-    # @property
-    # def is_active(self):
-        # self.filter(Q(ends_at=None) | Q(ends_at__gt=timezone.now()))
-        # print(self.filter(Q(ends_at=None) | Q(ends_at__gt=timezone.now())))
-        # print(self.ends_at__gt)
-        # return self.ends_at__gt=timezone.now()
-        # return True
-        # Return Bool True/False
+    @property
+    def is_active(self):
+        if self.ends_at is not None:
+            print(self.ends_at.date())
+            print(timezone.now().date())
+            print(self.ends_at.date() > timezone.now().date())
+            return self.ends_at.date() > timezone.now().date()
+        else:
+            return True
 
     @property
     def display_name(self):

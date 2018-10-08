@@ -45,9 +45,9 @@ class CustomUserAdmin(UserAdmin):
     inlines = [SubscriptionInline,]
 
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('stripe_id', 'user', 'plan', 'boxes_currently_out', 'available_boxes', 'max_boxes', )
+    list_display = ('stripe_id', 'user', 'plan', 'boxes_currently_out', 'available_boxes', 'max_boxes', 'is_active', )
     search_fields = ('name', 'user__name', 'user__username', 'stripe_id', )
-    readonly_fields = ('boxes_currently_out', 'available_boxes', 'max_boxes', 'last_used', 'total_checkins', 'total_checkouts', )
+    readonly_fields = ('boxes_currently_out', 'available_boxes', 'max_boxes', 'last_used', 'total_checkins', 'total_checkouts', 'is_active',  )
 
     actions = [checkin_all_boxes]
 
