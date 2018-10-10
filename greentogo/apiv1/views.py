@@ -300,7 +300,7 @@ class RfidView(APIView):
                 if sub.available_boxes > 1:
                     subscription = sub
                     break
-            print(subscription)
+            # print(subscription)
             # serializer = SubscriptionSerializer(subscription)
             data = {
                 "Boxes Avail": subscription.available_boxes,
@@ -328,7 +328,7 @@ class RfidView(APIView):
                 if sub.available_boxes > 1:
                     subscription = sub
                     break
-            print(subscription.available_boxes)
+            # print(subscription.available_boxes)
             if subscription:
                 subscription.tag_location(location, 1)
                 data = {

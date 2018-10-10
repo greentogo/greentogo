@@ -415,9 +415,6 @@ class Subscription(models.Model):
     @property
     def is_active(self):
         if self.ends_at is not None:
-            print(self.ends_at.date())
-            print(timezone.now().date())
-            print(self.ends_at.date() > timezone.now().date())
             return self.ends_at.date() > timezone.now().date()
         else:
             return True
@@ -759,6 +756,23 @@ class Location(models.Model):
                 lat, lng = result.latlng
                 self.latitude = lat
                 self.longitude = lng
+
+    @property
+    def is_admin_location(self):
+        if self.headquarters:
+            return 'Headquarters'
+        if self.washing_location:
+            return 'Washing Location'
+        if self.dumping_location:
+            if self.service == 'IN':
+                return 'Checkin Dumping Location'
+            if self.service == 'OUT':
+                return 'Checkout Dumping Location'
+            return 'Unknown Dumping Location'
+        if self.admin_location:
+            return 'Unknown Admin Location'
+        return ''
+
 
     def add_qrcode_to_pdf(self, pdf):
         import qrcode

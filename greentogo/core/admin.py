@@ -1,6 +1,11 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.http import HttpResponse
+from django.utils.html import format_html
+from django.conf.urls import include, url
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse, resolve
+from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import Location, UnclaimedSubscription, Subscription, LocationTag,\
         User
@@ -47,9 +52,72 @@ class CustomUserAdmin(UserAdmin):
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('stripe_id', 'user', 'plan', 'boxes_currently_out', 'available_boxes', 'max_boxes', 'is_active', )
     search_fields = ('name', 'user__name', 'user__username', 'stripe_id', )
-    readonly_fields = ('boxes_currently_out', 'available_boxes', 'max_boxes', 'last_used', 'total_checkins', 'total_checkouts', 'is_active',  )
+    readonly_fields = ('boxes_currently_out', 'available_boxes', 'max_boxes', 'last_used', 'total_checkins', 'total_checkouts', 'is_active', 'account_actions', )
+
+    def admin_checkin(self, request, account_id, *args, **kwargs):
+        print('admin_checkin called')
+        return self.process_action(
+            request=request,
+            account_id=account_id,
+            action='IN',
+        )
+    def admin_checkout(self, request, account_id, *args, **kwargs):
+        print('admin_checkout called')
+        return self.process_action(
+            request=request,
+            account_id=account_id,
+            action='OUT',
+        )
+
+    def process_action(
+        self,
+        request,
+        account_id,
+        action
+    ):
+        print('process_action called')
+        subscription = Subscription.objects.get(id=account_id)
+        try:
+            dump = Location.objects.get(dumping_location=True, service=action)
+            print(subscription.can_tag_location(dump))
+            if subscription.can_tag_location(dump):
+                subscription.tag_location(dump, 1)
+            else:
+                messages.add_message(request, messages.INFO, 'Unable to check {} box. user has no boxes left to check {}'.format(action, action))
+        except Location.DoesNotExist:
+            messages.add_message(request, messages.ERROR, 'No Check{} Dumping Location has been set! Please create a check{} dumping location'.format(action, action))
+        except:
+            messages.add_message(request, messages.ERROR, 'ERROR: Unable to process')
+        return redirect('admin:core_subscription_change', account_id)
+
+    def get_urls(self):
+        print('get_urls called')
+        urls = super().get_urls()
+        custom_urls = [
+            url(
+                r'^(?P<account_id>.+)/adminCheckin/$',
+                self.admin_site.admin_view(self.admin_checkin),
+                name='admin-checkin',
+            ),
+            url(
+                r'^(?P<account_id>.+)/adminCheckout/$',
+                self.admin_site.admin_view(self.admin_checkout),
+                name='admin-checkout',
+            ),
+        ]
+        return custom_urls + urls
 
     actions = [checkin_all_boxes]
+    def account_actions(self, obj):
+        print('accoutn actions called')
+        print(self)
+        return format_html(
+            '<a class="button" href="{}">CheckIn</a>&nbsp;'
+            '<a class="button" href="{}">CheckOut</a>',
+            reverse('admin:admin-checkin', args=(obj.id,)),
+            reverse('admin:admin-checkout', args=(obj.id,)),
+        )
+    account_actions.short_description = 'Account Actions'
 
 
 class PlanAdmin(admin.ModelAdmin):
@@ -62,8 +130,8 @@ class UnclaimedSubscriptionAdmin(admin.ModelAdmin):
 
 class LocationAdmin(admin.ModelAdmin):
     fields = ('name', 'code', 'service', 'address', 'website', 'latitude', 'longitude', 'phase', 'admin_location', 'headquarters', 'washing_location', 'dumping_location', 'notify', 'notifyEmail', 'retired')
-    readonly_fields = ('code', 'latitude', 'longitude', )
-    list_display = ('name', 'code', 'service', )
+    readonly_fields = ('code', 'latitude', 'longitude', 'is_admin_location', )
+    list_display = ('name', 'code', 'service', 'is_admin_location', )
     actions = [
         'make_qrcodes',
     ]
