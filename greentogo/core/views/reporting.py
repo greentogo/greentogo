@@ -156,9 +156,8 @@ def accidental_checkout(request):
         if form.is_valid():
             num_boxes = int(request.POST.get('num_boxes'))
             location = form.cleaned_data.get('location')
-            dumpSet = Location.objects.filter(dumping_location=True, service="IN")
-            dump = dumpSet[0]
-            if subscription.available_boxes - num_boxes <= subscription.number_of_boxes:
+            dump = Location.objects.get(dumping_location=True, service="IN")
+            if subscription.can_tag_location(dump, num_boxes):
                 resCount = location.get_estimated_stock()
                 subscription.tag_location(dump, num_boxes)
                 location.set_stock(resCount + num_boxes)
