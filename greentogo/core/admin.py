@@ -55,14 +55,12 @@ class SubscriptionAdmin(admin.ModelAdmin):
     readonly_fields = ('boxes_currently_out', 'available_boxes', 'max_boxes', 'last_used', 'total_checkins', 'total_checkouts', 'is_active', 'account_actions', )
 
     def admin_checkin(self, request, account_id, *args, **kwargs):
-        print('admin_checkin called')
         return self.process_action(
             request=request,
             account_id=account_id,
             action='IN',
         )
     def admin_checkout(self, request, account_id, *args, **kwargs):
-        print('admin_checkout called')
         return self.process_action(
             request=request,
             account_id=account_id,
@@ -75,11 +73,9 @@ class SubscriptionAdmin(admin.ModelAdmin):
         account_id,
         action
     ):
-        print('process_action called')
         subscription = Subscription.objects.get(id=account_id)
         try:
             dump = Location.objects.get(dumping_location=True, service=action)
-            print(subscription.can_tag_location(dump))
             if subscription.can_tag_location(dump):
                 subscription.tag_location(dump, 1)
             else:
@@ -91,7 +87,6 @@ class SubscriptionAdmin(admin.ModelAdmin):
         return redirect('admin:core_subscription_change', account_id)
 
     def get_urls(self):
-        print('get_urls called')
         urls = super().get_urls()
         custom_urls = [
             url(
@@ -109,8 +104,6 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
     actions = [checkin_all_boxes]
     def account_actions(self, obj):
-        print('accoutn actions called')
-        print(self)
         return format_html(
             '<a class="button" href="{}">CheckIn</a>&nbsp;'
             '<a class="button" href="{}">CheckOut</a>',
