@@ -4,6 +4,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 from rest_framework.validators import UniqueValidator
 from core.forms import UserSignupForm
+from django.db.utils import IntegrityError
 
 from core.models import Location, LocationTag, Restaurant, Subscription, User
 
@@ -42,6 +43,16 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('name', 'email', 'username', 'subscriptions', )
 
     subscriptions = SubscriptionSerializer(many=True)
+    def update(self, instance, data):
+        try: 
+            instance.name = data['name']
+            instance.email = data['email']
+            instance.save()
+            return 'saved'
+        except IntegrityError:
+            return 'User with this Email address already exists.'
+        except: 
+            return 'Error, please try again later.'
 
 
 class LocationSerializer(serializers.ModelSerializer):

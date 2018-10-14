@@ -16,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.models import User, Location, LocationTag, Plan, Restaurant, Subscription
-from core.forms import UserSignupForm\
+from core.forms import UserSignupForm, UserForm
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
@@ -73,6 +73,15 @@ class UserView(GenericAPIView):
     def get(self, request):
         serializer = self.get_serializer(request.user)
         return jsend_success(serializer.data)
+
+    def patch(self, request, format=None):
+        serializer = self.get_serializer(request.user)
+        saved = serializer.update(request.user, request.data)
+        if saved == 'saved':
+            newUser = self.get_serializer(request.user)
+            return jsend_success(newUser.data)
+        else:
+            return jsend_fail({"error": saved}, status=500)
 
 
 class LocationView(GenericAPIView):
