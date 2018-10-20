@@ -216,7 +216,7 @@ def export_subscriptions(request, *args, **kwargs):
     writer = csv.writer(response)
     subs = Subscription.objects.all()
 
-    writer.writerow(['starts at', 'ends at', 'plan', 'user', 'email', 'stripe id', 'stripe status', 'cancelled',  'corporate_code_id', 'coupon_code_id'])  
+    writer.writerow(['starts at', 'ends at', 'plan', 'user', 'email', 'stripe id', 'stripe status', 'cancelled',  'corporate_code_id', 'coupon_code_id', 'is_active', ])
 
     for sub in subs:
         writer.writerow([sub.starts_at, sub.ends_at, sub.plan, sub.user, sub.user.email, sub.stripe_id, sub.stripe_status, sub.cancelled, sub.corporate_code_id, sub.coupon_code_id])
