@@ -146,6 +146,7 @@ class User(AbstractUser):
     )
     referred_by = models.CharField(max_length=255, blank=True, null=True)
     stripe_id = models.CharField(max_length=100, blank=True, null=True)
+    expoPushToken = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.name or self.username
