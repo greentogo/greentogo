@@ -76,7 +76,12 @@ class UserView(GenericAPIView):
 
     def patch(self, request, format=None):
         serializer = self.get_serializer(request.user)
-        saved = serializer.update(request.user, request.data)
+        saved = 'NO DATA MATCH'
+        if 'name' in request.data and 'email' in request.data:
+            saved = serializer.updateNameAndEmail(request.user, request.data)
+        elif 'expoPushToken' in request.data:
+            saved = serializer.updateExpoPushToken(request.user, request.data)
+
         if saved == 'saved':
             newUser = self.get_serializer(request.user)
             return jsend_success(newUser.data)
