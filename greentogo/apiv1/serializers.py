@@ -40,17 +40,25 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('name', 'email', 'username', 'subscriptions', )
+        fields = ('name', 'email', 'username', 'subscriptions', 'expoPushToken', )
 
     subscriptions = SubscriptionSerializer(many=True)
-    def update(self, instance, data):
-        try: 
+    def updateNameAndEmail(self, instance, data):
+        try:
             instance.name = data['name']
             instance.email = data['email']
             instance.save()
             return 'saved'
         except IntegrityError:
             return 'User with this Email address already exists.'
+        except: 
+            return 'Error, please try again later.'
+
+    def updateExpoPushToken(self, instance, data):
+        try:
+            instance.expoPushToken = data['expoPushToken']
+            instance.save()
+            return 'saved'
         except: 
             return 'Error, please try again later.'
 
