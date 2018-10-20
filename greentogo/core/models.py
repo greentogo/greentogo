@@ -123,6 +123,8 @@ class AdminSettings(models.Model):
             blank=False,
             help_text="List of emails separated by commas for who should recieve alerts when stock is high at return stations")
 
+    appVideo = models.FileField(upload_to='video/', blank=True, null=True)
+
     def get_restaurant_low_stock_emails_list(self):
         return re.sub(",", " ",  self.lowStockEmails).split()
 
