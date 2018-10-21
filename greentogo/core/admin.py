@@ -6,6 +6,9 @@ from django.conf.urls import include, url
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse, resolve
 from django.shortcuts import get_object_or_404, redirect, render
+from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedDropdownFilter
+from django.contrib.admin import SimpleListFilter
+from django.utils import timezone
 
 from .models import Location, UnclaimedSubscription, Subscription, LocationTag,\
         User
@@ -49,10 +52,34 @@ class SubscriptionInline(admin.TabularInline):
 class CustomUserAdmin(UserAdmin):
     inlines = [SubscriptionInline,]
 
+class isActiveFilter(SimpleListFilter):
+    title = 'Active'
+    parameter_name = 'is_active'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('Active', 'Active'),
+            ('Inactive', 'Inactive'),
+        )
+
+    def queryset(self, request, queryset):
+        print(len([x for x in queryset if x.is_active]))
+        if self.value() == 'Active':
+            return queryset.filter(ends_at__gte=timezone.now().date()) | queryset.filter(ends_at=None)
+        if self.value() == 'Inactive':
+            return queryset.filter(ends_at__lte=timezone.now().date())
+
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('stripe_id', 'user', 'plan', 'boxes_currently_out', 'available_boxes', 'max_boxes', 'is_active', )
     search_fields = ('name', 'user__name', 'user__username', 'stripe_id', )
     readonly_fields = ('boxes_currently_out', 'available_boxes', 'max_boxes', 'last_used', 'total_checkins', 'total_checkouts', 'is_active', 'account_actions', )
+    list_filter = (
+        isActiveFilter,
+        # for ordinary fields
+        # ('stripe_status', DropdownFilter),
+        # for related fields
+        # ('user__name', RelatedDropdownFilter),
+    )
 
     def admin_checkin(self, request, account_id, *args, **kwargs):
         return self.process_action(

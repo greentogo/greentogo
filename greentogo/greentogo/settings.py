@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     #'django.contrib.admin',
     'flat_responsive',  # third-party, needs to be above django.contrib.admin
     'django.contrib.admin.apps.SimpleAdminConfig',
+    'django_admin_listfilter_dropdown',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
