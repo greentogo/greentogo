@@ -63,7 +63,6 @@ class isActiveFilter(SimpleListFilter):
         )
 
     def queryset(self, request, queryset):
-        print(len([x for x in queryset if x.is_active]))
         if self.value() == 'Active':
             return queryset.filter(ends_at__gte=timezone.now().date()) | queryset.filter(ends_at=None)
         if self.value() == 'Inactive':
