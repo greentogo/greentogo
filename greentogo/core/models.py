@@ -212,6 +212,12 @@ class CannotChangeException(Exception):
 class IncorrectIntervalException(Exception):
     """Raise when the interval string is not the correct type."""
 
+class MobileAppRatings(models.Model):
+    user = models.ForeignKey(User)
+    rating = models.IntegerField()
+    date = models.DateTimeField(default=timezone.now)
+    version = models.CharField(max_length=255)
+
 class PlanQuerySet(models.QuerySet):
     def available(self):
         return self.filter(available=True).exclude(stripe_id=None)
