@@ -15,12 +15,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import User, Location, LocationTag, Plan, Restaurant, Subscription
+from core.models import User, Location, LocationTag, Plan, Restaurant, Subscription, MobileAppRatings
 from core.forms import UserSignupForm, UserForm
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
-from .serializers import CheckinCheckoutSerializer, LocationTagSerializer, UserSerializer, LocationSerializer, RestaurantSerializer, UserRegistrationSerializer
+from .serializers import CheckinCheckoutSerializer, LocationTagSerializer, UserSerializer, LocationSerializer, RestaurantSerializer, UserRegistrationSerializer, RatingSerializer
 
 
 class CheckinCheckoutView(GenericAPIView):
@@ -87,6 +87,23 @@ class UserView(GenericAPIView):
             return jsend_success(newUser.data)
         else:
             return jsend_fail({"error": saved}, status=500)
+
+
+class RateView(GenericAPIView):
+    """
+    Let user rate mobile app
+    """
+
+    permission_classes = (IsAuthenticated, )
+    serializer_class = RatingSerializer
+
+    def post(self, request, format=None):
+        try:
+            MobileAppRatings.objects.create(user=request.user, rating=request.data['rating'], version=request.data['version'])
+            return jsend_success(None)
+        except Exception as ex:
+            rollbar.report_exc_info(sys.exc_info(), request)
+            return jsend_fail(None, status=500)
 
 
 class LocationView(GenericAPIView):

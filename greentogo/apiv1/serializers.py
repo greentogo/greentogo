@@ -6,7 +6,7 @@ from rest_framework.validators import UniqueValidator
 from core.forms import UserSignupForm
 from django.db.utils import IntegrityError
 
-from core.models import Location, LocationTag, Restaurant, Subscription, User
+from core.models import Location, LocationTag, Restaurant, Subscription, User, MobileAppRatings
 
 
 class CheckinCheckoutSerializer(serializers.Serializer):
@@ -61,6 +61,11 @@ class UserSerializer(serializers.ModelSerializer):
             return 'saved'
         except: 
             return 'Error, please try again later.'
+
+class RatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MobileAppRatings
+        fields = ('rating', 'version')
 
 
 class LocationSerializer(serializers.ModelSerializer):
