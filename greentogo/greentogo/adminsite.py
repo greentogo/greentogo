@@ -13,7 +13,7 @@ from core.models import (
 )
 from core.views.admin import (
     activity_report, empty_location, empty_locations, restock_location, restock_locations, user_report, 
-    stock_report, export_data, unclaimed_subscription_status_csv, export_total_check_out, 
+    stock_report, mobile_application, export_data, unclaimed_subscription_status_csv, export_total_check_out, 
     export_total_check_in, export_check_out_by_user, export_check_in_by_user, 
     export_check_out_by_location, export_check_in_by_location, export_user_reports, export_subscriptions
 )
@@ -112,6 +112,15 @@ class G2GAdminSite(admin.AdminSite):
 admin_site = G2GAdminSite(name='greentogo')
 admin_site.site_header = 'GreenToGo Admin'
 admin_site.site_title = 'GreenToGo Admin'
+
+admin_site.register_view(
+    path='mobile_application/',
+    view=mobile_application,
+    section="Mobile Application",
+    name="Mobile Application",
+    urlname="mobile_application",
+    only_superusers=True,
+)
 
 admin_site.register_view(
     path='core/unclaimed_subscriptions.csv',

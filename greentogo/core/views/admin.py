@@ -138,6 +138,13 @@ def restock_locations(request, *args, **kwargs):
     return render(request, "admin/restock_locations.html", {'locations': checkout_locations})
 
 
+def mobile_application(request, *args, **kwargs):
+    if request.method == "POST":
+        message = request.POST.get('push-notification-message')
+        print(message)
+    return render(request, 'admin/mobile_application.html')
+
+
 @require_POST
 def restock_location(request, location_id, *args, **kwargs):
     """Restock a specific location"""
