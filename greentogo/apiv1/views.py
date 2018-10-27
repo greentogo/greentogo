@@ -6,7 +6,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model, authenticate, login
 from django.core.mail import send_mail, EmailMultiAlternatives
-import json, re, rollbar, urllib.parse
+import json, re, rollbar, urllib.parse, sys
 
 from registration.models import RegistrationProfile
 from registration.signals import user_registered
