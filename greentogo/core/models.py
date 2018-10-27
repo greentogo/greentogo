@@ -20,6 +20,8 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
 from collections import Counter
+from exponent_server_sdk import PushClient, PushMessage, PushResponseError, PushServerError, DeviceNotRegisteredError
+from requests.exceptions import ConnectionError, HTTPError
 
 from django_geocoder.wrapper import get_cached as geocode
 from postgres_stats import DateTrunc
@@ -75,6 +77,7 @@ def activity_data(days=30):
 
 def total_boxes_returned():
     return LocationTag.objects.checkin().count()
+
 
 def export_chart_data(start_date=False, end_date=False):
     begin_datetime_start_of_day = datetime.combine(datetime.strptime(start_date, '%Y-%m-%d'), datetime.min.time())
@@ -137,7 +140,13 @@ class AdminSettings(models.Model):
         return super(AdminSettings, self).save(*args, **kwargs)
 
 
+class UserQuerySet(models.QuerySet):
+    def getPushTokens(self):
+        return self.exclude(expoPushToken__isnull=True)
+
 class User(AbstractUser):
+    objects = UserQuerySet.as_manager()
+
     name = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(
         verbose_name='Email address',
@@ -196,7 +205,8 @@ class User(AbstractUser):
         for sub in self.subscriptions.all():
             count = count + sub.total_checkouts()
         return count
-    
+
+    # TODO ADD THIS FUNCTIONALITY
     def add_to_mailchimp(self):
         if settings.DJANGO_ENV == 'development':
             print("In Development Environment")
