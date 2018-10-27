@@ -8,8 +8,12 @@
 {% endblock %}
 {% block content %}
 <div>
+    <h3>Push Notification</h3>
     <form class="push-notification-form" action="{% url "admin:mobile_application" %}" method="POST">
         {% csrf_token %}
+        <label for="push-notification-title">Push Notification Title:</label>
+        <input id="push-notification-title" name="push-notification-title" maxlength="20" required/>
+        <br/>
         <label for="push-notification-message">Push Notification Message:</label>
         <br/>
         <textarea id="push-notification-message" name="push-notification-message"
