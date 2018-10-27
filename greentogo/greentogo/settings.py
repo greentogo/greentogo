@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     'djoser',
     'postgres_stats',
     'export_action',
+    'exponent_server_sdk',
 
     # ours
     'core',

@@ -13,6 +13,7 @@ django-export-action
 djangorestframework
 django-registration-redux
 django-geocoder
+exponent_server_sdk
 autorepr
 shortuuid
 qrcode
