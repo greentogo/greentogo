@@ -1,6 +1,7 @@
 import csv
 import json
 
+from django.contrib import messages
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -14,7 +15,7 @@ from postgres_stats import DateTrunc
 
 from core.models import (
     Location, Plan, Restaurant, Subscription, \
-    UnclaimedSubscription, User, \
+    UnclaimedSubscription, User, send_push_message, \
     activity_data, export_chart_data, total_boxes_returned, LocationTag \
 )
 
@@ -140,8 +141,15 @@ def restock_locations(request, *args, **kwargs):
 
 def mobile_application(request, *args, **kwargs):
     if request.method == "POST":
-        message = request.POST.get('push-notification-message')
-        print(message)
+        try:
+            message = request.POST.get('push-notification-message')
+            title = request.POST.get('push-notification-title')
+            usersWithPushTokens = User.objects.getPushTokens()
+            for user in usersWithPushTokens:
+                send_push_message(user.expoPushToken, title, message)
+            messages.add_message(request, messages.INFO, 'Messages sent!')
+        except:
+            messages.add_message(request, messages.ERROR, 'ERROR SENDING MESSAGE, UNABLE TO SEND')
     return render(request, 'admin/mobile_application.html')
 
 
