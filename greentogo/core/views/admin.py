@@ -144,7 +144,7 @@ def mobile_application(request, *args, **kwargs):
         try:
             message = request.POST.get('push-notification-message')
             title = request.POST.get('push-notification-title')
-            usersWithPushTokens = User.objects.getPushTokens()
+            usersWithPushTokens = User.objects.all().exclude(expoPushToken__isnull=True)
             for user in usersWithPushTokens:
                 send_push_message(user.expoPushToken, title, message)
             messages.add_message(request, messages.INFO, 'Messages sent!')

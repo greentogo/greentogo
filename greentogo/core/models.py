@@ -192,14 +192,7 @@ class AdminSettings(models.Model):
             raise ValidationError('There is can be only one AdminSettings instance')
         return super(AdminSettings, self).save(*args, **kwargs)
 
-
-class UserQuerySet(models.QuerySet):
-    def getPushTokens(self):
-        return self.exclude(expoPushToken__isnull=True)
-
 class User(AbstractUser):
-    objects = UserQuerySet.as_manager()
-
     name = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(
         verbose_name='Email address',
