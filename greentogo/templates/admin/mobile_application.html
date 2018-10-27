@@ -31,7 +31,6 @@
         var pushNotificationMessage = document.getElementById('push-notification-message');
         var pushNotificationMessageLength = document.getElementById('push-notification-message-length');
         var pushNotificationSubmitButton = document.getElementById('push-notification-message-submit');
-        console.log(pushNotificationMessage)
         pushNotificationMessage.addEventListener('input', function () {
             pushNotificationMessageLength.textContent = 'Characters: ' + this.value.length;
             if (this.value.length > 1) {
