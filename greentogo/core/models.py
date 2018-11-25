@@ -725,6 +725,10 @@ class Location(models.Model):
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
     phase = models.PositiveIntegerField(default=1)
+    minimum_boxes = models.IntegerField(
+        default=15,
+        help_text="Minimum number of boxes to be kept at this check out \
+        location (please ignore for non-check out locations)")
 
     notify = models.BooleanField(
         default=False,
