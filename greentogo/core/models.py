@@ -870,6 +870,22 @@ class Location(models.Model):
             rollbar.report_exc_info(sys.exc_info(), ex)
             return 'ERROR'
 
+
+    @property
+    def avg_weekly_usage_over_past_4_weeks(self):
+        try:
+            tags = [
+                len(LocationTag.objects.filter(location=self, created_at__range=(timezone.now() - timedelta(weeks=1), timezone.now()))),
+                len(LocationTag.objects.filter(location=self, created_at__range=(timezone.now() - timedelta(weeks=2), timezone.now() - timedelta(weeks=1)))),
+                len(LocationTag.objects.filter(location=self, created_at__range=(timezone.now() - timedelta(weeks=3), timezone.now() - timedelta(weeks=2)))),
+                len(LocationTag.objects.filter(location=self, created_at__range=(timezone.now() - timedelta(weeks=4), timezone.now() - timedelta(weeks=3)))),
+            ]
+            return int(sum(tags)/len(tags))
+        except Exception as ex:
+            rollbar.report_exc_info(sys.exc_info(), ex)
+            return 'ERROR'
+
+
     @property
     def is_admin_location(self):
         if self.headquarters:
