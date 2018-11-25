@@ -148,8 +148,8 @@ class UnclaimedSubscriptionAdmin(admin.ModelAdmin):
 
 
 class LocationAdmin(admin.ModelAdmin):
-    fields = ('name', 'code', 'service', 'address', 'website', 'latitude', 'longitude', 'phase', 'admin_location', 'headquarters', 'washing_location', 'dumping_location', 'notify', 'notifyEmail', 'retired')
-    readonly_fields = ('code', 'latitude', 'longitude', 'is_admin_location', )
+    fields = ('name', 'code', 'service', 'address', 'website', 'latitude', 'longitude', 'phase', 'admin_location', 'headquarters', 'washing_location', 'dumping_location', 'notify', 'notifyEmail', 'retired', 'error_rate', )
+    readonly_fields = ('code', 'latitude', 'longitude', 'is_admin_location', 'error_rate', )
     list_display = ('name', 'code', 'service', 'is_admin_location', )
     actions = [
         'make_qrcodes',

@@ -823,6 +823,50 @@ class Location(models.Model):
                 self.longitude = lng
 
     @property
+    def error_percentage(self):
+        try:
+            if self.service != 'OUT' or self.admin_location:
+                return 'NA'
+            error_difference_list = [abs(report.actual_amount - report.estimated_amount) for report in LocationStockReport.objects.filter(location_id=self.id)]
+            if not error_difference_list:
+                return None
+            percent_correct = int((error_difference_list.count(0)/len(error_difference_list)) * 100)
+            percent_incorrect = 100 - percent_correct
+            return percent_incorrect
+        except Exception as ex:
+            rollbar.report_exc_info(sys.exc_info(), ex)
+            return 'ERROR'
+
+    @property
+    def error_avg_difference(self):
+        try:
+            if self.service != 'OUT' or self.admin_location:
+                return 'NA'
+            error_difference_list = [abs(report.actual_amount - report.estimated_amount) for report in LocationStockReport.objects.filter(location_id=self.id)]
+            if not error_difference_list:
+                return None
+            avg_difference = int(sum(error_difference_list)/len(error_difference_list))
+            return avg_difference
+        except Exception as ex:
+            rollbar.report_exc_info(sys.exc_info(), ex)
+            return 'ERROR'
+
+    @property
+    def error_rate(self):
+        try:
+            if self.error_percentage == 'ERROR' or self.error_avg_difference == 'ERROR':
+                return 'ERROR'
+            if self.error_percentage == 'NA' or self.error_avg_difference == 'NA':
+                return 'NA'
+            if self.error_percentage:
+                return '{}% of the time, the count is about {} boxes off'.format(self.error_percentage, self.error_avg_difference)
+            else:
+                return None
+        except Exception as ex:
+            rollbar.report_exc_info(sys.exc_info(), ex)
+            return 'ERROR'
+
+    @property
     def is_admin_location(self):
         if self.headquarters:
             return 'Headquarters'
