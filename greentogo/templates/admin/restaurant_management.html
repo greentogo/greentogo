@@ -34,7 +34,7 @@
 <div id="checklist">
 </div>
 <input type="button" class="button" id="getDirections" value="Get Directions" disabled />
-<p>Directions could take up to 10 seconds to load.</p>
+<p>Directions could take up to 10 seconds to load and can only calculate 10 locations at once.</p>
 {% endblock %}
 
 {% block extrahead %}
@@ -224,7 +224,7 @@
         var button = this;
         button.disabled = true;
         var locations = checklistData.list.reduce(function (accumulator, location) {
-            if (location.address && location.latitude && location.longitude) {
+            if (location.address && location.latitude && location.longitude && accumulator.length < 11) {
                 accumulator.push({
                     address: location.address,
                     lat: location.latitude,
