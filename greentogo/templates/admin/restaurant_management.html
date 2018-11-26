@@ -223,7 +223,7 @@
         var button = this;
         button.disabled = true;
         var locations = checklistData.list.reduce(function (accumulator, location) {
-            if (location.address && location.latitude && location.longitude && accumulator.length < 11) {
+            if (location.address && location.latitude && location.longitude && accumulator.length < 10) {
                 accumulator.push({
                     address: location.address,
                     lat: location.latitude,
