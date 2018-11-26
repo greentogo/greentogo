@@ -33,11 +33,14 @@
 <p id="hqEstimate"></p>
 <div id="checklist">
 </div>
+<input type="button" class="button" id="getDirections" value="Get Directions" disabled />
+<p>Directions could take up to 10 seconds to load.</p>
 {% endblock %}
 
 {% block extrahead %}
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     var colorMap = function (categoryFn, dataArray) {
         return dataArray
@@ -140,6 +143,11 @@
     function renderChecklist() {
         var checklistElement = document.getElementById('checklist');
         checklistElement.innerHTML = '';
+        if (checklistData.list.length > 0) {
+            document.getElementById("getDirections").disabled = false;
+        } else {
+            document.getElementById("getDirections").disabled = true;
+        }
         var boxesToRestock = checklistData.list.reduce(function (accumulator, location) {
             var newChild = document.createElement("div");
             newChild.innerHTML = `
@@ -155,7 +163,7 @@
         checklistData.hqEstimate = originalData.hq - boxesToRestock
         document.getElementById('hqEstimate').innerHTML = `Estimated boxes at HQ after restock: ${checklistData.hqEstimate}`;
     }
-    function removeFromChecklist(name){
+    function removeFromChecklist(name) {
         var newList = checklistData.list.reduce(function (accumulator, location) {
             if (location.name !== name) {
                 accumulator.push(location);
@@ -192,7 +200,6 @@
         var tempSort = sortByKey(data.locations, 'count');
         renderChart(tempSort);
     });
-    resetChecklist
     document.getElementById("resetChart").addEventListener("click", function () {
         highlight(this);
         data = originalData;
@@ -213,7 +220,42 @@
         });
         renderChecklist();
     });
-    //var canvas = document.getElementById("checkoutStockChart");
+    document.getElementById("getDirections").addEventListener("click", function () {
+        var button = this;
+        button.disabled = true;
+        var locations = checklistData.list.reduce(function (accumulator, location) {
+            if (location.address && location.latitude && location.longitude) {
+                accumulator.push({
+                    address: location.address,
+                    lat: location.latitude,
+                    lng: location.longitude,
+                });
+            }
+            return accumulator;
+        }, []);
+        var body = `locations=${JSON.stringify(locations)}`;
+        var config = {
+            headers: {
+                Authorization: 'Basic anRkdWRlMTAwOkpUMTIzZ2FtZQ==',
+            },
+        };
+        var newTab = window.open();
+        axios.post('https://api.routexl.com/tour/', body, config)
+            .then(function (response) {
+                var uri = 'https://www.google.com/maps/dir';
+                for (var location in response.data.route) {
+                    var encodedAddress = encodeURIComponent(response.data.route[location].name);
+                    uri = `${uri}/${encodedAddress}`;
+                }
+                button.disabled = false;
+                newTab.location.href = uri;
+            })
+            .catch(function (error) {
+                button.disabled = false;
+                newTab.close();
+                console.log(error);
+            });
+    });
     renderChart(data.locations);
     renderChecklist();
     });
@@ -222,6 +264,7 @@
     .tinyx {
         padding: 5px 8px !important;
     }
+
     .button {
         display: inline-block;
         vertical-align: middle;
