@@ -119,6 +119,36 @@ def stock_report(request, *args, **kwargs):
         ))}
     )
 
+def restaurant_management(request, *args, **kwargs):
+    """Show a report of current stock at each location."""
+    checkout_locations = Location.objects.checkout().order_by('name').filter(retired=False, admin_location=False)
+    washlocation = Location.objects.checkin().get(retired=False, washing_location=True)
+    hqLocation = Location.objects.checkin().get(retired=False, headquarters=True)
+
+    locations = []
+
+    for loc in checkout_locations:
+        if "Testing Location" not in loc.name and "Test Location" not in loc.name:
+            locations.append(dict(name=loc.name, count=loc.get_estimated_stock(), minimum_boxes=loc.minimum_boxes, avg_weekly_usage=loc.avg_weekly_usage_over_past_4_weeks))
+
+    def get_estimated_at_wash():
+        count = washlocation.get_estimated_stock()
+        return count
+
+    def get_estimated_at_hq():
+        count = hqLocation.get_estimated_stock()
+        return count
+
+    return render(
+        request, "admin/restaurant_management.html",
+        {
+            "data_json":json.dumps(dict(
+                locations=locations,
+                wash=get_estimated_at_wash(),
+                hq=get_estimated_at_hq(),
+        ))}
+    )
+
 
 def user_report(request,*args, **kwargs):
     data = User.objects.all()
