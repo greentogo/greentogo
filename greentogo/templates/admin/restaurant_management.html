@@ -62,6 +62,7 @@
         });
     }
     var lastClicked = null;
+    var checkoutChart;
     var originalData = {};
     var checklistData = {
         estimatedHQ: 0,
@@ -87,7 +88,7 @@
         Array.from(document.getElementsByClassName('success')).forEach(function (element) { element.classList.remove('success') });
         element.classList.add('success');
     }
-    function renderChart(locations) {
+    function newChart(locations) {
         var count = [];
         var names = [];
         locations.forEach(function (location, i) {
@@ -96,7 +97,7 @@
         });
 
         var checkoutCanvas = document.getElementById("checkoutStockChart");
-        var checkoutChart = new Chart(checkoutCanvas, {
+        checkoutChart = new Chart(checkoutCanvas, {
             type: 'horizontalBar',
             data: {
                 labels: names,
@@ -138,6 +139,32 @@
                 clickLocation(clickedPlace[0]._model.label);
             }
         };
+    }
+    function renderChart(locations) {
+        var count = [];
+        var names = [];
+        locations.forEach(function (location, i) {
+            count.push(location.count);
+            names.push(location.name);
+        });
+        checkoutChart.data = {
+            labels: names,
+            datasets: [{
+                label: "# of Boxes",
+                data: count,
+                backgroundColor: colorMap(function (val) {
+                    if (val > 30) {
+                        return 1
+                    } else if (val > 15) {
+                        return 2
+                    } else {
+                        return 3
+                    }
+                }, count),
+                borderWidth: 1
+            }]
+        }
+        checkoutChart.update();
     }
     function renderChecklist() {
         var checklistElement = document.getElementById('checklist');
@@ -186,13 +213,15 @@
             }
             return accumulator;
         }, [])
-        var tempSort = sortByKey(tempLoc, 'avg_weekly_usage').reverse();
-        renderChart(tempSort);
+        var tempSort = sortByKey(tempLoc, 'count').reverse();
+        var tempSort2 = sortByKey(tempSort, 'avg_weekly_usage').reverse();
+        renderChart(tempSort2);
     });
     document.getElementById("avgUsage").addEventListener("click", function () {
         highlight(this);
-        var tempSort = sortByKey(data.locations, 'avg_weekly_usage').reverse();
-        renderChart(tempSort);
+        var tempSort = sortByKey(data.locations, 'count').reverse();
+        var tempSort2 = sortByKey(tempSort, 'avg_weekly_usage').reverse();
+        renderChart(tempSort2);
     });
     document.getElementById("countFilter").addEventListener("click", function () {
         highlight(this);
@@ -255,7 +284,7 @@
                 console.log(error);
             });
     });
-    renderChart(data.locations);
+    newChart(data.locations);
     renderChecklist();
     });
 </script>
