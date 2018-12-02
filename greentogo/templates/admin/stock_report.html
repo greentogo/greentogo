@@ -21,16 +21,6 @@
 <h2>Admin Locations</h2>
 <p id="wash"></p>
 <p id="clean"></p>
-{% comment %} <div>
-    <h4>Filters</h4>
-    <input type="button" class="button" id="resetChart" value="Reset Chart" />
-    <input type="button" class="button" id="needRefill" value="Need Restock" />
-    <input type="button" class="button" id="avgUsage" value="Avg Usage (high to low)" />
-    <input type="button" class="button" id="countFilter" value="Count (low to high)" />
-    <select id="neighborhoodFilter">
-        <option value="none">none</option>
-    </select>
-</div> {% endcomment %}
 
 <h2>Clean Containers at Restaurants</h2>
 <canvas id="checkoutStockChart" width="500" height="250"></canvas>
@@ -47,6 +37,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
 <script>
 $(function () {
+    /*
+<div>
+    <h4>Filters</h4>
+    <input type="button" class="button" id="resetChart" value="Reset Chart" />
+    <input type="button" class="button" id="needRefill" value="Need Restock" />
+    <input type="button" class="button" id="avgUsage" value="Avg Usage (high to low)" />
+    <input type="button" class="button" id="countFilter" value="Count (low to high)" />
+    <select id="neighborhoodFilter">
+        <option value="none">none</option>
+    </select>
+</div> 
+    */
     var data = {{ data_json|safe }};
 
     var goodColor = 'rgba(26, 150, 65, 0.5)';
@@ -157,7 +159,7 @@ $(function () {
 
     function renderCheckOutChart(locations) {
         var data = formatLocationArrays(locations);
-        checkoutCanvas.height = data.names.length > 4 ? (data.names.length * 55) : 250 ;
+        //checkoutCanvas.height = data.names.length > 4 ? (data.names.length * 55) : 250 ;
         var backgroundColorMap = data.count.map((val, index)=>{
             if (val > data.minimum[index] * 2) {
                 return goodColor;
@@ -172,7 +174,7 @@ $(function () {
 
     function renderCheckInChart(locations) {
         var data = formatLocationArrays(locations);
-        checkinCanvas.height = data.names.length > 4 ? (data.names.length * 55) : 250 ;
+        //checkinCanvas.height = data.names.length > 4 ? (data.names.length * 55) : 250 ;
         var backgroundColorMap = data.count.map((val)=>{
             if (val > 30) {
                 return badColor;
