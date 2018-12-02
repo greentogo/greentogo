@@ -1,6 +1,12 @@
 {% extends "admin/base_site.html" %}
 {% block extrastyle %}
 {{ block.super }}
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+$(function () {
+    Array.from(document.getElementsByClassName('alert')).forEach(function (element) { element.classList.add('error') });
+});
+</script>
 <style type="text/css">
 body:before {
     display: block;

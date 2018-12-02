@@ -105,7 +105,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
             if subscription.can_tag_location(dump):
                 subscription.tag_location(dump, 1)
             else:
-                messages.add_message(request, messages.INFO, 'Unable to check {} box. user has no boxes left to check {}'.format(action, action))
+                messages.add_message(request, messages.WARN, 'Unable to check {} box. user has no boxes left to check {}'.format(action, action))
         except Location.DoesNotExist:
             messages.add_message(request, messages.ERROR, 'No Check{} Dumping Location has been set! Please create a check{} dumping location'.format(action, action))
         except:
