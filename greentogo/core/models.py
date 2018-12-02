@@ -702,6 +702,13 @@ def new_subscription_email_to_admins(sender, instance, created, **kwargs):
         )
 
 
+class Neighborhood(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return "{}".format(self.name)
+
+
 class LocationQuerySet(models.QuerySet):
     def checkin(self):
         return self.filter(service=Location.CHECKIN).order_by('name')
@@ -725,6 +732,7 @@ class Location(models.Model):
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
     phase = models.PositiveIntegerField(default=1)
+    neighborhood = models.ForeignKey(Neighborhood, blank=True, null=True)
     minimum_boxes = models.IntegerField(
         default=15,
         help_text="Minimum number of boxes to be kept at this check out \
