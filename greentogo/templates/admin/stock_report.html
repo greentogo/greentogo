@@ -21,12 +21,22 @@
 <h2>Admin Locations</h2>
 <p id="wash"></p>
 <p id="clean"></p>
+<div>
+    <h4>Filters</h4>
+    <input type="button" class="button" id="resetChart" value="Reset Chart" />
+    <input type="button" class="button" id="needRefill" value="Need Restock" />
+    <input type="button" class="button" id="avgUsage" value="Avg Usage (high to low)" />
+    <input type="button" class="button" id="countFilter" value="Count (low to high)" />
+    <select id="neighborhoodFilter">
+        <option value="none">none</option>
+    </select>
+</div>
 
 <h2>Clean Containers at Restaurants</h2>
-<canvas id="checkoutStockChart" width="500" height="250"></canvas>
+<canvas id="checkoutStockChart" width="500" height="400"></canvas>
 
 <h2>Dirty Containers in Return Stations</h2>
-<canvas id="checkinStockChart" width="500" height="250"></canvas>
+<canvas id="checkinStockChart" width="500" height="400"></canvas>
 
 </div>
 {% endblock %}
@@ -37,34 +47,25 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
 <script>
 $(function () {
-    /*
-<div>
-    <h4>Filters</h4>
-    <input type="button" class="button" id="resetChart" value="Reset Chart" />
-    <input type="button" class="button" id="needRefill" value="Need Restock" />
-    <input type="button" class="button" id="avgUsage" value="Avg Usage (high to low)" />
-    <input type="button" class="button" id="countFilter" value="Count (low to high)" />
-    <select id="neighborhoodFilter">
-        <option value="none">none</option>
-    </select>
-</div> 
-    */
     var data = {{ data_json|safe }};
 
     var goodColor = 'rgba(26, 150, 65, 0.5)';
     var warningColor = 'rgba(253, 174, 97, 0.5)';
     var badColor = 'rgba(215, 25, 28, 0.5)';
     var options = {
+        legend: {
+            display: false,
+        },
         scales: {
-            //yAxes: [{
             xAxes: [{
                 ticks: {
-                    autoSkip: false
+                    autoSkip: false,
+                    beginAtZero: true
                 }
             }],
-            //xAxes: [{
             yAxes: [{
                 ticks: {
+                    autoSkip: false,
                     beginAtZero: true
                 }
             }]
@@ -74,6 +75,8 @@ $(function () {
     var checkoutCanvas = document.getElementById("checkoutStockChart");
     var checkinCanvas = document.getElementById("checkinStockChart");
     var cycleCanvas = document.getElementById("cycleChart");
+    var checkoutChart;
+    var checkinChart;
     document.getElementById("totalContainerCount").innerHTML = "Clean at G2G HQ: " + data.total;
     document.getElementById("wash").innerHTML = "Washing Location: " + data.wash;
     document.getElementById("clean").innerHTML = "Clean at G2G HQ: " + data.clean;
@@ -96,6 +99,20 @@ $(function () {
         option.value = neighborhood;
         neighborhoodFilter.appendChild(option);
     })
+
+    function isMobile() {
+        return window.innerWidth < 800;
+    }
+
+    function calculateCanvasHeight(names) {
+        if (isMobile()){
+            if (names.length > 4) {
+                return names.length * 50;
+            }
+            return 250;
+        }
+        return 400;
+    }
 
     function sortByKey(array, key) {
         return array.sort(function (a, b) {
@@ -142,8 +159,7 @@ $(function () {
 
     function setChartData(data, backgroundColorMap) {
         return {
-            //type: 'horizontalBar',
-            type: 'bar',
+            type: isMobile() ? 'horizontalBar' : 'bar',
             data: {
                 labels: data.names,
                 datasets: [{
@@ -157,25 +173,36 @@ $(function () {
         }
     }
 
-    function renderCheckOutChart(locations) {
-        var data = formatLocationArrays(locations);
-        //checkoutCanvas.height = data.names.length > 4 ? (data.names.length * 55) : 250 ;
-        var backgroundColorMap = data.count.map((val, index)=>{
-            if (val > data.minimum[index] * 2) {
+    function calculateCheckOutColor(count, minimum) {
+        return count.map(function(val, index) {
+            if (val > minimum[index] * 2) {
                 return goodColor;
-            } else if (val > data.minimum[index]) {
+            } else if (val > minimum[index]) {
                 return warningColor;
             } else {
                 return badColor;
             }
         });
-        new Chart(checkoutCanvas, setChartData(data, backgroundColorMap));
     }
 
-    function renderCheckInChart(locations) {
+    function createCheckOutChart(locations, chartType) {
         var data = formatLocationArrays(locations);
-        //checkinCanvas.height = data.names.length > 4 ? (data.names.length * 55) : 250 ;
-        var backgroundColorMap = data.count.map((val)=>{
+        checkoutCanvas.height = calculateCanvasHeight(data.names);
+        var backgroundColorMap = calculateCheckOutColor(data.count, data.minimum);
+        checkoutChart = new Chart(checkoutCanvas, setChartData(data, backgroundColorMap));
+        console.log(checkoutChart)
+    }
+
+    function renderCheckOutChart(locations) {
+        var data = formatLocationArrays(locations);
+        checkoutCanvas.height = calculateCanvasHeight(data.names);
+        var backgroundColorMap = calculateCheckOutColor(data.count, data.minimum);
+        checkoutChart.config = setChartData(data, backgroundColorMap);
+        checkoutChart.update();
+    }
+
+    function calculateCheckInColor(count) {
+        return count.map((val)=>{
             if (val > 30) {
                 return badColor;
             } else if (val > 15) {
@@ -184,12 +211,26 @@ $(function () {
                 return goodColor;
             }
         });
-        new Chart(checkinCanvas, setChartData(data, backgroundColorMap));
     }
-    
 
-    renderCheckOutChart(data.checkout);
-    renderCheckInChart(data.checkin);
+    function createCheckInChart(locations) {
+        var data = formatLocationArrays(locations);
+        checkinCanvas.height = calculateCanvasHeight(data.names);
+        var backgroundColorMap = calculateCheckInColor(data.count);
+        checkinChart = new Chart(checkinCanvas, setChartData(data, backgroundColorMap));
+    }
+
+    function renderCheckInChart(locations) {
+        var data = formatLocationArrays(locations);
+        checkinCanvas.height = calculateCanvasHeight(data.names);
+        var backgroundColorMap = calculateCheckInColor(data.count);
+        checkinChart.config = setChartData(data, backgroundColorMap);
+        checkinChart.update();
+    }
+
+
+    createCheckOutChart(data.checkout);
+    createCheckInChart(data.checkin);
 
 
     document.getElementById("needRefill").addEventListener("click", function () {
