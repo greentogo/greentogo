@@ -1,0 +1,6 @@
+Hey GreenToGo Team - 
+
+Time to restock {{ location.name }}! Their container count just reached {{ count }}. 
+
+Peace, 
+The Database 

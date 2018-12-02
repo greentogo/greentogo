@@ -9,13 +9,13 @@ from core.admin import LocationAdmin, UnclaimedSubscriptionAdmin, GroupAdmin,\
                         SubscriptionAdmin, PlanAdmin, CustomUserAdmin
 from core.models import (
     CorporateCode, Location, LocationTag, Plan, Restaurant, Subscription, UnclaimedSubscription,
-    User, CouponCode, LocationStockReport
+    User, CouponCode, LocationStockReport, AdminSettings, MobileAppRatings, Neighborhood
 )
 from core.views.admin import (
-    activity_report, empty_location, empty_locations, restock_location, restock_locations,
-    stock_report, export_data, unclaimed_subscription_status_csv, export_total_check_out, 
+    activity_report, empty_location, empty_locations, restock_location, restock_locations, user_report, restaurant_management,
+    stock_report, mobile_application, export_data, unclaimed_subscription_status_csv, export_total_check_out, 
     export_total_check_in, export_check_out_by_user, export_check_in_by_user, 
-    export_check_out_by_location, export_check_in_by_location, export_user_reports
+    export_check_out_by_location, export_check_in_by_location, export_user_reports, export_subscriptions
 )
 
 from export_action.admin import export_selected_objects
@@ -114,6 +114,15 @@ admin_site.site_header = 'GreenToGo Admin'
 admin_site.site_title = 'GreenToGo Admin'
 
 admin_site.register_view(
+    path='mobile_application/',
+    view=mobile_application,
+    section="Mobile Application",
+    name="Mobile Application",
+    urlname="mobile_application",
+    only_superusers=True,
+)
+
+admin_site.register_view(
     path='core/unclaimed_subscriptions.csv',
     view=unclaimed_subscription_status_csv,
     section="Reports",
@@ -178,6 +187,15 @@ admin_site.register_view(
     visible=True,
 )
 
+admin_site.register_view(
+    path='export_data/core/export_subscriptions.csv',
+    view=export_subscriptions,
+    section="Reports",
+    name="Download CSV of All Subscriptions",
+    only_superusers=True,
+    visible=True,
+)
+
 
 # admin_site.register_view(
 #     path='restock_locations/',
@@ -221,6 +239,24 @@ admin_site.register_view(
 )
 
 admin_site.register_view(
+    path='restaurant_management/',
+    view=restaurant_management,
+    section="Reports",
+    name="Resturant Checkout Management",
+    urlname="restaurant_management",
+    only_superusers=True,
+)
+
+admin_site.register_view(
+    path='user_report/',
+    view=user_report,
+    section="Reports",
+    name="User Reports",
+    urlname="user_report",
+    only_superusers=True,
+)
+
+admin_site.register_view(
     path='activity_report/',
     view=activity_report,
     section="Reports",
@@ -250,6 +286,9 @@ admin_site.register(CorporateCode)
 admin_site.register(CouponCode)
 admin_site.register(LocationTag)
 admin_site.register(LocationStockReport)
+admin_site.register(AdminSettings)
+admin_site.register(MobileAppRatings)
+admin_site.register(Neighborhood)
 
 
 # export tools
@@ -265,6 +304,9 @@ admin.site.register(CorporateCode)
 admin.site.register(CouponCode)
 admin.site.register(LocationTag)
 admin.site.register(LocationStockReport)
+admin.site.register(AdminSettings)
+admin.site.register(MobileAppRatings)
+admin.site.register(Neighborhood)
 
 #Add the export action to the custom admin site
 admin_site.add_action(export_selected_objects)

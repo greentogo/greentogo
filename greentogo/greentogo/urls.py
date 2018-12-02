@@ -40,12 +40,18 @@ subscriptions_patterns = [
         core.views.subscriptions.corporate_subscription,
         name='corporate_subscription'
     ),
+        url(
+        r'^(?P<sub_id>[A-Za-z0-9]+)/renew_corporate/$',
+        core.views.subscriptions.renew_corporate,
+        name='renew_corporate'
+    ),
     url(
         r'^coupon/$',
         core.views.subscriptions.coupon_subscription,
         name='coupon_subscription'
     ),
     url(r'^new/$', core.views.subscriptions.add_subscription, name='add_subscription'),
+    url(r'^new/(?P<code>[A-Z0-9]+)/$', core.views.subscriptions.add_subscription, name='add_subscription'),
     url(
         r'^new/(?P<coupon_type>corporate)/(?P<code>[A-Z0-9]+)/$',
         core.views.subscriptions.add_subscription,
@@ -105,13 +111,16 @@ urlpatterns = [
     url(r'^admin/', admin_site.urls),
     url(r'^stock/$', core_views.reporting.stock_landing_page, name='stock_report'),
     url(r'^shelve/$', core_views.reporting.stock_shelve, name='stock_shelve'),
+    url(r'^addboxes/$', core_views.reporting.stock_add_to_shelf, name='stock_add_to_shelf'),
+    url(r'^update_restaurant/$', core_views.reporting.update_restaurant_inventory, name='update_restaurant_inventory'),
     url(r'^(?P<stock_action>restock)/$', core_views.reporting.stock_report, name='stock_report_restock'),
     url(r'^(?P<stock_action>empty)/$', core_views.reporting.stock_report, name='stock_report_empty'),
     url(r'^api/docs/', include_docs_urls(title='GreenToGo API')),
     url(r'^api/v1/auth/', include('djoser.urls.authtoken')),
     url(r'^api/v1/', include('apiv1.urls')),
     url(r'^$', core_views.index),
-    url(r'^accidental_checkout/$', core.views.reporting.accidental_checkout, name='accidental_checkout')
+    url(r'^accidental_checkout/$', core.views.reporting.accidental_checkout, name='accidental_checkout'),
+    url(r'^privacy/$', core.views.registration.privacy, name='privacy')
 ] + static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
 )

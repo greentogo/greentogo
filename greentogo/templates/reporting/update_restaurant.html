@@ -1,0 +1,35 @@
+{% extends "core/base.html" %}
+{% load staticfiles %}
+{% block content %}
+<div class="row">
+  <div class="medium-12 columns">
+    <h2>Update Restaurant Stock</h2>
+    <form action="." method="POST">
+      {% csrf_token %}
+      <!-- <p> {{ form.non_field_errors }} </p> -->
+      <div class="reportrow">
+        <h5>Select Restaurant for Update</h5>
+        <select id="location_id" name="location" required>
+          {% for location in locations %}
+          <option value="{{ location.id }}">{{ location }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="reportrow">
+        <h5>How many clean boxes ARE CURRENTLY THERE:</h5>
+        <div id="sliderActual"></div>
+      </div>
+      <div>
+        <input class="reportinput" name="actual_count" id="sliderActualText">
+      </div>
+      <div class="reportrow">
+        <button type="submit" class="button">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block javascript %}
+<script src="{% static 'js/nouislider.min.js' %}"></script>
+<script src="{% static 'js/stock_view.js' %}"></script>
+{% endblock %}

@@ -7,9 +7,14 @@
 {% block content %}
 <div class="row">
     <div class="medium-4 columns">
-        <img src="{% static 'registration.jpg' %}" alt="Fill out the form below and verify your email address to become a member" style="width: 400px;"/>
+        <div class="text-center registration-picture">
+            <img src="{% static 'logo_inverted.png' %}" alt="Fill out the form below and then choose your subscription level" style="width: 400px;"/>
+            <p><strong>Joining GreenToGo is easy!</strong></p>
+            <p>Fill out the form below and then choose your subscription level.</p>
+        </div>
     </div>
     <div class="medium-8 columns">
+        <p>Already have a GreenToGo subscription? You can go straight to <a href="https://app.durhamgreentogo.com/locations/">Checkout/Return a box!</a></p>
         <form method="post" action=".">
             {% csrf_token %}
             {{ form.non_field_errors }}

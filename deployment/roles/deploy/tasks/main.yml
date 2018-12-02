@@ -2,7 +2,7 @@
 - become: no
   block:
   - name: Check out code
-    local_action: git repo="{{ repo.url }}" dest="{{ git_tmp_dir }}" version={{ repo.branch }}
+    local_action: git repo="{{ repo.url }}" dest="{{ git_tmp_dir }}" version={{ repo.branch }} force=true
 - name: Push files to server
   synchronize:
     src="{{ git_tmp_dir }}"
@@ -18,8 +18,6 @@
   apt: name=npm state=present
 - name: Install node-legacy
   apt: name=nodejs-legacy state=present
-- name: Install bower
-  npm: name=bower global=yes state=present
 - name: Install uwsgi
   pip: name=uwsgi executable=pip3
 - name: Create uwsgi config
@@ -30,8 +28,6 @@
   block:
   - name: Create envvars script
     template: src=envvars dest={{ project.root }}/envvars
-  - name: Install bower components
-    shell: bower install chdir={{ project.srcroot }}
   - name: Install requirements with pip
     pip: >
       requirements="{{ project.srcroot }}requirements.txt"

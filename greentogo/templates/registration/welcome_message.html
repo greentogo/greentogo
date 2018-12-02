@@ -15,9 +15,9 @@
 </head>
 
 <body>
-    <p>Dear {{ user.username }},</p>
-
     <p>Welcome to GreenToGo!</p>
+
+    <p>Your username is: {{ user.username }},</p>
 
     <p>
         Thank you for taking action toward curing the single-use container epidemic. Together, our community has already averted
@@ -41,50 +41,11 @@
 
 
     <ol>
+    {% for restaurant in restaurants %}
         <li>
-            <a href="http://www.alpacachicken.com/" target="_blank" rel="noopener noreferrer">Alpaca Peruvian Chicken</a> | 703a 9th St, Durham, NC 27705</li>
-        <li>
-            <a href="http://bagelbarbagels.com/" target="_blank" rel="noopener noreferrer">Bagel Bar</a> | 104 City Hall Plaza #101, Durham, NC 27701</li>
-        <li>
-            <a href="http://www.bullcityburgerandbrewery.com/" target="_blank" rel="noopener noreferrer">Bull City Burger and Brewery</a> | 107 E Parrish St, Durham, NC 27701</li>
-        <li>
-            <a href="http://bullmccabesirishpub.com/" target="_blank" rel="noopener noreferrer">Bull McCabes</a> | 427 W Main St, Durham, NC 27701</li>
-        <li>
-            <a href="http://durham.coop/" target="_blank" rel="noopener noreferrer">Durham Co-Op Market</a> | 1111 W Chapel Hill St, Durham, NC 27701</li>
-        <li>
-            <a href="http://geerstreetgarden.com/" target="_blank" rel="noopener noreferrer">Geer St. Garden</a> | 644 Foster St, Durham, NC 27701</li>
-        <li>
-            <a href="http://www.kokyubbq.com/" target="_blank" rel="noopener noreferrer">Ko Kyu Na’Mean</a> | 4823 Meadow Dr, Durham, NC 27713</li>
-        <li>
-            <a href="http://lunarotisserie.com/" target="_blank" rel="noopener noreferrer">Luna Rotisserie</a> | 112 W Main St, Durham, NC 27701</li>
-        <li>
-            <a href="https://www.monutsdonuts.com/" target="_blank" rel="noopener noreferrer">Monuts</a> | 1002 9th St, Durham, NC 27705</li>
-        <li>
-            <a href="http://www.nanataco.com/" target="_blank" rel="noopener noreferrer">NanaTaco</a> | 2512 University Dr, Durham, NC 277707</li>
-        <li>
-            <a href="http://www.ninthstbakery.com/" target="_blank" rel="noopener noreferrer">Ninth St. Bakery</a> | 136 E Chapel Hill St, Durham, NC 27701</li>
-        <li>
-            <a href="https://www.piepushers.com/" target="_blank" rel="noopener noreferrer">Pie Pushers</a> | 117A W Main St, Durham, NC 27701</li>
-        <li>
-            <a href="http://www.pompieripizza.com/" target="_blank" rel="noopener noreferrer">Pompieri Pizza</a> | 102 City Hall Plaza, Durham, NC 27701</li>
-        <li>
-            <a href="https://rosesmeatandsweets.com/" target="_blank" rel="noopener noreferrer">Rose’s Noodles, Dumplings, and Sweets</a> | 121 N Gregson St, Durham, NC 27701</li>
-        <li>
-            <a href="https://www.saltboxseafoodjoint.com/" target="_blank" rel="noopener noreferrer">Saltbox Seafood Joint</a> | 2637 Durham-Chapel Hill Blvd</li>
-        <li>
-            <a href="https://www.saltboxseafoodjoint.com/" target="_blank" rel="noopener noreferrer">Saltbox Seafood Joint</a> | 608 N Mangum St, Durham, NC 27701</li>
-        <li>
-            <a href="https://www.soulyvegancafe.com/" target="_blank" rel="noopener noreferrer">Souly Vegan</a> | 306 W Franklin St, Chapel Hill, NC 27516</li>
-        <li>
-            <a href="http://www.thebootdurham.com/" target="_blank" rel="noopener noreferrer">The Boot</a> | 2501 University Dr, Durham, NC 27707</li>
-        <li>
-            <a href="http://www.theqshackoriginal.com/" target="_blank" rel="noopener noreferrer">The Original Q-Shack</a> | 2510 University Dr, Durham, NC 27707</li>
-        <li>
-            <a href="http://toast-fivepoints.com/" target="_blank" rel="noopener noreferrer">Toast</a> | 345 W Main St, Durham, NC 27701</li>
-        <li>
-            <a href="http://www.veganflavacafe.com/" target="_blank" rel="noopener noreferrer">Vegan Flava Cafe</a> | 1720 Guess Rd #18, Durham, NC 27701</li>
-        <li>
-            <a href="https://www.zenfishpokebar.com/" target="_blank" rel="noopener noreferrer">Zenfish</a> | 810 9th St, Durham, NC 27705</li>
+            <a href="{{ restaurant.website }}" target="_blank" rel="noopener noreferrer">{{ restaurant.name }}</a>  |  {{ restaurant.address }}
+        </li>
+    {% endfor %}
     </ol>
 
     <p>

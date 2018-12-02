@@ -47,7 +47,7 @@ URL = __env__('G2G_URL')
 
 ALLOWED_HOSTS = [
     'app.durhamgreentogo.com', 'g2g.dreisbach.us', 'purchase.durhamgreentogo.com', 'localhost',
-    '127.0.0.1'
+    '127.0.0.1', '.ngrok.io'
 ]
 
 ALLOWED_HOSTS += [__env__('HOSTNAME') + '.ngrok.io']
@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     #'django.contrib.admin',
     'flat_responsive',  # third-party, needs to be above django.contrib.admin
     'django.contrib.admin.apps.SimpleAdminConfig',
+    'django_admin_listfilter_dropdown',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -75,6 +76,7 @@ INSTALLED_APPS = [
     'djoser',
     'postgres_stats',
     'export_action',
+    'exponent_server_sdk',
 
     # ours
     'core',
@@ -177,7 +179,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = str(__root__.path("staticfiles/"))
 STATICFILES_DIRS = [
-    str(__root__.path('bower_components/')),
+    str(__root__.path('greentogo/vendor/')),
     str(__root__.path('greentogo/static/')),
 ]
 STATICFILES_FINDERS = (
@@ -327,3 +329,11 @@ CACHES = {
         'KEY_FUNCTION': 'greentogo.cache.make_key',
     }
 }
+
+
+# DJOSER = {
+#     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+#     'ACTIVATION_URL': '#/activate/{uid}/{token}',
+#     'SEND_ACTIVATION_EMAIL': True,
+#     'SERIALIZERS': {},
+# }

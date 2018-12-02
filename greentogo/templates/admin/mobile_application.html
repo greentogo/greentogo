@@ -1,0 +1,46 @@
+{# -*- engine:django -*- #}
+{% extends "admin/base_site.html" %}
+
+{% load static %}
+
+{% block content_title %}
+<h1>Mobile Application</h1>
+{% endblock %}
+{% block content %}
+<div>
+    <h3>Push Notification</h3>
+    <form class="push-notification-form" action="{% url "admin:mobile_application" %}" method="POST">
+        {% csrf_token %}
+        <label for="push-notification-title">Push Notification Title:</label>
+        <input id="push-notification-title" name="push-notification-title" maxlength="20" required/>
+        <br/>
+        <label for="push-notification-message">Push Notification Message:</label>
+        <br/>
+        <textarea id="push-notification-message" name="push-notification-message"
+            rows="3" cols="33" maxlength="150"
+            wrap="soft" required></textarea>
+        <br/>
+        <p id="push-notification-message-length">Characters: 0</p>
+        <p>Note: Max characters for push notification messages are 150,
+            but it is recommended that you use between 40-50 characters
+        </p>
+        <button id="push-notification-message-submit" type="submit" disabled>Send Push Notification</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extrahead %}
+<script>
+    window.onload = function () {
+        var pushNotificationMessage = document.getElementById('push-notification-message');
+        var pushNotificationMessageLength = document.getElementById('push-notification-message-length');
+        var pushNotificationSubmitButton = document.getElementById('push-notification-message-submit');
+        pushNotificationMessage.addEventListener('input', function () {
+            pushNotificationMessageLength.textContent = 'Characters: ' + this.value.length;
+            if (this.value.length > 1) {
+                pushNotificationSubmitButton.disabled = false;
+            }
+        });
+    }
+</script>
+{% endblock %}

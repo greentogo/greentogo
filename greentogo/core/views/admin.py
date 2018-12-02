@@ -1,6 +1,7 @@
 import csv
 import json
 
+from django.contrib import messages
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -13,8 +14,8 @@ from datetime import date, timedelta, datetime
 from postgres_stats import DateTrunc
 
 from core.models import (
-    Location, Plan, Restaurant, Subscription, \
-    UnclaimedSubscription, User, \
+    Location, Plan, Restaurant, Subscription, Neighborhood, \
+    UnclaimedSubscription, User, send_push_message, \
     activity_data, export_chart_data, total_boxes_returned, LocationTag \
 )
 
@@ -34,26 +35,22 @@ def unclaimed_subscription_status_csv(request, *args, **kwargs):
 
 def stock_report(request, *args, **kwargs):
     """Show a report of current stock at each location."""
-    checkout_locations = Location.objects.checkout().order_by('name').filter(retired=False)
-    checkin_locations = Location.objects.checkin().order_by('name').filter(retired=False)
+    checkout_locations = Location.objects.checkout().order_by('name').filter(retired=False, admin_location=False)
+    checkin_locations = Location.objects.checkin().order_by('name').filter(retired=False, admin_location=False)
+    washlocation = Location.objects.checkin().get(retired=False, washing_location=True)
+    hqLocation = Location.objects.checkin().get(retired=False, headquarters=True)
 
-    checkout_data = {
-        "names": [],
-        "count": [],
-    }
+    neighborhoods = list(x.__str__() for x in Neighborhood.objects.all())
+    checkout_data = []
+    checkin_data = []
 
     for loc in checkout_locations:
-        checkout_data["names"].append(loc.name)
-        checkout_data["count"].append(loc.get_estimated_stock())
-
-    checkin_data = {
-        "names": [],
-        "count": [],
-    }
+        if "Testing Location" not in loc.name and "Test Location" not in loc.name:
+            checkout_data.append(dict(name=loc.name, count=loc.get_estimated_stock(), avg_weekly_usage=loc.avg_weekly_usage_over_past_4_weeks, address=loc.address, latitude=loc.latitude, longitude=loc.longitude, neighborhood=loc.neighborhood, minimum_boxes=loc.minimum_boxes))
 
     for loc in checkin_locations:
-        checkin_data["names"].append(loc.name)
-        checkin_data["count"].append(loc.get_estimated_stock())
+        if "Testing Location" not in loc.name and "Test Location" not in loc.name:
+            checkin_data.append(dict(name=loc.name, count=loc.get_estimated_stock(), avg_weekly_usage=loc.avg_weekly_usage_over_past_4_weeks, address=loc.address, latitude=loc.latitude, longitude=loc.longitude, neighborhood=loc.neighborhood))
 
     def get_estimated_at_checkout():
         count = sum([l.get_estimated_stock() for l in
@@ -62,36 +59,90 @@ def stock_report(request, *args, **kwargs):
 
     def get_estimated_at_checkin():
         count = sum([l.get_estimated_stock() for l in
-            Location.objects.checkin()])
+            checkin_locations])
         return count
 
     def get_estimated_checkedout():
-        count = sum([s.boxes_checked_out for s in
+        count = sum([s.boxes_currently_out for s in
             Subscription.objects.active()])
+        return count
+
+    def get_estimated_at_wash():
+        count = washlocation.get_estimated_stock()
+        return count
+
+    def get_estimated_at_hq():
+        count = hqLocation.get_estimated_stock()
         return count
 
     cycle_data = {
         "labels": [
             "Clean at restaurants",
             "Checked out",
-            "Dirty", #this should expand to 3 categories
+            "Dirty at return stations", #this should expand to 3 categories, two of them is below
+            "Dirty and being washed",
+            "Clean at G2G HQ",
         ],
         "count": [
             get_estimated_at_checkout(),
             get_estimated_checkedout(),
             get_estimated_at_checkin(),
+            get_estimated_at_wash(),
+            get_estimated_at_hq(),
         ],
     }
+
+    total = get_estimated_at_checkout() + get_estimated_checkedout() + get_estimated_at_checkin() + get_estimated_at_wash() + get_estimated_at_hq()
 
     return render(
         request, "admin/stock_report.html",
         {
             "data_json":json.dumps(dict(
+                neighborhoods=neighborhoods,
                 checkin=checkin_data, 
                 checkout=checkout_data,
-                cycle=cycle_data,
+                total=total,
+                clean=get_estimated_at_hq(),
+                wash=get_estimated_at_wash(),
+                cycle=cycle_data
         ))}
     )
+
+def restaurant_management(request, *args, **kwargs):
+    """Show a report of current stock at each location."""
+    checkout_locations = Location.objects.checkout().order_by('name').filter(retired=False, admin_location=False)
+    washlocation = Location.objects.checkin().get(retired=False, washing_location=True)
+    hqLocation = Location.objects.checkin().get(retired=False, headquarters=True)
+
+    locations = []
+
+    for loc in checkout_locations:
+        if "Testing Location" not in loc.name and "Test Location" not in loc.name:
+            locations.append(dict(name=loc.name, count=loc.get_estimated_stock(), minimum_boxes=loc.minimum_boxes, avg_weekly_usage=loc.avg_weekly_usage_over_past_4_weeks, address=loc.address, latitude=loc.latitude, longitude=loc.longitude, neighborhood=loc.neighborhood))
+
+    def get_estimated_at_wash():
+        count = washlocation.get_estimated_stock()
+        return count
+
+    def get_estimated_at_hq():
+        count = hqLocation.get_estimated_stock()
+        return count
+
+    return render(
+        request, "admin/restaurant_management.html",
+        {
+            "data_json":json.dumps(dict(
+                locations=locations,
+                wash=get_estimated_at_wash(),
+                hq=get_estimated_at_hq(),
+        ))}
+    )
+
+
+def user_report(request,*args, **kwargs):
+    data = User.objects.all()
+    view_data = {"data": data}
+    return render(request, 'admin/user_report.html', view_data)
 
 
 def activity_report(request, days=30, *args, **kwargs):
@@ -100,6 +151,57 @@ def activity_report(request, days=30, *args, **kwargs):
     view_data = {"data_json": data_json, "total_boxes_returned": total_boxes_returned()}
     return render(request, 'admin/activity_report.html', view_data)
 
+
+def restock_locations(request, *args, **kwargs):
+    """Present all locations for restock"""
+    checkout_locations = Location.objects.checkout().order_by('name')
+    return render(request, "admin/restock_locations.html", {'locations': checkout_locations})
+
+
+def mobile_application(request, *args, **kwargs):
+    if request.method == "POST":
+        try:
+            message = request.POST.get('push-notification-message')
+            title = request.POST.get('push-notification-title')
+            usersWithPushTokens = User.objects.all().exclude(expoPushToken__isnull=True)
+            for user in usersWithPushTokens:
+                send_push_message(user.expoPushToken, title, message)
+            messages.add_message(request, messages.INFO, 'Messages sent!')
+        except:
+            messages.add_message(request, messages.ERROR, 'ERROR SENDING MESSAGE, UNABLE TO SEND')
+    return render(request, 'admin/mobile_application.html')
+
+
+@require_POST
+def restock_location(request, location_id, *args, **kwargs):
+    """Restock a specific location"""
+    return _set_stock_count(request, location_id, "admin:restock_locations")
+
+
+def empty_locations(request, *args, **kwargs):
+    """Present all checkin locations for emptying"""
+    checkin_locations = Location.objects.checkin().order_by('name').get(admin_location=False)
+    return render(request, "admin/empty_locations.html", {'locations': checkin_locations})
+
+
+@require_POST
+def empty_location(request, location_id, *args, **kwargs):
+    """Empty a specific location"""
+    return _set_stock_count(request, location_id, "admin:empty_locations")
+
+
+def _set_stock_count(request, location_id, redirect_to):
+    location = get_object_or_404(Location, pk=location_id)
+    stock_count_str = request.POST['stock_count']
+    try:
+        stock_count = int(stock_count_str, base=10)
+    except ValueError:
+        return redirect(reverse(redirect_to))
+
+    if stock_count >= 0:
+        location.stock_counts.create(count=stock_count)
+
+    return redirect(reverse(redirect_to))
 
 def export_data(request, days=30, *args, **kwargs):
     chartData = False
@@ -139,6 +241,19 @@ def export_total_check_out(request, *args, **kwargs):
 
     for tags in filteredTagQuery:
         writer.writerow([tags.subscription, tags.subscription.user.username, tags.subscription.user.email, tags.created_at, tags.location])
+    return response
+
+def export_subscriptions(request, *args, **kwargs):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="all_subscriptions.csv"'
+
+    writer = csv.writer(response)
+    subs = Subscription.objects.all()
+
+    writer.writerow(['starts at', 'ends at', 'plan', 'user', 'email', 'stripe id', 'stripe status', 'cancelled_by_user',  'corporate_code_id', 'coupon_code_id', 'is_active', 'total_checkouts', ])
+
+    for sub in subs:
+        writer.writerow([sub.starts_at, sub.ends_at, sub.plan, sub.user, sub.user.email, sub.stripe_id, sub.stripe_status, sub.cancelled, sub.corporate_code_id, sub.coupon_code_id, sub.is_active, sub.total_checkouts()])
     return response
 
 def export_total_check_in(request, *args, **kwargs):
@@ -320,40 +435,3 @@ def export_user_reports(request, *args, **kwargs):
         else:
             writer.writerow([user.username, user.name, user.email, user.date_joined, user.last_login, '', '', '', ''])
     return response
-
-def restock_locations(request, *args, **kwargs):
-    """Present all locations for restock"""
-    checkout_locations = Location.objects.checkout().order_by('name')
-    return render(request, "admin/restock_locations.html", {'locations': checkout_locations})
-
-
-@require_POST
-def restock_location(request, location_id, *args, **kwargs):
-    """Restock a specific location"""
-    return _set_stock_count(request, location_id, "admin:restock_locations")
-
-
-def empty_locations(request, *args, **kwargs):
-    """Present all checkin locations for emptying"""
-    checkin_locations = Location.objects.checkin().order_by('name')
-    return render(request, "admin/empty_locations.html", {'locations': checkin_locations})
-
-
-@require_POST
-def empty_location(request, location_id, *args, **kwargs):
-    """Empty a specific location"""
-    return _set_stock_count(request, location_id, "admin:empty_locations")
-
-
-def _set_stock_count(request, location_id, redirect_to):
-    location = get_object_or_404(Location, pk=location_id)
-    stock_count_str = request.POST['stock_count']
-    try:
-        stock_count = int(stock_count_str, base=10)
-    except ValueError:
-        return redirect(reverse(redirect_to))
-
-    if stock_count >= 0:
-        location.stock_counts.create(count=stock_count)
-
-    return redirect(reverse(redirect_to))

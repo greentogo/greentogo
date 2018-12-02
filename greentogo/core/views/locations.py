@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.defaultfilters import pluralize
+from django.template.loader import render_to_string
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -42,17 +44,12 @@ def locations(request):
 
 @login_required
 def location(request, location_code):
-    boxesCheckedIn = 0
-    communityBoxesCheckedIn = 0
     user = request.user
     location = get_object_or_404(Location, code=location_code.upper())
     complete = False
 
     if request.method == "POST":
         subscription_id = request.POST.get('subscription_id')
-        for sub in user.get_subscriptions():
-            boxesCheckedIn = boxesCheckedIn + int((LocationTag.objects.filter(subscription_id=sub.id)).count()/2)
-        communityBoxesCheckedIn = int((LocationTag.objects.all()).count()/2) + 100
         try:
             subscription = user.subscriptions.active().get(pk=subscription_id)
         except Subscription.DoesNotExist as ex:
@@ -65,7 +62,7 @@ def location(request, location_code):
             if len(request.POST.get('number_of_boxes')) > 0 and int(request.POST.get('number_of_boxes')) > 0:
                 number_of_boxes = int(request.POST.get('number_of_boxes', 1))
                 if subscription.can_tag_location(location, number_of_boxes):
-                    subscription.tag_location(location, number_of_boxes)
+                    subscription.tag_location(location, number_of_boxes, user)
                     if location.service == location.CHECKIN:
                         msg = "You have returned {} {}.".format(
                             number_of_boxes, box_plural(number_of_boxes)
@@ -117,8 +114,8 @@ def location(request, location_code):
         request, "core/location.djhtml", {
             "location": location,
             "subscriptions": subscriptions,
-            "boxesCheckedIn": boxesCheckedIn,
-            "communityBoxesCheckedIn": communityBoxesCheckedIn,
+            "boxesCheckedIn": user.total_boxes_checkedin(),
+            "communityBoxesCheckedIn": int((LocationTag.objects.all()).count()/2) + 100,
             "complete": complete,
         }
     )

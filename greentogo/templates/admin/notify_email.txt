@@ -1,0 +1,11 @@
+{% load i18n %}
+
+Hello,
+
+A user has checked {{ action }} {{ number_of_boxes }} box(s).
+
+User Email: {{ email }}
+User Name: {{ name }}
+
+
+Automated GreenToGo Email

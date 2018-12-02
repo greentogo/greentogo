@@ -1,0 +1,6 @@
+Hey GreenToGo Team - 
+
+Time to clean out the {{ location.name }} return station! There are currently {{ count }} containers in the station.
+
+Peace, 
+The Database 

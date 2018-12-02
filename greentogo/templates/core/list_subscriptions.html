@@ -16,9 +16,9 @@
                         Corporate code: {{ sub.corporate_code.code }} - ${{ sub.corporate_code.amount_off }} discount<br />
                     {% endif %}
                     {% if sub.will_auto_renew and sub.ends_at %}
-                        Renews automatically on {{ sub.ends_at }}
+                        Renews {% if not sub.corporate_code %}automatically {% endif %}on {{ sub.ends_at }}
                     {% elif sub.ends_at %}
-                        {% if sub.cancelled %}Cancelled - {% endif %}
+                        {% if sub.cancelled and sub.corporate_code %}Corporate - {% elif sub.cancelled %}Cancelled - {% endif %}
                         Ends on {{ sub.ends_at }}
                     {% else %}
                         No end date
@@ -28,7 +28,9 @@
         </div>
         <div class="row">
             <div class="medium-6 columns">
-                {% if not sub.cancelled %}
+                {% if sub.corporate_code %}
+                    <a href="{% url 'renew_corporate' sub_id=sub.hashed_id %}" class="button">Renew corporate subscription</a>
+                {% elif not sub.cancelled %}
                     {% if sub.has_stripe_subscription %}
                         <a href="{% url 'subscription_plan' sub_id=sub.hashed_id %}" class="button">Change Your Current Subscription</a>
                     {% else %}
@@ -50,7 +52,12 @@
         </div>
         {% endif %}
         <div>
-            <a href="{% url 'add_subscription' %}" class="button large">Add a NEW subscription</a>
+            {% if subscriptions %}
+            <a href="{% url 'change_payment_method' %}" class="button large">Update payment method</a>
+            {% endif %}
+        </div>
+        <div>
+            <a href="{% url 'add_subscription' %}" class="button large">Buy a GreenToGo Subscription</a>
         </div>
         {% endwith %}
     </div>

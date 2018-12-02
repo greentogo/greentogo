@@ -9,6 +9,7 @@ click==6.7                # via geocoder
 coreapi==2.3.3
 coreschema==0.0.4         # via coreapi
 decorator==4.1.2          # via ratelim
+django-admin-list-filter-dropdown==1.0.1
 django-appconf==1.0.2     # via django-compressor, pinax-stripe
 django-compressor==2.1.1
 django-environ==0.4.4
@@ -24,6 +25,7 @@ django==1.10.6
 djangorestframework==3.6.4
 djoser==0.5.4
 et-xmlfile==1.0.1         # via openpyxl
+exponent_server_sdk==0.2.0
 geocoder==1.15.1          # via django-geocoder
 hashids==1.2.0
 itypes==1.1.0             # via coreapi

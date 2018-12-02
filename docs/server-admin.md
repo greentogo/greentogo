@@ -8,4 +8,10 @@ source env/bin/activate
 source envvars
 ```
 
+Logs are at:
+/opt/greentogo/logs
+
 Then you should be good to go!
+
+
+If you ever run into a "sha1" issue when deploying, delete your temp greentogo files in /tmp/greentogo

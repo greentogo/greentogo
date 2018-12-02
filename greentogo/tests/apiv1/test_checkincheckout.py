@@ -16,7 +16,6 @@ def test_no_action(apiclient, subscription1, checkin_location):
         format="json"
     )
 
-    print(response.data)
     assert response.status_code == 400
     assert "This field is required." in response.data['data']['action']
 

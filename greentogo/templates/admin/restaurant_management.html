@@ -1,0 +1,261 @@
+{# -*- engine:django -*- #}
+{% extends "admin/base_site.html" %}
+
+{% load static %}
+
+{% load foundation_extras %}
+
+{% block content_title %}
+<h1>GreenToGo Containers, by Location</h1>
+{% endblock %}
+{% block content %}
+<div class="medium-8 columns">
+    {% for label in data_json.cycle.count %}
+    <h1>{{ label }}</h1>
+    {% endfor %}
+</div>
+<div style="max-width: 960px;">
+    <h2>Current Container Status</h2>
+    <p>Containers Currently Available at HQ: <span id="hqContainerCount"></span></p>
+    <p>Containers Currently Washing: <span id="washingContainerCount"></span></p>
+</div>
+
+<h2>Containers at Restaurants</h2>
+<input type="button" class="button" id="resetChart" value="Reset Chart" />
+<input type="button" class="button" id="needRefill" value="Show Locations that need restock" />
+<input type="button" class="button" id="avgUsage" value="Filter by Avg Usage (high to low)" />
+<input type="button" class="button" id="countFilter" value="Filter by count (low to high)" />
+<p>Tap location twice to put location on checklist</p>
+<canvas id="checkoutStockChart" width="500" height="1000"></canvas>
+<h2>Checklist</h2>
+<input type="button" class="button" id="resetChecklist" value="Reset Checklist" />
+<input type="button" class="button" id="checkAddRestock" value="Add locations that need restock" />
+<p id="hqEstimate"></p>
+<div id="checklist">
+</div>
+<input type="button" class="button" id="getDirections" value="Get Directions" disabled />
+<p>Directions could take up to 10 seconds to load and can only calculate 10 locations at once.</p>
+{% endblock %}
+
+{% block extrahead %}
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    function formatLocationArrays(locations) {
+        var count = [];
+        var names = [];
+        var minimum = []
+        locations.forEach(function (location, i) {
+            count.push(location.count);
+            names.push(location.name);
+            minimum.push(location.minimum_boxes);
+        });
+        return {
+            count,
+            names,
+            minimum,
+        }
+    }
+    function sortByKey(array, key) {
+        return array.sort(function (a, b) {
+            var x = a[key]; var y = b[key];
+            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+        });
+    }
+    var lastClicked = null;
+    var checkoutChart;
+    var originalData = {};
+    var checklistData = {
+        estimatedHQ: 0,
+        list: []
+    };
+    function clickLocation(location) {
+        if (lastClicked && location === lastClicked) {
+            var existsInChecklist = checklistData.list.find(function (element) {
+                return element.name === location;
+            });
+            if (!existsInChecklist) {
+                var obj = originalData.locations.find(function (element) {
+                    return element.name === location;
+                });
+                checklistData.list.push(obj);
+                renderChecklist();
+            }
+        } else {
+            lastClicked = location;
+        }
+    }
+    function highlight(element) {
+        Array.from(document.getElementsByClassName('success')).forEach(function (element) { element.classList.remove('success') });
+        element.classList.add('success');
+    }
+    function renderChart(locations) {
+        var checkoutCanvas = document.getElementById("checkoutStockChart");
+        var data = formatLocationArrays(locations);
+        checkoutCanvas.height = data.names.length > 4 ? (data.names.length * 50) : 250 ;
+        checkoutChart = new Chart(checkoutCanvas, {
+            type: 'horizontalBar',
+            data: {
+                labels: data.names,
+                datasets: [{
+                    label: "# of Boxes",
+                    data: data.count,
+                    backgroundColor: data.count.map((val, index)=>{
+                        if (val > data.minimum[index] * 2) {
+                            return 'rgba(26, 150, 65, 0.5)';
+                        } else if (val > data.minimum[index]) {
+                            return 'rgba(253, 174, 97, 0.5)';
+                        } else {
+                            return 'rgba(215, 25, 28, 0.5)';
+                        }
+                    }),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            autoSkip: false
+                        }
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+        checkoutCanvas.onclick = function (evt) {
+            var clickedPlace = checkoutChart.getElementsAtEvent(evt);
+            if (clickedPlace && clickedPlace[0] && clickedPlace[0]._model && clickedPlace[0]._model.label) {
+                clickLocation(clickedPlace[0]._model.label);
+            }
+        };
+        checkoutChart.update();
+    }
+    function renderChecklist() {
+        var checklistElement = document.getElementById('checklist');
+        checklistElement.innerHTML = '';
+        if (checklistData.list.length > 0) {
+            document.getElementById("getDirections").disabled = false;
+        } else {
+            document.getElementById("getDirections").disabled = true;
+        }
+        var boxesToRestock = checklistData.list.reduce(function (accumulator, location) {
+            var newChild = document.createElement("div");
+            newChild.innerHTML = `
+                <p>${location.name}:<br>Needs ${location.minimum_boxes - location.count} <input type="button" class="button alert tinyx" onClick="removeFromChecklist('${location.name}')" value="X" /></p>
+            `;
+            checklistElement.appendChild(newChild);
+            var restockNum = location.minimum_boxes - location.count;
+            if (restockNum < 1) {
+                restockNum = 0;
+            }
+            return accumulator + restockNum;
+        }, 0);
+        checklistData.hqEstimate = originalData.hq - boxesToRestock
+        document.getElementById('hqEstimate').innerHTML = `Estimated boxes at HQ after restock: ${checklistData.hqEstimate}`;
+    }
+    function removeFromChecklist(name) {
+        var newList = checklistData.list.reduce(function (accumulator, location) {
+            if (location.name !== name) {
+                accumulator.push(location);
+            }
+            return accumulator;
+        }, []);
+        checklistData.list = newList;
+        renderChecklist();
+    }
+    $(function () {
+        var data = {{ data_json| safe}};
+    checklistData.estimatedHQ = data.hq;
+    originalData = JSON.parse(JSON.stringify(data));
+    document.getElementById("hqContainerCount").textContent = data.hq;
+    document.getElementById("washingContainerCount").textContent = data.wash;
+    document.getElementById("needRefill").addEventListener("click", function () {
+        highlight(this);
+        var tempLoc = data.locations.reduce(function (accumulator, location) {
+            if (location.minimum_boxes >= location.count) {
+                accumulator.push(location);
+            }
+            return accumulator;
+        }, [])
+        var tempSort = sortByKey(tempLoc, 'count').reverse();
+        var tempSort2 = sortByKey(tempSort, 'avg_weekly_usage').reverse();
+        renderChart(tempSort2);
+    });
+    document.getElementById("avgUsage").addEventListener("click", function () {
+        highlight(this);
+        var tempSort = sortByKey(data.locations, 'count').reverse();
+        var tempSort2 = sortByKey(tempSort, 'avg_weekly_usage').reverse();
+        renderChart(tempSort2);
+    });
+    document.getElementById("countFilter").addEventListener("click", function () {
+        highlight(this);
+        var tempSort = sortByKey(data.locations, 'count');
+        renderChart(tempSort);
+    });
+    document.getElementById("resetChart").addEventListener("click", function () {
+        highlight(this);
+        data = originalData;
+        renderChart(data.locations);
+    });
+    document.getElementById("resetChecklist").addEventListener("click", function () {
+        checklistData = {
+            estimatedHQ: data.hq,
+            list: []
+        };
+        renderChecklist();
+    });
+    document.getElementById("checkAddRestock").addEventListener("click", function () {
+        data.locations.forEach(function (location) {
+            if (location.minimum_boxes > location.count) {
+                checklistData.list.push(location);
+            }
+        });
+        renderChecklist();
+    });
+    document.getElementById("getDirections").addEventListener("click", function () {
+        var button = this;
+        button.disabled = true;
+        var locations = checklistData.list.reduce(function (accumulator, location) {
+            if (location.address && location.latitude && location.longitude && accumulator.length < 10) {
+                accumulator.push({
+                    address: location.address,
+                    lat: location.latitude,
+                    lng: location.longitude,
+                });
+            }
+            return accumulator;
+        }, []);
+        var body = `locations=${JSON.stringify(locations)}`;
+        var config = {
+            headers: {
+                Authorization: 'Basic anRkdWRlMTAwOkpUMTIzZ2FtZQ==',
+            },
+        };
+        var newTab = window.open();
+        axios.post('https://api.routexl.com/tour/', body, config)
+            .then(function (response) {
+                var uri = 'https://www.google.com/maps/dir';
+                for (var location in response.data.route) {
+                    var encodedAddress = encodeURIComponent(response.data.route[location].name);
+                    uri = `${uri}/${encodedAddress}`;
+                }
+                button.disabled = false;
+                newTab.location.href = uri;
+            })
+            .catch(function (error) {
+                button.disabled = false;
+                newTab.close();
+                console.log(error);
+            });
+    });
+    renderChart(data.locations);
+    renderChecklist();
+    });
+</script>
+{% endblock %}

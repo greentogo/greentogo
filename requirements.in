@@ -8,10 +8,12 @@ pinax-stripe
 stripe
 rollbar
 djoser
+django-admin-list-filter-dropdown
 django-export-action
 djangorestframework
 django-registration-redux
 django-geocoder
+exponent_server_sdk
 autorepr
 shortuuid
 qrcode

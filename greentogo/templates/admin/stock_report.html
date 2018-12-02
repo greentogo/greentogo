@@ -10,120 +10,70 @@
 <div class="medium-8 columns">
     {% for label in data_json.cycle.count %}
         <h1>{{ label }}</h1>
-        <h1>keke</h1>
     {% endfor %}
 </div>
 <div style="max-width: 960px;">
 <h2>Current Container Status</h2>
+<p>Total Containers: <span id="totalContainerCount"></span></p>
 <canvas id="cycleChart" width="500" height="300"></canvas>
 </div>
 
-<h2>Checkout location stock</h2>
-<canvas id="checkoutStockChart" width="500" height="300"></canvas>
+<h2>Admin Locations</h2>
+<p id="wash"></p>
+<p id="clean"></p>
+<div>
+    <h4>Filters</h4>
+    <input type="button" class="button" id="resetChart" value="Reset Chart" />
+    <input type="button" class="button" id="needRefill" value="Need Restock" />
+    <input type="button" class="button" id="avgUsage" value="Avg Usage (high to low)" />
+    <input type="button" class="button" id="countFilter" value="Count (low to high)" />
+    <select id="neighborhoodFilter">
+        <option value="none">none</option>
+    </select>
+</div>
 
-<h2>Checkin location boxes</h2>
-<canvas id="checkinStockChart" width="500" height="300"></canvas>
+<h2>Clean Containers at Restaurants</h2>
+<canvas id="checkoutStockChart" width="500" height="250"></canvas>
+
+<h2>Dirty Containers in Return Stations</h2>
+<canvas id="checkinStockChart" width="500" height="250"></canvas>
+
 </div>
 {% endblock %}
 
 {% block extrahead %}
 <style type="text/css">
 </style>
-<script src="{% static 'jquery/dist/jquery.js' %}"></script>
-<script src="{% static 'chart.js/dist/Chart.bundle.min.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
 <script>
 $(function () {
     var data = {{ data_json|safe }};
 
-    var colorMap = function (categoryFn, dataArray) {
-        return dataArray
-            .map(categoryFn)
-            .map(function (category) {
-                if (category == 1) {
-                    return 'rgba(26, 150, 65, 0.5)';
-                } else if (category == 2) {
-                    return 'rgba(253, 174, 97, 0.5)';
-                } else {
-                    return 'rgba(215, 25, 28, 0.5)';
+    var goodColor = 'rgba(26, 150, 65, 0.5)';
+    var warningColor = 'rgba(253, 174, 97, 0.5)';
+    var badColor = 'rgba(215, 25, 28, 0.5)';
+    var options = {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    autoSkip: false
                 }
-            });
+            }],
+            xAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
     };
-
-
+    var neighborhoodFilter = document.getElementById("neighborhoodFilter");
     var checkoutCanvas = document.getElementById("checkoutStockChart");
-    var checkoutChart = new Chart(checkoutCanvas, {
-        type: 'bar',
-        data: {
-            labels: data.checkout.names,
-            datasets: [{
-                label: "# of Boxes",
-                data: data.checkout.count,
-                backgroundColor: colorMap(function (val) {
-                    if (val > 30) {
-                        return 1
-                    } else if (val > 15) {
-                        return 2
-                    } else {
-                        return 3
-                    }
-                }, data.checkout.count),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                xAxes: [{
-                    ticks: {
-                        autoSkip: false
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
-        }
-    });
-
     var checkinCanvas = document.getElementById("checkinStockChart");
-    var checkinChart = new Chart(checkinCanvas, {
-        type: 'bar',
-        data: {
-            labels: data.checkin.names,
-            datasets: [{
-                label: "# of Boxes",
-                data: data.checkin.count,
-                backgroundColor: colorMap(function (val) {
-                    if (val > 30) {
-                        return 3
-                    } else if (val > 15) {
-                        return 2
-                    } else {
-                        return 1
-                    }
-                }, data.checkin.count),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                xAxes: [{
-                    ticks: {
-                        autoSkip: false
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
-        }
-    });
-  
     var cycleCanvas = document.getElementById("cycleChart");
-    var cycleChart = new Chart(cycleCanvas, {
+    document.getElementById("totalContainerCount").innerHTML = "Clean at G2G HQ: " + data.total;
+    document.getElementById("wash").innerHTML = "Washing Location: " + data.wash;
+    document.getElementById("clean").innerHTML = "Clean at G2G HQ: " + data.clean;
+    new Chart(cycleCanvas, {
         type: 'pie',
         data: {
             labels: data.cycle.labels,
@@ -131,11 +81,154 @@ $(function () {
                 label: "# of Boxes",
                 data: data.cycle.count,
                 borderWidth: 1,
-                backgroundColor:['#88df67','#c576e3','#e06528','#']
+                backgroundColor:['#88df67','#c576e3','#e06528','#ffff00', '#006400']
             }],
-        },
-        options: {
         }
+    });
+
+    data.neighborhoods.forEach(function (neighborhood) {
+        var option = document.createElement('option');
+        option.innerHTML = neighborhood;
+        option.value = neighborhood;
+        neighborhoodFilter.appendChild(option);
+    })
+
+    function sortByKey(array, key) {
+        return array.sort(function (a, b) {
+            var x = a[key]; var y = b[key];
+            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+        });
+    }
+
+    function highlight(element) {
+        Array.from(document.getElementsByClassName('success')).forEach(function (element) { element.classList.remove('success') });
+        element.classList.add('success');
+    }
+
+    function filterLocationData() {
+        var checkout = data.checkout.filter(function(location) {
+            return neighborhoodFilter.value === 'none' || location.neighborhood === neighborhoodFilter.value;
+        })
+        var checkin = data.checkin.filter(function(location) {
+            return neighborhoodFilter.value === 'none' || location.neighborhood === neighborhoodFilter.value;
+        })
+        return {
+            checkout: checkout,
+            checkin: checkin
+        }
+    }
+
+    function formatLocationArrays(locations) {
+        var count = [];
+        var names = [];
+        var minimum = []
+        locations.forEach(function (location) {
+            count.push(location.count);
+            names.push(location.name);
+            if (location.minimum_boxes) {
+                minimum.push(location.minimum_boxes);
+            }
+        });
+        return {
+            count,
+            names,
+            minimum,
+        }
+    }
+
+    function setChartData(data, backgroundColorMap) {
+        return {
+            type: 'horizontalBar',
+            data: {
+                labels: data.names,
+                datasets: [{
+                    label: "# of Boxes",
+                    data: data.count,
+                    backgroundColor: backgroundColorMap,
+                    borderWidth: 1
+                }]
+            },
+            options: options
+        }
+    }
+
+    function renderCheckOutChart(locations) {
+        var data = formatLocationArrays(locations);
+        checkoutCanvas.height = data.names.length > 4 ? (data.names.length * 55) : 250 ;
+        var backgroundColorMap = data.count.map((val, index)=>{
+            if (val > data.minimum[index] * 2) {
+                return goodColor;
+            } else if (val > data.minimum[index]) {
+                return warningColor;
+            } else {
+                return badColor;
+            }
+        });
+        new Chart(checkoutCanvas, setChartData(data, backgroundColorMap));
+    }
+
+    function renderCheckInChart(locations) {
+        var data = formatLocationArrays(locations);
+        checkinCanvas.height = data.names.length > 4 ? (data.names.length * 55) : 250 ;
+        var backgroundColorMap = data.count.map((val)=>{
+            if (val > 30) {
+                return badColor;
+            } else if (val > 15) {
+                return warningColor;
+            } else {
+                return goodColor;
+            }
+        });
+        new Chart(checkinCanvas, setChartData(data, backgroundColorMap));
+    }
+    
+
+    renderCheckOutChart(data.checkout);
+    renderCheckInChart(data.checkin);
+
+
+    document.getElementById("needRefill").addEventListener("click", function () {
+        highlight(this);
+        var filteredData = filterLocationData();
+        var checkOutFilter = filteredData.checkout.reduce(function (accumulator, location) {
+            if (location.minimum_boxes >= location.count) {
+                accumulator.push(location);
+            }
+            return accumulator;
+        }, [])
+        var outCount = sortByKey(checkOutFilter, 'count').reverse();
+        var outSort = sortByKey(outCount, 'avg_weekly_usage').reverse();
+        renderCheckOutChart(outSort);
+        var checkinSet = filteredData.checkin.filter(function(x) {return x.count > 3})
+        var checkinSort = sortByKey(checkinSet, 'count').reverse()
+        renderCheckInChart(checkinSort);
+    });
+    document.getElementById("avgUsage").addEventListener("click", function () {
+        highlight(this);
+        var filteredData = filterLocationData();
+        var checkoutCount = sortByKey(filteredData.checkout, 'count').reverse();
+        var checkoutUsage = sortByKey(checkoutCount, 'avg_weekly_usage').reverse();
+        renderCheckOutChart(checkoutUsage);
+        var checkinCount = sortByKey(filteredData.checkin, 'count');
+        var checkinUsage = sortByKey(checkinCount, 'avg_weekly_usage').reverse();
+        renderCheckInChart(checkinUsage);
+    });
+    document.getElementById("countFilter").addEventListener("click", function () {
+        highlight(this);
+        var filteredData = filterLocationData();
+        renderCheckOutChart(sortByKey(filteredData.checkout, 'count'));
+        renderCheckInChart(sortByKey(filteredData.checkin, 'count'));
+    });
+    document.getElementById("resetChart").addEventListener("click", function () {
+        highlight(this);
+        neighborhoodFilter.value = 'none';
+        renderCheckOutChart(data.checkout);
+        renderCheckInChart(data.checkin);
+    });
+    neighborhoodFilter.addEventListener("change", function () {
+        var filteredData = filterLocationData();
+        renderCheckOutChart(filteredData.checkout);
+        renderCheckInChart(filteredData.checkin);
     });
 });
 </script>

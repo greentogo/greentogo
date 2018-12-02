@@ -1,3 +1,5 @@
+import re, rollbar, shortuuid, logging, sys
+
 from datetime import date, datetime, timedelta
 
 from django.conf import settings
@@ -5,6 +7,7 @@ from django.contrib.auth import hashers
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.models import Site
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
@@ -15,17 +18,17 @@ from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.text import slugify
+from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
 from collections import Counter
+from exponent_server_sdk import PushClient, PushMessage, PushResponseError, PushServerError, DeviceNotRegisteredError
+from requests.exceptions import ConnectionError, HTTPError
 
-import shortuuid
 from django_geocoder.wrapper import get_cached as geocode
 from postgres_stats import DateTrunc
 from templated_email import send_templated_mail
 
 from core.stripe import stripe
 from core.utils import decode_id, encode_nums
-
-import logging
 
 
 logger = logging.getLogger('django')
@@ -48,7 +51,12 @@ def activity_data(days=30):
         return data
 
     def _get_user_data():
-        # filter this to only count active subscriptions
+        # TODO filter this to only count active subscriptions
+        # TODO filter this to only count active subscriptions
+        # TODO filter this to only count active subscriptions
+        # TODO filter this to only count active subscriptions
+        # TODO filter this to only count active subscriptions
+        # TODO filter this to only count active subscriptions
         total_active_subs = Subscription.objects.all().count()
 
         data = LocationTag.objects.filter(created_at__gte=begin_datetime_start_of_day) \
@@ -69,6 +77,60 @@ def activity_data(days=30):
 
 def total_boxes_returned():
     return LocationTag.objects.checkin().count()
+
+
+# Basic arguments. You should extend this function with the push features you
+# want to use, or simply pass in a `PushMessage` object.
+def send_push_message(token, title, message, extra=None):
+    try:
+        # TODO look into what ttl is
+        # TODO look into channel_id issues on android
+        # TODO handle responeses to check if notification was deleivered
+        response = PushClient().publish(
+            PushMessage(to=token,
+                        title=title,
+                        body=message,
+                        data=extra,
+                        sound='default',
+                        priority='high'))
+    except PushServerError as exc:
+        # Encountered some likely formatting/validation error.
+        rollbar.report_exc_info(
+            extra_data={
+                'token': token,
+                'message': message,
+                'extra': extra,
+                'errors': exc.errors,
+                'response_data': exc.response_data,
+            })
+        raise
+    except (ConnectionError, HTTPError) as exc:
+        # Encountered some Connection or HTTP error - retry a few times in
+        # case it is transient.
+        rollbar.report_exc_info(
+            extra_data={'token': token, 'message': message, 'extra': extra})
+        raise self.retry(exc=exc)
+
+    try:
+        # We got a response back, but we don't know whether it's an error yet.
+        # This call raises errors so we can handle them with normal exception
+        # flows.
+        response.validate_response()
+    except DeviceNotRegisteredError:
+        print('Token Not Active')
+        # Mark the push token as inactive
+        # from notifications.models import PushToken
+        # PushToken.objects.filter(token=token).update(active=False)
+    except PushResponseError as exc:
+        # Encountered some other per-notification error.
+        rollbar.report_exc_info(
+            extra_data={
+                'token': token,
+                'message': message,
+                'extra': extra,
+                'push_response': exc.push_response._asdict(),
+            })
+        raise self.retry(exc=exc)
 
 def export_chart_data(start_date=False, end_date=False):
     begin_datetime_start_of_day = datetime.combine(datetime.strptime(start_date, '%Y-%m-%d'), datetime.min.time())
@@ -106,6 +168,30 @@ def export_chart_data(start_date=False, end_date=False):
 def total_boxes_returned():
     return LocationTag.objects.checkin().count()
 
+class AdminSettings(models.Model):
+    lowStockEmails = models.TextField(
+            max_length=1024,
+            blank=False,
+            help_text="List of emails separated by commas for who should recieve alerts when stock is low at restaurants")
+
+    highStockEmails = models.TextField(
+            max_length=1024,
+            blank=False,
+            help_text="List of emails separated by commas for who should recieve alerts when stock is high at return stations")
+
+    appVideo = models.FileField(upload_to='video/', blank=True, null=True)
+
+    def get_restaurant_low_stock_emails_list(self):
+        return re.sub(",", " ",  self.lowStockEmails).split()
+
+    def get_return_high_stock_emails_list(self):
+        return re.sub(",", " ",  self.highStockEmails).split()
+
+    def save(self, *args, **kwargs):
+        if AdminSettings.objects.exists() and not self.pk:
+            raise ValidationError('There is can be only one AdminSettings instance')
+        return super(AdminSettings, self).save(*args, **kwargs)
+
 class User(AbstractUser):
     name = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(
@@ -115,6 +201,7 @@ class User(AbstractUser):
     )
     referred_by = models.CharField(max_length=255, blank=True, null=True)
     stripe_id = models.CharField(max_length=100, blank=True, null=True)
+    expoPushToken = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.name or self.username
@@ -152,7 +239,20 @@ class User(AbstractUser):
 
         customer = stripe.Customer.retrieve(self.stripe_id)
         return customer
-    
+
+    def total_boxes_checkedin(self):
+        count = 0
+        for sub in self.subscriptions.all():
+            count = count + sub.total_checkins()
+        return count
+
+    def total_boxes_checkedout(self):
+        count = 0
+        for sub in self.subscriptions.all():
+            count = count + sub.total_checkouts()
+        return count
+
+    # TODO ADD THIS FUNCTIONALITY
     def add_to_mailchimp(self):
         if settings.DJANGO_ENV == 'development':
             print("In Development Environment")
@@ -160,17 +260,6 @@ class User(AbstractUser):
             print("In Production Environment")
         else:
             print("In Unknown Environment:" + settings.DJANGO_ENV)
-        
-    def checkForMissingStripeID(self, user):
-        user_id = User.objects.get(username=user)
-        subscriptionSet = Subscription.objects.filter(user_id=user_id)
-        if len(subscriptionSet) == 1 and len(subscriptionSet[0].stripe_id) < 2:
-            stripCust = stripe.Customer.list(email=user_id.email)
-            for x in stripCust.data:
-                stripeSub = stripe.Subscription.list(customer=x.id)
-                for y in stripeSub.data:
-                    if y.id:
-                        subscriptionSet[0].sync_with_stripe(y)
 
 
 class CannotChangeException(Exception):
@@ -178,6 +267,12 @@ class CannotChangeException(Exception):
 
 class IncorrectIntervalException(Exception):
     """Raise when the interval string is not the correct type."""
+
+class MobileAppRatings(models.Model):
+    user = models.ForeignKey(User)
+    rating = models.IntegerField()
+    date = models.DateTimeField(default=timezone.now)
+    version = models.CharField(max_length=255)
 
 class PlanQuerySet(models.QuerySet):
     def available(self):
@@ -189,12 +284,13 @@ class PlanQuerySet(models.QuerySet):
 
 class Plan(models.Model):
     objects = PlanQuerySet.as_manager()
+    INTERVAL_CHOICES = (('month', 'month'), ('year', 'year'), )
 
     name = models.CharField(max_length=255, unique=True)
     available = models.BooleanField(default=True)
     amount = models.PositiveIntegerField(help_text="Amount in cents.")
     number_of_boxes = models.PositiveIntegerField()
-    interval = models.CharField(max_length=255, help_text="Should say 'year' or 'month'.", default="year")
+    interval = models.CharField(max_length=255, choices=INTERVAL_CHOICES, help_text="Should say 'year' or 'month'.", default="year")
     stripe_id = models.CharField(max_length=255, unique=True, blank=True, null=True, editable=False)
 
     class Meta:
@@ -376,6 +472,18 @@ class Subscription(models.Model):
     def hashed_id(self):
         return encode_nums(self.id)
 
+    # @property
+    # def active(self):
+        # return encode_nums(self.id)
+        # Return String Active/Expired
+
+    @property
+    def is_active(self):
+        if self.ends_at is not None:
+            return self.ends_at.date() > timezone.now().date()
+        else:
+            return True
+
     @property
     def display_name(self):
         return self.name or self.plan_display()
@@ -395,7 +503,6 @@ class Subscription(models.Model):
     def number_of_boxes(self):
         if self.plan:
             return self.plan.number_of_boxes
-
         return 0
 
     @property
@@ -404,10 +511,10 @@ class Subscription(models.Model):
 
     @property
     def available_boxes(self):
-        return self.number_of_boxes - (self.boxes_checked_out or 0)
+        return self.number_of_boxes - (self.boxes_currently_out or 0)
 
     @property
-    def boxes_checked_out(self):
+    def boxes_currently_out(self):
         checked_out = LocationTag.objects.filter(subscription=self).aggregate(
                 checked_out=Sum(
                     Case(
@@ -441,10 +548,75 @@ class Subscription(models.Model):
         else:
             return self.can_checkout(number_of_boxes)
 
-    def tag_location(self, location, number_of_boxes=1):
+    def tag_location(self, location, number_of_boxes=1, user=False):
         tags = []
         for _ in range(number_of_boxes):
             tags.append(LocationTag.objects.create(subscription=self, location=location))
+        try: 
+            if location.notify and len(location.notifyEmail) > 1:
+                userEmail = 'N/A'
+                userName = 'N/A'
+                if user:
+                    userEmail = user.email
+                    userName = user.name
+                message_data = {
+                    'email': userEmail,
+                    'name': userName,
+                    'number_of_boxes': number_of_boxes,
+                    'action': location.service
+                }
+                message_txt = render_to_string('admin/notify_email.txt', message_data)
+                message_html = render_to_string('admin/notify_email.html', message_data)
+                email = EmailMultiAlternatives(
+                    subject='GreenToGo Box Notification',
+                    body=message_txt,
+                    from_email='greentogo@app.durhamgreentogo.com',
+                    to=[location.notifyEmail],
+                    reply_to=["amy@durhamgreentogo.com"]
+                )
+                email.attach_alternative(message_html, "text/html")
+                email.send()
+
+            if location.service == "OUT" and not location.admin_location and location.get_estimated_stock() < 7:
+                message_data = {
+                    'location': location,
+                    'count': location.get_estimated_stock(),
+                }
+                message_txt = render_to_string('admin/low_stock.txt', message_data)
+                toList = None
+                if AdminSettings.objects.first() == None:
+                    toList = []
+                else:
+                    toList = AdminSettings.objects.first().get_restaurant_low_stock_emails_list()
+                email = EmailMessage(
+                    subject='Low Stock At {}'.format(location.name),
+                    body=message_txt,
+                    from_email='database@app.durhamgreentogo.com',
+                    to=toList,
+                )
+                email.send()
+
+            if location.service == "IN" and not location.admin_location and location.get_estimated_stock() > 6:
+                message_data = {
+                    'location': location,
+                    'count': location.get_estimated_stock(),
+                }
+                message_txt = render_to_string('admin/high_stock.txt', message_data)
+                toList = None
+                if AdminSettings.objects.first() == None:
+                    toList = []
+                else:
+                    toList = AdminSettings.objects.first().get_return_high_stock_emails_list()
+                email = EmailMessage(
+                    subject='Please Empty {}'.format(location.name),
+                    body=message_txt,
+                    from_email='database@app.durhamgreentogo.com',
+                    to=toList,
+                )
+                email.send()
+
+        except Exception as ex:
+            rollbar.report_exc_info(sys.exc_info(), request)
         return tags
 
     def used_today(self):
@@ -453,6 +625,15 @@ class Subscription(models.Model):
     def used_on_date(self, date):
         tag_count = LocationTag.objects.filter(subscription=self, created_at__date=date).count()
         return tag_count > 0
+
+    def last_used(self):
+        return LocationTag.objects.filter(subscription_id=self.id).latest('created_at').created_at
+
+    def total_checkins(self):
+        return LocationTag.objects.filter(subscription_id=self.id, location__service="IN").count()
+
+    def total_checkouts(self):
+        return LocationTag.objects.filter(subscription_id=self.id, location__service="OUT").count()
 
     def will_auto_renew(self):
         return self.has_stripe_subscription() and self.is_stripe_active() and not self.cancelled
@@ -521,6 +702,13 @@ def new_subscription_email_to_admins(sender, instance, created, **kwargs):
         )
 
 
+class Neighborhood(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return "{}".format(self.name)
+
+
 class LocationQuerySet(models.QuerySet):
     def checkin(self):
         return self.filter(service=Location.CHECKIN).order_by('name')
@@ -540,15 +728,32 @@ class Location(models.Model):
     service = models.CharField(max_length=25, choices=SERVICE_CHOICES)
     name = models.CharField(max_length=255)
     address = models.CharField(max_length=1023)
+    website = models.CharField(max_length=1023, null=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
+    phase = models.PositiveIntegerField(default=1)
+    neighborhood = models.ForeignKey(Neighborhood, blank=True, null=True)
+    minimum_boxes = models.IntegerField(
+        default=15,
+        help_text="Minimum number of boxes to be kept at this check out \
+        location (please ignore for non-check out locations)")
+
+    notify = models.BooleanField(
+        default=False,
+        help_text="If checked, an email will be sent any \
+        time a box is checked in or out of this location")
+
+    notifyEmail = models.CharField(
+        blank=True,
+        max_length=255,
+        help_text="Email for notify option")
 
     admin_location = models.BooleanField(
         blank=True,
         default=False,
-        help_text="Admin locations are locations where \
-        boxes will be checked in when resetting a \
-        subscriptions box count manually")
+        help_text="Admin locations are locations that \
+        are only supposed to be used for administrative \
+        and backend purposes.")
 
     retired = models.BooleanField(
         blank=True,
@@ -556,10 +761,37 @@ class Location(models.Model):
         help_text="Retired locations will not show up in reporting \
         but their data will remain in history.")
 
+    headquarters = models.BooleanField(
+        blank=True,
+        default=False,
+        help_text="Headquarters is a location where \
+        boxes will be moved to when they are \
+        cleaned. \
+        THERE CAN ONLY BE ONE HEADQUARTER LOCATION!")
+
+    washing_location = models.BooleanField(
+        blank=True,
+        default=False,
+        help_text="washing_location is a location where \
+        boxes are moved when they are picked up \
+        from checkin locations. \
+        THERE CAN ONLY BE ONE WASHING LOCATION!")
+
+    dumping_location = models.BooleanField(
+        blank=True,
+        default=False,
+        help_text="dumping_location is a location where \
+        accidental checkout boxes are 'checked in' to. \
+        THERE CAN ONLY BE ONE DUMPING LOCATION!")
+
     def __str__(self):
         return "{} - {} ({})".format(self.name, self.service, self.code)
 
     def save(self, *args, **kwargs):
+        if self.headquarters or self.washing_location or self.dumping_location:
+            self.admin_location = True
+        else:
+            self.admin_location = False
         self._set_code()
         self._geocode()
         super().save(*args, **kwargs)
@@ -601,6 +833,83 @@ class Location(models.Model):
                 lat, lng = result.latlng
                 self.latitude = lat
                 self.longitude = lng
+
+    @property
+    def error_percentage(self):
+        try:
+            if self.service != 'OUT' or self.admin_location:
+                return 'NA'
+            error_difference_list = [abs(report.actual_amount - report.estimated_amount) for report in LocationStockReport.objects.filter(location_id=self.id)]
+            if not error_difference_list:
+                return None
+            percent_correct = int((error_difference_list.count(0)/len(error_difference_list)) * 100)
+            percent_incorrect = 100 - percent_correct
+            return percent_incorrect
+        except Exception as ex:
+            rollbar.report_exc_info(sys.exc_info(), ex)
+            return 'ERROR'
+
+    @property
+    def error_avg_difference(self):
+        try:
+            if self.service != 'OUT' or self.admin_location:
+                return 'NA'
+            error_difference_list = [abs(report.actual_amount - report.estimated_amount) for report in LocationStockReport.objects.filter(location_id=self.id)]
+            if not error_difference_list:
+                return None
+            avg_difference = int(sum(error_difference_list)/len(error_difference_list))
+            return avg_difference
+        except Exception as ex:
+            rollbar.report_exc_info(sys.exc_info(), ex)
+            return 'ERROR'
+
+    @property
+    def error_rate(self):
+        try:
+            if self.error_percentage == 'ERROR' or self.error_avg_difference == 'ERROR':
+                return 'ERROR'
+            if self.error_percentage == 'NA' or self.error_avg_difference == 'NA':
+                return 'NA'
+            if self.error_percentage:
+                return '{}% of the time, the count is about {} boxes off'.format(self.error_percentage, self.error_avg_difference)
+            else:
+                return None
+        except Exception as ex:
+            rollbar.report_exc_info(sys.exc_info(), ex)
+            return 'ERROR'
+
+
+    @property
+    def avg_weekly_usage_over_past_4_weeks(self):
+        try:
+            tags = [
+                len(LocationTag.objects.filter(location=self, created_at__range=(timezone.now() - timedelta(weeks=1), timezone.now()))),
+                len(LocationTag.objects.filter(location=self, created_at__range=(timezone.now() - timedelta(weeks=2), timezone.now() - timedelta(weeks=1)))),
+                len(LocationTag.objects.filter(location=self, created_at__range=(timezone.now() - timedelta(weeks=3), timezone.now() - timedelta(weeks=2)))),
+                len(LocationTag.objects.filter(location=self, created_at__range=(timezone.now() - timedelta(weeks=4), timezone.now() - timedelta(weeks=3)))),
+            ]
+            return int(sum(tags)/len(tags))
+        except Exception as ex:
+            rollbar.report_exc_info(sys.exc_info(), ex)
+            return 'ERROR'
+
+
+    @property
+    def is_admin_location(self):
+        if self.headquarters:
+            return 'Headquarters'
+        if self.washing_location:
+            return 'Washing Location'
+        if self.dumping_location:
+            if self.service == 'IN':
+                return 'Checkin Dumping Location'
+            if self.service == 'OUT':
+                return 'Checkout Dumping Location'
+            return 'Unknown Dumping Location'
+        if self.admin_location:
+            return 'Unknown Admin Location'
+        return ''
+
 
     def add_qrcode_to_pdf(self, pdf):
         import qrcode
@@ -679,9 +988,11 @@ class LocationStockReport(models.Model):
 class Restaurant(models.Model):
     name = models.CharField(max_length=255)
     address = models.CharField(max_length=1023)
+    website = models.CharField(max_length=1023, null=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
     phase = models.PositiveIntegerField(default=1)
+    active = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
         if self.address and self.latitude is None or self.longitude is None:
