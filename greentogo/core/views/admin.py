@@ -14,7 +14,7 @@ from datetime import date, timedelta, datetime
 from postgres_stats import DateTrunc
 
 from core.models import (
-    Location, Plan, Restaurant, Subscription, \
+    Location, Plan, Restaurant, Subscription, Neighborhood, \
     UnclaimedSubscription, User, send_push_message, \
     activity_data, export_chart_data, total_boxes_returned, LocationTag \
 )
@@ -37,36 +37,20 @@ def stock_report(request, *args, **kwargs):
     """Show a report of current stock at each location."""
     checkout_locations = Location.objects.checkout().order_by('name').filter(retired=False, admin_location=False)
     checkin_locations = Location.objects.checkin().order_by('name').filter(retired=False, admin_location=False)
-    admin_locations = Location.objects.checkin().order_by('name').filter(retired=False, admin_location=True)
     washlocation = Location.objects.checkin().get(retired=False, washing_location=True)
     hqLocation = Location.objects.checkin().get(retired=False, headquarters=True)
 
-    checkout_data = {
-        "names": [],
-        "count": [],
-    }
+    neighborhoods = list(x.__str__() for x in Neighborhood.objects.all())
+    checkout_data = []
+    checkin_data = []
 
     for loc in checkout_locations:
-        checkout_data["names"].append(loc.name)
-        checkout_data["count"].append(loc.get_estimated_stock())
-
-    checkin_data = {
-        "names": [],
-        "count": [],
-    }
+        if "Testing Location" not in loc.name and "Test Location" not in loc.name:
+            checkout_data.append(dict(name=loc.name, count=loc.get_estimated_stock(), avg_weekly_usage=loc.avg_weekly_usage_over_past_4_weeks, address=loc.address, latitude=loc.latitude, longitude=loc.longitude, neighborhood=loc.neighborhood, minimum_boxes=loc.minimum_boxes))
 
     for loc in checkin_locations:
-        checkin_data["names"].append(loc.name)
-        checkin_data["count"].append(loc.get_estimated_stock())
-
-    admin_data = {
-        "names": [],
-        "count": [],
-    }
-
-    for loc in admin_locations:
-        admin_data["names"].append(loc.name)
-        admin_data["count"].append(loc.get_estimated_stock())
+        if "Testing Location" not in loc.name and "Test Location" not in loc.name:
+            checkin_data.append(dict(name=loc.name, count=loc.get_estimated_stock(), avg_weekly_usage=loc.avg_weekly_usage_over_past_4_weeks, address=loc.address, latitude=loc.latitude, longitude=loc.longitude, neighborhood=loc.neighborhood))
 
     def get_estimated_at_checkout():
         count = sum([l.get_estimated_stock() for l in
@@ -108,13 +92,18 @@ def stock_report(request, *args, **kwargs):
         ],
     }
 
+    total = get_estimated_at_checkout() + get_estimated_checkedout() + get_estimated_at_checkin() + get_estimated_at_wash() + get_estimated_at_hq()
+
     return render(
         request, "admin/stock_report.html",
         {
             "data_json":json.dumps(dict(
+                neighborhoods=neighborhoods,
                 checkin=checkin_data, 
                 checkout=checkout_data,
-                admin=admin_data,
+                total=total,
+                clean=get_estimated_at_hq(),
+                wash=get_estimated_at_wash(),
                 cycle=cycle_data
         ))}
     )
@@ -129,7 +118,7 @@ def restaurant_management(request, *args, **kwargs):
 
     for loc in checkout_locations:
         if "Testing Location" not in loc.name and "Test Location" not in loc.name:
-            locations.append(dict(name=loc.name, count=loc.get_estimated_stock(), minimum_boxes=loc.minimum_boxes, avg_weekly_usage=loc.avg_weekly_usage_over_past_4_weeks, address=loc.address, latitude=loc.latitude, longitude=loc.longitude))
+            locations.append(dict(name=loc.name, count=loc.get_estimated_stock(), minimum_boxes=loc.minimum_boxes, avg_weekly_usage=loc.avg_weekly_usage_over_past_4_weeks, address=loc.address, latitude=loc.latitude, longitude=loc.longitude, neighborhood=loc.neighborhood))
 
     def get_estimated_at_wash():
         count = washlocation.get_estimated_stock()
