@@ -12,7 +12,6 @@
                 <label for="location_code">Location code</label>
                 <input type="text" id="location_code" name="location_code"
                 autofocus maxlength="6" minlength="6" pattern="[A-Za-z1-9]{6}" oninput="autoCapitalize()" />
-
                 <button type="submit" class="button">
                     Continue
                 </button>

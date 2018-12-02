@@ -17,6 +17,7 @@ def locations(request):
     if not user.stripe_id:
         user.create_stripe_customer()
     if request.method == "POST":
+        # Check if the user used the drop down or entered a code (drop down is priority)
         location_code = request.POST.get('location_code').upper()
         try:
             location = Location.objects.get(code=location_code)
