@@ -9,25 +9,16 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from core.models import Location, Subscription, LocationTag, User
-from core.forms import LocationForm
 
 
 @login_required
 def locations(request):
     user = request.user
-    form = LocationForm()
     if not user.stripe_id:
         user.create_stripe_customer()
     if request.method == "POST":
         # Check if the user used the drop down or entered a code (drop down is priority)
-        if len(request.POST.get('location_code')) == 0:
-            form = LocationForm(request.POST)
-            if form.is_valid():
-                form_location = form.cleaned_data['location']
-                location = get_object_or_404(Location, name=form_location)
-                location_code = location.code
-        else:
-            location_code = request.POST.get('location_code').upper()
+        location_code = request.POST.get('location_code').upper()
         try:
             location = Location.objects.get(code=location_code)
             return redirect(location.get_absolute_url())
@@ -37,9 +28,7 @@ def locations(request):
             else:
                 messages.error(request, "Please enter a code.")
 
-    return render(request, "core/locations.djhtml", {
-        "form": form
-    })
+    return render(request, "core/locations.djhtml")
 
 
 @login_required
