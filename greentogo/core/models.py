@@ -839,7 +839,7 @@ class Location(models.Model):
         try:
             if self.service != 'OUT' or self.admin_location:
                 return 'NA'
-            error_difference_list = [abs(report.actual_amount - report.estimated_amount) for report in LocationStockReport.objects.filter(location_id=self.id)]
+            error_difference_list = [abs(report.actual_amount - report.estimated_amount) for report in LocationStockReport.objects.filter(location_id=self.id, created_at__range=(timezone.now() - timedelta(weeks=12), timezone.now()))]
             if not error_difference_list:
                 return None
             percent_correct = int((error_difference_list.count(0)/len(error_difference_list)) * 100)
