@@ -827,7 +827,7 @@ class Location(models.Model):
             self.code = code
 
     def _geocode(self):
-        if self.address and self.latitude is None or self.longitude is None:
+        if self.address:
             result = geocode(self.address, provider='google')
             if result.latlng:
                 lat, lng = result.latlng
