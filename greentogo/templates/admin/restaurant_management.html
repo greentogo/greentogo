@@ -26,7 +26,9 @@
 <input type="button" class="button" id="avgUsage" value="Filter by Avg Usage (high to low)" />
 <input type="button" class="button" id="countFilter" value="Filter by count (low to high)" />
 <p>Tap location twice to put location on checklist</p>
-<canvas id="checkoutStockChart" width="500" height="1000"></canvas>
+<div id="checkoutStockDiv">
+    <canvas id="checkoutStockChart" width="500" height="1000"></canvas>
+</div>
 <h2>Checklist</h2>
 <input type="button" class="button" id="resetChecklist" value="Reset Checklist" />
 <input type="button" class="button" id="checkAddRestock" value="Add locations that need restock" />
@@ -64,7 +66,6 @@
         });
     }
     var lastClicked = null;
-    var checkoutChart;
     var originalData = {};
     var checklistData = {
         estimatedHQ: 0,
@@ -90,11 +91,18 @@
         Array.from(document.getElementsByClassName('success')).forEach(function (element) { element.classList.remove('success') });
         element.classList.add('success');
     }
-    function newChart(locations) {
-        var checkoutCanvas = document.getElementById("checkoutStockChart");
+    function renderChart(locations) {
+        var checkoutDiv = document.getElementById("checkoutStockDiv");
+        while (checkoutDiv.firstChild) {
+            checkoutDiv.removeChild(checkoutDiv.firstChild);
+        }
+        var checkoutCanvas = document.createElement('canvas'); 
+        checkoutDiv.appendChild(checkoutCanvas);
         var data = formatLocationArrays(locations);
-        checkoutCanvas.height = data.names.length > 4 ? (data.names.length * 50) : 250 ;
-        checkoutChart = new Chart(checkoutCanvas, {
+        var height = data.names.length > 4 ? (data.names.length * 50) : 250 ;
+        checkoutCanvas.height = height;
+        checkoutCanvas.style.height = `${height}px`;
+        var checkoutChart = new Chart(checkoutCanvas, {
             type: 'horizontalBar',
             data: {
                 labels: data.names,
@@ -133,29 +141,6 @@
             if (clickedPlace && clickedPlace[0] && clickedPlace[0]._model && clickedPlace[0]._model.label) {
                 clickLocation(clickedPlace[0]._model.label);
             }
-        };
-        checkoutChart.update();
-    }
-    function renderChart(locations) {
-        var checkoutCanvas = document.getElementById("checkoutStockChart");
-        var data = formatLocationArrays(locations);
-        //checkoutCanvas.height = data.names.length > 4 ? (data.names.length * 50) : 250 ;
-        checkoutChart.data = {
-            labels: data.names,
-            datasets: [{
-                label: "# of Boxes",
-                data: data.count,
-                backgroundColor: data.count.map((val, index)=>{
-                    if (val > data.minimum[index] * 2) {
-                        return 'rgba(26, 150, 65, 0.5)';
-                    } else if (val > data.minimum[index]) {
-                        return 'rgba(253, 174, 97, 0.5)';
-                    } else {
-                        return 'rgba(215, 25, 28, 0.5)';
-                    }
-                }),
-                borderWidth: 1
-            }]
         };
         checkoutChart.update();
     }
@@ -277,7 +262,7 @@
                 console.log(error);
             });
     });
-    newChart(data.locations);
+    renderChart(data.locations);
     renderChecklist();
     });
 </script>
