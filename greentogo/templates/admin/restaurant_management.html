@@ -47,17 +47,23 @@
     function formatLocationArrays(locations) {
         var count = [];
         var names = [];
-        var minimum = []
-        locations.forEach(function (location, i) {
+        var minimum = [];
+        var maximum = [];
+        var errorNum = [];
+        locations.forEach(function (location) {
             count.push(location.count);
             names.push(location.name);
             minimum.push(location.minimum_boxes);
+            maximum.push(location.maximum_boxes);
+            errorNum.push(location.error_avg_difference);
         });
         return {
             count,
             names,
             minimum,
-        }
+            maximum,
+            errorNum,
+        };
     }
     function sortByKey(array, key) {
         return array.sort(function (a, b) {
@@ -109,6 +115,7 @@
                 datasets: [{
                     label: "# of Boxes",
                     data: data.count,
+                    ...data,
                     backgroundColor: data.count.map((val, index)=>{
                         if (val > data.minimum[index] * 2) {
                             return 'rgba(26, 150, 65, 0.5)';
@@ -122,6 +129,21 @@
                 }]
             },
             options: {
+                legend: {
+                    display: false,
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function (tooltip, data) {
+                            var numOfBoxes = data.datasets[0].data[tooltip.index];
+                            var errorAmount = data.datasets[0].errorNum[tooltip.index] !== undefined ? `Worst Case: ${numOfBoxes - data.datasets[0].errorNum[tooltip.index]} |` : '';
+                            var maxBoxes = data.datasets[0].maximum[tooltip.index] !== undefined ? `| Max: ${data.datasets[0].maximum[tooltip.index]}` : '';
+                            return `Boxes: ${errorAmount} Current: ${numOfBoxes} ${maxBoxes}`;
+                        }
+                    }
+                },
                 scales: {
                     yAxes: [{
                         ticks: {
