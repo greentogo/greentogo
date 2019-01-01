@@ -733,6 +733,7 @@ class Location(models.Model):
     longitude = models.FloatField(blank=True, null=True)
     phase = models.PositiveIntegerField(default=1)
     neighborhood = models.ForeignKey(Neighborhood, blank=True, null=True)
+    maximum_boxes = models.IntegerField(default=40)
     minimum_boxes = models.IntegerField(
         default=15,
         help_text="Minimum number of boxes to be kept at this check out \
