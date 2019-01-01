@@ -118,7 +118,7 @@ def restaurant_management(request, *args, **kwargs):
 
     for loc in checkout_locations:
         if "Testing Location" not in loc.name and "Test Location" not in loc.name:
-            locations.append(dict(name=loc.name, count=loc.get_estimated_stock(), minimum_boxes=loc.minimum_boxes, avg_weekly_usage=loc.avg_weekly_usage_over_past_4_weeks, address=loc.address, latitude=loc.latitude, longitude=loc.longitude, neighborhood=loc.neighborhood))
+            locations.append(dict(name=loc.name, count=loc.get_estimated_stock(), avg_weekly_usage=loc.avg_weekly_usage_over_past_4_weeks, address=loc.address, latitude=loc.latitude, longitude=loc.longitude, neighborhood=loc.neighborhood, minimum_boxes=loc.minimum_boxes, maximum_boxes=loc.maximum_boxes, error_avg_difference=loc.error_avg_difference))
 
     def get_estimated_at_wash():
         count = washlocation.get_estimated_stock()
