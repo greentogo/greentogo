@@ -33,10 +33,14 @@
 </div>
 
 <h2>Clean Containers at Restaurants</h2>
-<canvas id="checkoutStockChart" width="500" height="400"></canvas>
+<div id="checkoutStockDiv">
+    <canvas id="checkoutStockChart" width="500" height="400"></canvas>
+</div>
 
 <h2>Dirty Containers in Return Stations</h2>
-<canvas id="checkinStockChart" width="500" height="400"></canvas>
+<div id="checkinStockDiv">
+    <canvas id="checkinStockChart" width="500" height="400"></canvas>
+</div>
 
 </div>
 {% endblock %}
@@ -59,12 +63,14 @@ $(function () {
         scales: {
             xAxes: [{
                 ticks: {
+                    //barThickness: 5,
                     autoSkip: false,
                     beginAtZero: true
                 }
             }],
             yAxes: [{
                 ticks: {
+                    //barThickness: 5,
                     autoSkip: false,
                     beginAtZero: true
                 }
@@ -72,8 +78,8 @@ $(function () {
         }
     };
     var neighborhoodFilter = document.getElementById("neighborhoodFilter");
-    var checkoutCanvas = document.getElementById("checkoutStockChart");
-    var checkinCanvas = document.getElementById("checkinStockChart");
+    var checkoutDiv = document.getElementById("checkoutStockDiv");
+    var checkinDiv = document.getElementById("checkinStockDiv");
     var cycleCanvas = document.getElementById("cycleChart");
     var checkoutChart;
     var checkinChart;
@@ -107,7 +113,8 @@ $(function () {
     function calculateCanvasHeight(names) {
         if (isMobile()){
             if (names.length > 4) {
-                return names.length * 50;
+                // GRAPH NEEDS TO JUST BE SHORTER... 
+                return names.length * 40;
             }
             return 250;
         }
@@ -185,20 +192,20 @@ $(function () {
         });
     }
 
-    function createCheckOutChart(locations, chartType) {
+    function renderCheckOutChart(locations) {
+        while (checkoutDiv.firstChild) {
+            checkoutDiv.removeChild(checkoutDiv.firstChild);
+        }
+        var checkoutCanvas = document.createElement('canvas'); 
+        checkoutDiv.appendChild(checkoutCanvas);
         var data = formatLocationArrays(locations);
-        checkoutCanvas.height = calculateCanvasHeight(data.names);
+        if (isMobile()) {
+            var height = calculateCanvasHeight(data.names);
+            checkoutCanvas.height = height;
+            checkoutCanvas.style.height = `${height}px`;
+        }
         var backgroundColorMap = calculateCheckOutColor(data.count, data.minimum);
         checkoutChart = new Chart(checkoutCanvas, setChartData(data, backgroundColorMap));
-        console.log(checkoutChart)
-    }
-
-    function renderCheckOutChart(locations) {
-        var data = formatLocationArrays(locations);
-        checkoutCanvas.height = calculateCanvasHeight(data.names);
-        var backgroundColorMap = calculateCheckOutColor(data.count, data.minimum);
-        checkoutChart.config = setChartData(data, backgroundColorMap);
-        checkoutChart.update();
     }
 
     function calculateCheckInColor(count) {
@@ -213,24 +220,25 @@ $(function () {
         });
     }
 
-    function createCheckInChart(locations) {
+    function renderCheckInChart(locations) {
+        while (checkinDiv.firstChild) {
+            checkinDiv.removeChild(checkinDiv.firstChild);
+        }
+        var checkinCanvas = document.createElement('canvas'); 
+        checkinDiv.appendChild(checkinCanvas);
         var data = formatLocationArrays(locations);
-        checkinCanvas.height = calculateCanvasHeight(data.names);
+        if (isMobile()) {
+            var height = calculateCanvasHeight(data.names);
+            checkinCanvas.height = height;
+            checkinCanvas.style.height = `${height}px`;
+        }
         var backgroundColorMap = calculateCheckInColor(data.count);
         checkinChart = new Chart(checkinCanvas, setChartData(data, backgroundColorMap));
     }
 
-    function renderCheckInChart(locations) {
-        var data = formatLocationArrays(locations);
-        checkinCanvas.height = calculateCanvasHeight(data.names);
-        var backgroundColorMap = calculateCheckInColor(data.count);
-        checkinChart.config = setChartData(data, backgroundColorMap);
-        checkinChart.update();
-    }
 
-
-    createCheckOutChart(data.checkout);
-    createCheckInChart(data.checkin);
+    renderCheckOutChart(data.checkout);
+    renderCheckInChart(data.checkin);
 
 
     document.getElementById("needRefill").addEventListener("click", function () {
