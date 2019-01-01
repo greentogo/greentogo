@@ -1,0 +1,9 @@
+Hey GreenToGo Team - 
+
+According to the database, based on previously reported error rates, there is a possibility that {{ location.name }} could need more containers.
+Their container count just reached {{ count }}, however, based on previous data, the database says:
+{{ errorText }}
+Meaning they could have as low as {{ badNumber }} containers.
+
+Peace, 
+The Database 
