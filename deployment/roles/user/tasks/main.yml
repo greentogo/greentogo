@@ -19,3 +19,8 @@
     owner: "{{ project.user }}"
     group: "{{ project.group }}"
     path: "{{ project.root }}/logs"
+
+- name: Remove Temp Files
+  file:
+    path: /tmp/greentogo
+    state: absent
