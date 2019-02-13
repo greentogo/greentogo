@@ -45,6 +45,7 @@ update-requirements: check-pip-tools
 	pip-compile --upgrade dev-requirements.in
 
 deploy-staging:
+	rm -rf /tmp/greentogo
 	ansible-playbook -i deployment/environments/staging/hosts --vault-password-file=.password  deployment/playbook.yml
 	curl https://api.rollbar.com/api/1/deploy/ \
 		-F access_token=$(ROLLBAR_KEY) \
@@ -53,6 +54,7 @@ deploy-staging:
 		-F local_username=$(LOCAL_USERNAME)
 
 deploy-production:
+	rm -rf /tmp/greentogo
 	ansible-playbook -i deployment/environments/production/hosts --vault-password-file=.password  deployment/playbook.yml
 	curl https://api.rollbar.com/api/1/deploy/ \
 		-F access_token=$(ROLLBAR_KEY) \
