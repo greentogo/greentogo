@@ -44,6 +44,10 @@ update-requirements: check-pip-tools
 	pip-compile --upgrade requirements.in
 	pip-compile --upgrade dev-requirements.in
 
+migrations: 
+	./greentogo/manage.py makemigrations
+	./greentogo/manage.py migrate
+
 deploy-staging:
 	rm -rf /tmp/greentogo
 	ansible-playbook -i deployment/environments/staging/hosts --vault-password-file=.password  deployment/playbook.yml
