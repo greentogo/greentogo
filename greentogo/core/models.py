@@ -9,7 +9,6 @@ from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.models import Site
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.core.mail import EmailMessage
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import Case, Count, Q, Sum, When
@@ -471,11 +470,6 @@ class Subscription(models.Model):
     @property
     def hashed_id(self):
         return encode_nums(self.id)
-
-    # @property
-    # def active(self):
-        # return encode_nums(self.id)
-        # Return String Active/Expired
 
     @property
     def is_active(self):
