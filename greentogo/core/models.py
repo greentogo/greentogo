@@ -247,7 +247,8 @@ class User(AbstractUser):
 
     @property
     def reward_points(self):
-        return self.total_reward_points() - 0
+        redeemedPoints = Reward.objects.filter(user=self).count() * 6
+        return self.total_reward_points() - redeemedPoints
 
     def total_boxes_checkedin(self):
         return LocationTag.objects.filter(subscription_id__in=self.get_all_subids(), location__service='IN').count()
@@ -947,6 +948,13 @@ class Location(models.Model):
         pdf.showPage()
         return pdf
 
+
+class Reward(models.Model):
+    user = models.ForeignKey(User, related_name="rewards")
+    restaurant = models.ForeignKey(Location, related_name="rewards")
+    created_at = models.DateTimeField(auto_now_add=True)
+    amount = models.FloatField(default=5.00)
+    redeemed = models.BooleanField(default=False)
 
 class LocationTagQuerySet(models.QuerySet):
     def checkin(self):
