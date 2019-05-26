@@ -50,6 +50,7 @@ class SubscriptionInline(admin.TabularInline):
         return False
 
 class CustomUserAdmin(UserAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'rewardPoints', 'is_staff', )
     inlines = [SubscriptionInline,]
 
 class isActiveFilter(SimpleListFilter):
