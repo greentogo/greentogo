@@ -239,17 +239,18 @@ class User(AbstractUser):
         customer = stripe.Customer.retrieve(self.stripe_id)
         return customer
 
+    def get_all_subids(self):
+        return self.subscriptions.all().values_list('pk', flat=True)
+
+    @property
+    def rewardPoints(self):
+        return LocationTag.objects.filter(subscription_id__in=self.get_all_subids(), location__service='IN').annotate(date=DateTrunc('created_at', precision='month')).values('date').distinct().count()
+
     def total_boxes_checkedin(self):
-        count = 0
-        for sub in self.subscriptions.all():
-            count = count + sub.total_checkins()
-        return count
+        return LocationTag.objects.filter(subscription_id__in=self.get_all_subids(), location__service='IN').count()
 
     def total_boxes_checkedout(self):
-        count = 0
-        for sub in self.subscriptions.all():
-            count = count + sub.total_checkouts()
-        return count
+        return LocationTag.objects.filter(subscription_id__in=self.get_all_subids(), location__service='OUT').count()
 
     # TODO ADD THIS FUNCTIONALITY
     def add_to_mailchimp(self):
