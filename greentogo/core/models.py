@@ -252,15 +252,6 @@ class User(AbstractUser):
     def total_boxes_checkedout(self):
         return LocationTag.objects.filter(subscription_id__in=self.get_all_subids(), location__service='OUT').count()
 
-    # TODO ADD THIS FUNCTIONALITY
-    def add_to_mailchimp(self):
-        if settings.DJANGO_ENV == 'development':
-            print("In Development Environment")
-        elif settings.DJANGO_ENV == 'production':
-            print("In Production Environment")
-        else:
-            print("In Unknown Environment:" + settings.DJANGO_ENV)
-
 
 class CannotChangeException(Exception):
     """Raise when model field should not change after initial creation."""
