@@ -242,9 +242,12 @@ class User(AbstractUser):
     def get_all_subids(self):
         return self.subscriptions.all().values_list('pk', flat=True)
 
-    @property
-    def rewardPoints(self):
+    def total_reward_points(self):
         return LocationTag.objects.filter(subscription_id__in=self.get_all_subids(), location__service='IN').annotate(date=DateTrunc('created_at', precision='month')).values('date').distinct().count()
+
+    @property
+    def reward_points(self):
+        return self.total_reward_points() - 0
 
     def total_boxes_checkedin(self):
         return LocationTag.objects.filter(subscription_id__in=self.get_all_subids(), location__service='IN').count()
