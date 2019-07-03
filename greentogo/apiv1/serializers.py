@@ -6,7 +6,7 @@ from rest_framework.validators import UniqueValidator
 from core.forms import UserSignupForm
 from django.db.utils import IntegrityError
 
-from core.models import Location, LocationTag, Restaurant, Subscription, User, MobileAppRatings
+from core.models import Location, LocationTag, Restaurant, Subscription, User, MobileAppRatings, Reward
 
 
 class CheckinCheckoutSerializer(serializers.Serializer):
@@ -33,16 +33,23 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         fields = ('id', 'name', 'available_boxes', 'max_boxes', 'is_active', )
-
     name = serializers.CharField(source="display_name")
+
+class RewardsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reward
+        fields = ('restaurantName', 'restaurantCode', 'created_at', 'amount', 'redeemed', 'redeemed_at', )
+    restaurantCode = serializers.CharField(source="restaurant.code")
+    restaurantName = serializers.CharField(source="restaurant.name")
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('name', 'email', 'username', 'subscriptions', 'expoPushToken', )
+        fields = ('name', 'email', 'username', 'reward_points', 'subscriptions', 'expoPushToken', 'rewards', )
 
     subscriptions = SubscriptionSerializer(many=True)
+    rewards = RewardsSerializer(many=True)
     def updateNameAndEmail(self, instance, data):
         try:
             instance.name = data['name']
