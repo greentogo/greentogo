@@ -845,6 +845,10 @@ class Location(models.Model):
                 self.longitude = lng
 
     @property
+    def total_uses(self):
+        return LocationTag.objects.filter(location=self).count()
+
+    @property
     def error_percentage(self):
         try:
             if self.service != 'OUT' or self.admin_location:

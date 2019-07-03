@@ -6,13 +6,16 @@
 <h2>{{restaurant.name}}</h2>
     <div class="medium-12 columns">
         <h4>Status: Estimated {{restaurant.get_estimated_stock}} Containers</h4>
-        <h4>Preferred Delivery Time:</h4>
+        {% comment %} <h4>Preferred Delivery Time: ((Change))</h4>
         <h4>
             Delivery Details:
             20 - Single Compartment (edit)
             10 - Three Compartment (edit)
             Pickup: Twice a week (edit)
-        </h4>
+        </h4> {% endcomment %}
+        <h4>Total Checkouts since membership began {{restaurant.total_uses}}</h4>
+        <h4>Avg. Checkouts per week: {{restaurant.avg_weekly_usage_over_past_4_weeks}}</h4>
+        <h4>Total G2G customers: {{num_users}}</h4>
     </div>
 </div>
 {% endblock %}
