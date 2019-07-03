@@ -953,6 +953,14 @@ class Reward(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     amount = models.FloatField(default=5.00)
     redeemed = models.BooleanField(default=False)
+    redeemed_at = models.DateTimeField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.redeemed and self.redeemed_at is None:
+            self.redeemed_at = timezone.now()
+        elif not self.redeemed and self.redeemed_at is not None:
+            self.redeemed_at = None
+        super().save(*args, **kwargs)
 
 class LocationTagQuerySet(models.QuerySet):
     def checkin(self):
