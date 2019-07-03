@@ -1,0 +1,18 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+
+<div class="row">
+<h2>{{restaurant.name}}</h2>
+    <div class="medium-12 columns">
+        <h4>Status: Estimated {{restaurant.get_estimated_stock}} Containers</h4>
+        <h4>Preferred Delivery Time:</h4>
+        <h4>
+            Delivery Details:
+            20 - Single Compartment (edit)
+            10 - Three Compartment (edit)
+            Pickup: Twice a week (edit)
+        </h4>
+    </div>
+</div>
+{% endblock %}

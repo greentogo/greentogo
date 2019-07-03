@@ -26,6 +26,8 @@ import core.views.locations
 import core.views.subscriptions
 import core.views.reporting
 import core.views.registration
+import core.views.dashboard
+# import core.views.video
 from core import views as core_views
 from core.views.webhook import stripe_webhook
 
@@ -79,6 +81,15 @@ subscriptions_patterns = [
     ),
 ]
 
+dashboard_patterns = [
+    url(r'^$', core.views.dashboard.dashboard_home, name='dashboard_home'),
+    url(
+        r'^(?P<location_code>[A-Za-z1-9]{6})/$',
+        core.views.dashboard.dashboard,
+        name='dashboard'
+    ),
+]
+
 urlpatterns = [
     url(r'^webhook/$', stripe_webhook),
     url(r'^locations/$', core.views.locations.locations, name='locations'),
@@ -107,6 +118,7 @@ urlpatterns = [
     name="password_reset"),
     #route other accounts URLs to defaults
     url(r'^accounts/', include('registration.backends.default.urls')),
+    url(r'^dashboard/', include(dashboard_patterns)),
 
     url(r'^admin/', admin_site.urls),
     url(r'^stock/$', core_views.reporting.stock_landing_page, name='stock_report'),
@@ -121,6 +133,7 @@ urlpatterns = [
     url(r'^$', core_views.index),
     url(r'^accidental_checkout/$', core.views.reporting.accidental_checkout, name='accidental_checkout'),
     url(r'^privacy/$', core.views.registration.privacy, name='privacy')
+    # url(r'^video/(?P<video>)$', core.views.video.howto, name='video')
 ] + static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
 )
