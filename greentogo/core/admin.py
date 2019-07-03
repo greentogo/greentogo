@@ -49,9 +49,12 @@ class SubscriptionInline(admin.TabularInline):
     def has_add_permission(self, request):
         return False
 
+class RestaurantManagerInline(admin.TabularInline):
+    model = User.restaurant_manager.through
+
 class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'reward_points', 'is_staff', )
-    inlines = [SubscriptionInline,]
+    inlines = [SubscriptionInline,RestaurantManagerInline]
 
 class isActiveFilter(SimpleListFilter):
     title = 'Active'

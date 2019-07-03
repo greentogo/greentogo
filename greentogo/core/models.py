@@ -164,9 +164,6 @@ def export_chart_data(start_date=False, end_date=False):
     user_percentage_data = _get_user_data()
     return {"checkin": checkin_data, "checkout": checkout_data, "user": user_percentage_data}
 
-def total_boxes_returned():
-    return LocationTag.objects.checkin().count()
-
 class AdminSettings(models.Model):
     lowStockEmails = models.TextField(
             max_length=1024,
@@ -201,6 +198,7 @@ class User(AbstractUser):
     referred_by = models.CharField(max_length=255, blank=True, null=True)
     stripe_id = models.CharField(max_length=100, blank=True, null=True)
     expoPushToken = models.CharField(max_length=255, blank=True, null=True)
+    restaurant_manager = models.ManyToManyField('Location')
 
     def __str__(self):
         return self.name or self.username
