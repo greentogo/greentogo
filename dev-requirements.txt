@@ -4,6 +4,7 @@
 #
 #    pip-compile --output-file dev-requirements.txt dev-requirements.in
 #
+appnope==0.1.0            # via ipython
 decorator==4.1.2          # via ipython, traitlets
 faker==0.7.18
 ipython-genutils==0.2.0   # via traitlets
@@ -15,6 +16,7 @@ pexpect==4.2.1            # via ipython
 pickleshare==0.7.4        # via ipython
 prompt-toolkit==1.0.15    # via ipython
 ptyprocess==0.5.2         # via pexpect
+pylint===2.3.1
 py==1.4.34                # via pytest
 pygments==2.2.0           # via ipython
 pytest-django==3.1.2
