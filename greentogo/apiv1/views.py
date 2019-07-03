@@ -67,8 +67,6 @@ class UserView(GenericAPIView):
 
     permission_classes = (IsAuthenticated, )
     serializer_class = UserSerializer
-    # Tell DRF documentation you are not a list view.
-    action = 'retrieve'
 
     def get(self, request):
         serializer = self.get_serializer(request.user)
