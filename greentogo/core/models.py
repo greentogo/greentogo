@@ -17,7 +17,7 @@ from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.text import slugify
-from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
+from django.core.mail import send_mail, EmailMessage
 from collections import Counter
 from exponent_server_sdk import PushClient, PushMessage, PushResponseError, PushServerError, DeviceNotRegisteredError
 from requests.exceptions import ConnectionError, HTTPError
@@ -540,7 +540,7 @@ class Subscription(models.Model):
         tags = []
         for _ in range(number_of_boxes):
             tags.append(LocationTag.objects.create(subscription=self, location=location))
-        try: 
+        try:
             if location.notify and len(location.notifyEmail) > 1:
                 userEmail = 'N/A'
                 userName = 'N/A'
@@ -553,76 +553,44 @@ class Subscription(models.Model):
                     'number_of_boxes': number_of_boxes,
                     'action': location.service
                 }
-                message_txt = render_to_string('admin/notify_email.txt', message_data)
-                message_html = render_to_string('admin/notify_email.html', message_data)
-                email = EmailMultiAlternatives(
+                EmailMessage(
                     subject='GreenToGo Box Notification',
-                    body=message_txt,
+                    body=render_to_string('admin/notify_email.txt', message_data),
                     from_email='greentogo@app.durhamgreentogo.com',
                     to=[location.notifyEmail],
                     reply_to=["amy@durhamgreentogo.com"]
-                )
-                email.attach_alternative(message_html, "text/html")
-                email.send()
+                ).send()
 
-            if location.service == "OUT" and not location.admin_location:
-                if location.get_estimated_stock() < 7:
-                    message_data = {
-                        'location': location,
-                        'count': location.get_estimated_stock(),
-                    }
-                    message_txt = render_to_string('admin/low_stock.txt', message_data)
-                    toList = None
-                    if AdminSettings.objects.first() == None:
-                        toList = []
-                    else:
-                        toList = AdminSettings.objects.first().get_restaurant_low_stock_emails_list()
-                    email = EmailMessage(
-                        subject='Low Stock At {}'.format(location.name),
-                        body=message_txt,
-                        from_email='database@app.durhamgreentogo.com',
-                        to=toList,
-                    )
-                    email.send()
-                elif location.error_percentage and (location.get_estimated_stock() - location.error_avg_difference) < 7:
-                    message_data = {
-                        'location': location,
-                        'count': location.get_estimated_stock(),
-                        'errorText': location.error_rate,
-                        'badNumber': location.get_estimated_stock() - location.error_avg_difference,
-                    }
-                    message_txt = render_to_string('admin/low_stock_possible.txt', message_data)
-                    toList = None
-                    if AdminSettings.objects.first() == None:
-                        toList = []
-                    else:
-                        toList = AdminSettings.objects.first().get_restaurant_low_stock_emails_list()
-                    email = EmailMessage(
-                        subject='Possible Low Stock At {}'.format(location.name),
-                        body=message_txt,
-                        from_email='database@app.durhamgreentogo.com',
-                        to=toList,
-                    )
-                    email.send()
-
-            if location.service == "IN" and not location.admin_location and location.get_estimated_stock() > 6:
+            if not location.admin_location and AdminSettings.objects.first() is not None:
                 message_data = {
                     'location': location,
                     'count': location.get_estimated_stock(),
+                    'errorText': location.error_rate,
+                    'badNumber': location.get_estimated_stock() - location.error_avg_difference,
                 }
-                message_txt = render_to_string('admin/high_stock.txt', message_data)
-                toList = None
-                if AdminSettings.objects.first() == None:
-                    toList = []
-                else:
-                    toList = AdminSettings.objects.first().get_return_high_stock_emails_list()
-                email = EmailMessage(
-                    subject='Please Empty {}'.format(location.name),
-                    body=message_txt,
-                    from_email='database@app.durhamgreentogo.com',
-                    to=toList,
-                )
-                email.send()
+                if location.service == "OUT":
+                    if location.get_estimated_stock() < 7:
+                        EmailMessage(
+                            subject='Low Stock At {}'.format(location.name),
+                            body=render_to_string('admin/low_stock.txt', message_data),
+                            from_email='database@app.durhamgreentogo.com',
+                            to=AdminSettings.objects.first().get_restaurant_low_stock_emails_list(),
+                        ).send()
+                    elif location.error_percentage and (location.get_estimated_stock() - location.error_avg_difference) < 7:
+                        EmailMessage(
+                            subject='Possible Low Stock At {}'.format(location.name),
+                            body=render_to_string('admin/low_stock_possible.txt', message_data),
+                            from_email='database@app.durhamgreentogo.com',
+                            to=AdminSettings.objects.first().get_restaurant_low_stock_emails_list(),
+                        ).send()
+
+                if location.service == "IN" and location.get_estimated_stock() > 6:
+                    EmailMessage(
+                        subject='Please Empty {}'.format(location.name),
+                        body=render_to_string('admin/high_stock.txt', message_data),
+                        from_email='database@app.durhamgreentogo.com',
+                        to=AdminSettings.objects.first().get_return_high_stock_emails_list(),
+                    ).send()
 
         except Exception as ex:
             rollbar.report_exc_info(sys.exc_info(), request)
