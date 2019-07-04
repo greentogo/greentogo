@@ -733,6 +733,7 @@ class Location(models.Model):
     CHECKOUT = 'OUT'
     SERVICE_CHOICES = ((CHECKIN, 'Check in'), (CHECKOUT, 'Check out'), )
 
+    restaurant_manager = models.ManyToManyField(User)
     code = models.CharField(max_length=6, unique=True)
     service = models.CharField(max_length=25, choices=SERVICE_CHOICES)
     name = models.CharField(max_length=255)

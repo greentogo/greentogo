@@ -158,6 +158,7 @@ class LocationAdmin(admin.ModelAdmin):
     actions = [
         'make_qrcodes',
     ]
+    inlines = [RestaurantManagerInline]
 
     def dashboard(self, obj):
         return format_html("<a href='{url}'>{url}</a>", url=obj.dashboard_url)
