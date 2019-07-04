@@ -711,6 +711,23 @@ class Location(models.Model):
     CHECKIN = 'IN'
     CHECKOUT = 'OUT'
     SERVICE_CHOICES = ((CHECKIN, 'Check in'), (CHECKOUT, 'Check out'), )
+    TIME_CHOICES = (
+        ('Anytime', 'Anytime'),
+        ('8am', '8 am'),
+        ('9am', '9 am'),
+        ('10am', '10 am'),
+        ('11am', '11 am'),
+        ('12pm', '12 pm'),
+        ('1pm', '1 pm'),
+        ('2pm', '2 pm'),
+        ('3pm', '3 pm'),
+        ('4pm', '4 pm'),
+        ('5pm', '5 pm'),
+        ('6pm', '6 pm'),
+        ('7pm', '7 pm'),
+        ('8pm', '8 pm'),
+        ('9pm', '9 pm'),
+    )
 
     restaurant_manager = models.ManyToManyField(User)
     code = models.CharField(max_length=6, unique=True)
@@ -722,6 +739,7 @@ class Location(models.Model):
     longitude = models.FloatField(blank=True, null=True)
     phase = models.PositiveIntegerField(default=1)
     neighborhood = models.ForeignKey(Neighborhood, blank=True, null=True)
+    preferred_delivery_time = models.CharField(max_length=25, choices=TIME_CHOICES, default=TIME_CHOICES[0][0])
     maximum_boxes = models.IntegerField(default=40)
     minimum_boxes = models.IntegerField(
         default=15,
@@ -775,7 +793,7 @@ class Location(models.Model):
         THERE CAN ONLY BE ONE DUMPING LOCATION!")
 
     def __str__(self):
-        return "{} - {} ({})".format(self.name, self.service, self.code)
+        return f"{self.name} - {self.service} ({self.code})"
 
     def save(self, *args, **kwargs):
         if self.headquarters or self.washing_location or self.dumping_location:
