@@ -813,6 +813,11 @@ class Location(models.Model):
     def set_stock(self, count):
         return LocationStockCount.objects.create(location=self, count=count)
 
+    @property
+    def dashboard_url(self):
+        from django.urls import reverse
+        return reverse('dashboard', kwargs={"location_code": self.code})
+
     def get_estimated_stock(self):
         try:
             last_count = LocationStockCount.objects.filter(location=self).order_by('-created_at')[0]
