@@ -2,20 +2,30 @@
 {% block content %}
 
 
-<div class="row">
+<div class="row dashboard">
 <h2>{{restaurant.name}}</h2>
     <div class="medium-12 columns">
-        <h4>Status: Estimated {{restaurant.get_estimated_stock}} Containers</h4>
-        {% comment %} <h4>Preferred Delivery Time: ((Change))</h4>
-        <h4>
-            Delivery Details:
-            20 - Single Compartment (edit)
-            10 - Three Compartment (edit)
-            Pickup: Twice a week (edit)
-        </h4> {% endcomment %}
-        <h4>Total Checkouts since membership began {{restaurant.total_uses}}</h4>
-        <h4>Avg. Checkouts per week: {{restaurant.avg_weekly_usage_over_past_4_weeks}}</h4>
-        <h4>Total G2G customers: {{num_users}}</h4>
+        <div class="row">
+            <div class="columns small-5 status-box">
+                <h4>Estimated Containers: <br/>{{restaurant.get_estimated_stock}}</h4>
+            </div>
+            <div class="columns medium-7">
+                <p>Preferred Delivery Time: ((Change))</p>
+                <p>
+                    Delivery Details:
+                    20 - Single Compartment (edit)
+                    10 - Three Compartment (edit)
+                    Pickup: Twice a week (edit)
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="medium-12 columns">
+        <p>
+            Total Checkouts since membership began {{restaurant.total_uses}}<br/>
+            Avg. Checkouts per week: {{restaurant.avg_weekly_usage_over_past_4_weeks}}<br/>
+            Total G2G customers: {{num_users}}<br/>
+        </p>
     </div>
 </div>
 {% endblock %}
