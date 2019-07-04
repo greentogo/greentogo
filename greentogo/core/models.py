@@ -693,6 +693,17 @@ class LocationQuerySet(models.QuerySet):
     def checkout(self):
         return self.filter(service=Location.CHECKOUT).order_by('name')
 
+    def getTopUsedLocation(self, month, year):
+        location = LocationTag.objects.filter(
+            location__service=Location.CHECKOUT,
+            created_at__year=year,
+            created_at__month=month,
+        ).values('location').annotate(c=Count('location')).order_by('-c').first()
+        if location is not None:
+            return self.get(id=location.get('location'))
+        else:
+            return None
+
 
 class Location(models.Model):
     objects = LocationQuerySet.as_manager()
@@ -925,21 +936,6 @@ class Location(models.Model):
         return pdf
 
 
-class Reward(models.Model):
-    user = models.ForeignKey(User, related_name="rewards")
-    restaurant = models.ForeignKey(Location, related_name="rewards")
-    created_at = models.DateTimeField(auto_now_add=True)
-    amount = models.FloatField(default=5.00)
-    redeemed = models.BooleanField(default=False)
-    redeemed_at = models.DateTimeField(null=True, blank=True)
-
-    def save(self, *args, **kwargs):
-        if self.redeemed and self.redeemed_at is None:
-            self.redeemed_at = timezone.now()
-        elif not self.redeemed and self.redeemed_at is not None:
-            self.redeemed_at = None
-        super().save(*args, **kwargs)
-
 class LocationTagQuerySet(models.QuerySet):
     def checkin(self):
         return self.filter(location__service=Location.CHECKIN)
@@ -1012,6 +1008,27 @@ class Restaurant(models.Model):
 def one_year_from_now():
     return date.today() + timedelta(days=365)
 
+class Reward(models.Model):
+    user = models.ForeignKey(User, related_name="rewards")
+    restaurant = models.ForeignKey(Location, related_name="rewards")
+    created_at = models.DateTimeField(auto_now_add=True)
+    amount = models.FloatField(default=5.00)
+    redeemed = models.BooleanField(default=False)
+    redeemed_at = models.DateTimeField(null=True, blank=True)
+
+    def default_location(self):
+        lastMonth = timezone.now() - timedelta(days=30)
+        return Location.objects.getTopUsedLocation(lastMonth.month, lastMonth.year)
+
+    def __str__(self):
+        return f'{self.user} - {self.restaurant}'
+
+    def save(self, *args, **kwargs):
+        if self.redeemed and self.redeemed_at is None:
+            self.redeemed_at = timezone.now()
+        elif not self.redeemed and self.redeemed_at is not None:
+            self.redeemed_at = None
+        super().save(*args, **kwargs)
 
 class CouponCode(models.Model):
     # TODO MAKE SURE THAT CORP CODES AND CUP CODES CANT MATCH
