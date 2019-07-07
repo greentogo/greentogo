@@ -562,11 +562,16 @@ class Subscription(models.Model):
                 ).send()
 
             if not location.admin_location and AdminSettings.objects.first() is not None:
+                error_avg_difference = 0
+                try:
+                    error_avg_difference = int(location.error_avg_difference)
+                except Exception:
+                    error_avg_difference = 0
                 message_data = {
                     'location': location,
                     'count': location.get_estimated_stock(),
                     'errorText': location.error_rate,
-                    'badNumber': location.get_estimated_stock() - location.error_avg_difference,
+                    'badNumber': location.get_estimated_stock() - error_avg_difference,
                 }
                 if location.service == "OUT":
                     if location.get_estimated_stock() < 7:
@@ -576,7 +581,7 @@ class Subscription(models.Model):
                             from_email='database@app.durhamgreentogo.com',
                             to=AdminSettings.objects.first().get_restaurant_low_stock_emails_list(),
                         ).send()
-                    elif location.error_percentage and (location.get_estimated_stock() - location.error_avg_difference) < 7:
+                    elif location.error_percentage and (location.get_estimated_stock() - error_avg_difference) < 7:
                         EmailMessage(
                             subject='Possible Low Stock At {}'.format(location.name),
                             body=render_to_string('admin/low_stock_possible.txt', message_data),
