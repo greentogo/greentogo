@@ -25,7 +25,7 @@ django==1.10.6
 djangorestframework==3.6.4
 djoser==0.5.4
 et-xmlfile==1.0.1         # via openpyxl
-exponent_server_sdk==0.2.0
+exponent-server-sdk==0.2.0
 geocoder==1.15.1          # via django-geocoder
 hashids==1.2.0
 itypes==1.1.0             # via coreapi
@@ -43,11 +43,11 @@ qrcode==5.3
 ratelim==0.1.6            # via geocoder
 rcssmin==1.0.6            # via django-compressor
 reportlab==3.4.0
-requests==2.13.0          # via coreapi, geocoder, rollbar, stripe
+requests==2.13.0          # via coreapi, exponent-server-sdk, geocoder, rollbar, stripe
 rjsmin==1.0.12            # via django-compressor
 rollbar==0.13.12
 shortuuid==0.5.0
-six==1.10.0               # via django-environ, django-extensions, django-templated-email, geocoder, pinax-stripe, qrcode, rollbar
+six==1.10.0               # via django-environ, django-extensions, django-templated-email, exponent-server-sdk, geocoder, pinax-stripe, qrcode, rollbar
 stripe==1.62.0
 uritemplate==3.0.0        # via coreapi
 werkzeug==0.12.2
