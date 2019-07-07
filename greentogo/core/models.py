@@ -593,7 +593,7 @@ class Subscription(models.Model):
                     ).send()
 
         except Exception as ex:
-            rollbar.report_exc_info(sys.exc_info(), request)
+            rollbar.report_exc_info(sys.exc_info(), ex)
         return tags
 
     def used_today(self):
