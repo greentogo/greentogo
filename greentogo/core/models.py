@@ -1044,7 +1044,7 @@ class Reward(models.Model):
         return Location.objects.getTopUsedLocation(lastMonth.month, lastMonth.year)
 
     def __str__(self):
-        return f'{self.user} - {self.restaurant}'
+        return '{} - {}'.format(self.user, self.restaurant)
 
     def save(self, *args, **kwargs):
         if self.redeemed and self.redeemed_at is None:
