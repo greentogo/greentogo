@@ -798,7 +798,7 @@ class Location(models.Model):
         THERE CAN ONLY BE ONE DUMPING LOCATION!")
 
     def __str__(self):
-        return f"{self.name} - {self.service} ({self.code})"
+        return "{} - {} ({})".format(self.name, self.service, self.code)
 
     def save(self, *args, **kwargs):
         if self.headquarters or self.washing_location or self.dumping_location:
