@@ -159,17 +159,17 @@ def restock_locations(request, *args, **kwargs):
 
 
 def mobile_application(request, *args, **kwargs):
+    usersWithPushTokens = User.objects.all().exclude(expoPushToken__isnull=True)
     if request.method == "POST":
         try:
             message = request.POST.get('push-notification-message')
             title = request.POST.get('push-notification-title')
-            usersWithPushTokens = User.objects.all().exclude(expoPushToken__isnull=True)
             for user in usersWithPushTokens:
                 send_push_message(user.expoPushToken, title, message)
             messages.add_message(request, messages.INFO, 'Messages sent!')
         except:
             messages.add_message(request, messages.ERROR, 'ERROR SENDING MESSAGE, UNABLE TO SEND')
-    return render(request, 'admin/mobile_application.html')
+    return render(request, 'admin/mobile_application.html', { 'users': usersWithPushTokens })
 
 
 @require_POST
