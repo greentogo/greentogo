@@ -26,6 +26,12 @@
         </p>
         <button id="push-notification-message-submit" type="submit" disabled>Send Push Notification</button>
     </form>
+    <p>Users that will recieve a notification ({{users|length}}):</p>
+    <ul>
+    {% for user in users %}
+        <li>{{user.name}}</li>
+    {% endfor %}
+    </ul>
 </div>
 {% endblock %}
 
