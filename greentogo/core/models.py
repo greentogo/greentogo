@@ -819,7 +819,10 @@ class Location(models.Model):
     @property
     def dashboard_url(self):
         from django.urls import reverse
-        return reverse('dashboard', kwargs={"location_code": self.code})
+        if self.code:
+            return reverse('dashboard', kwargs={"location_code": self.code})
+        else:
+            return ''
 
     def get_estimated_stock(self):
         try:
