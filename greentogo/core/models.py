@@ -976,6 +976,7 @@ class LocationTag(models.Model):
     subscription = models.ForeignKey(Subscription)
     location = models.ForeignKey(Location)
     created_at = models.DateTimeField(auto_now_add=True)
+    emailed = models.BooleanField(default=False)
 
     def __str__(self):
         return "Location Tag - {} - {}".format(self.subscription.user, self.created_at)
