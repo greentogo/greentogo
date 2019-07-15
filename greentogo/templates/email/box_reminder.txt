@@ -1,0 +1,6 @@
+Hello {{user.username}},
+
+Don't forget to return the box you checked out from {{checkout.location.name}}!
+
+Regards,
+The GreenToGo Database
