@@ -963,6 +963,20 @@ class Location(models.Model):
 
 
 class LocationTagQuerySet(models.QuerySet):
+    def tags_on_days_ago(self, days = 7):
+        day = timezone.now() - timedelta(days)
+        return self.filter(created_at__gte=day)
+
+    def tags_since_days_ago(self, days = 7):
+        return self.filter(
+            created_at__range=(
+                timezone.now() - timedelta(days=days), timezone.now()
+                )
+            )
+
+    def tags_not_emailed(self):
+        return self.filter(emailed=False)
+
     def checkin(self):
         return self.filter(location__service=Location.CHECKIN)
 
