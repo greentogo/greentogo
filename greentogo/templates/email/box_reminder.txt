@@ -1,6 +1,6 @@
-Hello {{user.username}},
+Dear {{user.username}},
 
-Don't forget to return the box you checked out from {{checkout.location.name}}!
+It’s time to rinse and return your container! Help us keep our reusable containers in circulation! Download the GreenToGo app (or go to app.durhamgreentogo.com/restaurants) to find a return station near you!
+You are reducing litter, carbon emissions, landfill trash! While helping our local economy and generating love.
 
-Regards,
-The GreenToGo Database
+We hope you enjoyed your meal, thanks for using GreenToGo!
