@@ -24,7 +24,7 @@ class Command(BaseCommand):
         print(users_that_havent_checkedin)
         for user in users_that_havent_checkedin:
           checkout = checkouts_one_week_ago.filter(subscription__user=user).first()
-          print('{} has not checked in since they checked out at {}'.format(user.name,checkout.location.name))
+          print('{} has not checked in since they checked out at {}'.format(user.username,checkout.location.name))
           # checkout.emailed = True
           # checkout.save()
           # EmailMessage(
