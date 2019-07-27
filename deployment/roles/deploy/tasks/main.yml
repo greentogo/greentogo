@@ -47,3 +47,12 @@
       virtualenv={{ project.virtualenv }}
 - name: Make sure uwsgi is running
   service: name=uwsgi enabled=yes state=restarted
+- name: Setting Conjob Perms
+  file: dest={{ django.root }}emailactivity.sh mode=a+x
+- name: Cronjob
+  cron:
+    name: box return email cronjob
+    minute: 00
+    hour: 21
+    user: greentogo
+    job: "{{ django.root }}emailactivity.sh {{ django.root }} > {{ project.root }}logs/cron.log"
