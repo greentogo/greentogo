@@ -35,8 +35,8 @@ def unclaimed_subscription_status_csv(request, *args, **kwargs):
 
 def stock_report(request, *args, **kwargs):
     """Show a report of current stock at each location."""
-    checkout_locations = Location.objects.checkout().order_by('name').filter(retired=False, admin_location=False)
-    checkin_locations = Location.objects.checkin().order_by('name').filter(retired=False, admin_location=False)
+    checkout_locations = Location.objects.checkout().order_by('name').notRetiredOrAdmin()
+    checkin_locations = Location.objects.checkin().order_by('name').notRetiredOrAdmin()
     washlocation = Location.objects.checkin().get(retired=False, washing_location=True)
     hqLocation = Location.objects.checkin().get(retired=False, headquarters=True)
 
@@ -110,7 +110,7 @@ def stock_report(request, *args, **kwargs):
 
 def restaurant_management(request, *args, **kwargs):
     """Show a report of current stock at each location."""
-    checkout_locations = Location.objects.checkout().order_by('name').filter(retired=False, admin_location=False)
+    checkout_locations = Location.objects.checkout().order_by('name').notRetiredOrAdmin()
     washlocation = Location.objects.checkin().get(retired=False, washing_location=True)
     hqLocation = Location.objects.checkin().get(retired=False, headquarters=True)
 

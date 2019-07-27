@@ -21,7 +21,7 @@ def registration_form(request):
             user.create_stripe_customer()
             user.email = form.cleaned_data.get('email')
             to_email = form.cleaned_data.get('email')
-            restaurants = Location.objects.filter(retired=False, admin_location=False, service='OUT')
+            restaurants = Location.objects.checkout().notRetiredOrAdmin()
             message_data = {
                 'user': user,
                 'restaurants': restaurants,

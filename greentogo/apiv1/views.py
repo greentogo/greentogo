@@ -179,7 +179,7 @@ class RestaurantsView(APIView):
 
     def get(self, request, format=None):
         # serializer = RestaurantSerializer(Restaurant.objects.filter(active=True), many=True)
-        serializer = RestaurantSerializer(Location.objects.filter(retired=False, admin_location=False), many=True)
+        serializer = RestaurantSerializer(Location.objects.notRetiredOrAdmin(), many=True)
         for location in serializer.data:
             filtered = re.sub('(- )?(check)?(-)?(in|out)(?:\s|$)', '', location['name'], flags=re.IGNORECASE)
             location['name'] = filtered
@@ -282,7 +282,7 @@ class Register(GenericAPIView):
                 user.email = form.cleaned_data.get('email')
                 user.save()
                 to_email = form.cleaned_data.get('email')
-                restaurants = Location.objects.filter(retired=False, admin_location=False, service='OUT')
+                restaurants = Location.objects.checkout().notRetiredOrAdmin()
                 message_data = {
                     'user': user,
                     'restaurants': restaurants,

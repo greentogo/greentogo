@@ -71,7 +71,7 @@ def update_restaurant_inventory(request):
     """
     This view is for updating restaurants
     """
-    locations = Location.objects.checkout().filter(retired=False, admin_location=False)
+    locations = Location.objects.checkout().notRetiredOrAdmin()
     if request.method == 'POST':
         location = Location.objects.get(pk=request.POST.get('location'))
         actual_count = request.POST.get('actual_count')
@@ -117,11 +117,9 @@ def stock_report(request, stock_action):
         return redirect('/stock/')
 
     if stock_action == 'restock':
-        locations = Location.objects.checkout()
-        locations = locations.filter(retired=False, admin_location=False)
+        locations = Location.objects.checkout().notRetiredOrAdmin()
     else:
-        locations = Location.objects.checkin()
-        locations = locations.filter(retired=False, admin_location=False)
+        locations = Location.objects.checkin().notRetiredOrAdmin()
     return render(request,'reporting/stock.html',{
         "locations": locations,
         "stock_action": stock_action,

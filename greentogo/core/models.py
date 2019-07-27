@@ -697,6 +697,9 @@ class LocationQuerySet(models.QuerySet):
 
     def checkout(self):
         return self.filter(service=Location.CHECKOUT).order_by('name')
+    
+    def notRetiredOrAdmin(self):
+        return self.filter(retired=False, admin_location=False)
 
     def getTopUsedLocation(self, month, year):
         location = LocationTag.objects.filter(
