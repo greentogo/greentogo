@@ -1,4 +1,4 @@
 #!/bin/bash
 source env/bin/activate
 source envvars
-./manage.py emailActivity
+$1manage.py emailActivity
