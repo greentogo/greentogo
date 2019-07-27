@@ -1,23 +1,21 @@
 {% extends "core/base.html" %}
 
-{% load foundation_extras %}
-{% load serialization_extras %}
 
 {% block content %}
     <div class="row">
         <div class="medium-3 xlarge-2 columns">
-            {% for phase, restaurants in restaurants_by_phase.items %}
+            {% comment %} {% for phase, restaurants in restaurants_by_phase.items %}
                 <div class="lead"
                      style="border-width: 0 0 0 10px; border-color: {{ phase_colors|getitem:phase}}; padding-left: 5px; border-style: solid;">
                     <strong>Phase {{ phase }}</strong>
-                </div>
+                </div> {% endcomment %}
                 {% for restaurant in restaurants %}
                     <p>
                         <span><strong>{{ restaurant.name }}</strong></span>
                         <span>{{ restaurant.address }}</span>
                     </p>
                 {% endfor %}
-            {% endfor %}
+            {% comment %} {% endfor %} {% endcomment %}
         </div>
         <div class="medium-9 xlarge-10 columns">
             <h2>Participating Restaurants</h2>
@@ -54,7 +52,8 @@
 
          restaurants.forEach(function (restaurant) {
              var marker = new google.maps.Marker({
-                 icon: phaseImage(restaurant.fields.phase),
+                 // icon: phaseImage(restaurant.fields.phase),
+                 icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
                  map: map,
                  title: restaurant.fields.name,
                  position: { lat: restaurant.fields.latitude, lng: restaurant.fields.longitude },

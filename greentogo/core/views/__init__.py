@@ -92,21 +92,23 @@ def change_payment_method(request):
 
 
 def restaurants(request):
-    restaurants = Restaurant.objects.order_by('phase', 'name').all()
-    restaurants_by_phase = OrderedDict()
-    phases = []
-    for phase, rlist in groupby((r for r in restaurants), key=lambda r: r.phase):
-        phases.append(phase)
-        restaurants_by_phase[phase] = [r for r in rlist]
+    restaurants = Restaurant.objects.order_by('name').all()
+    # restaurants = Restaurant.objects.order_by('phase', 'name').all()
+    # restaurants_by_phase = OrderedDict()
+    # phases = []
+    # for phase, rlist in groupby((r for r in restaurants), key=lambda r: r.phase):
+    #     phases.append(phase)
+    #     restaurants_by_phase[phase] = [r for r in rlist]
     phase_colors = {1: 'red', 2: 'blue', 3: 'purple', 4: 'yellow', 5: 'green'}
 
     return render(
         request, "core/restaurants.djhtml", {
             "api_key": settings.GOOGLE_API_KEY,
-            "phases": phases,
+            # "phases": phases,
             "phase_colors": phase_colors,
             "phase_colors_json": mark_safe(json.dumps(phase_colors)),
-            "restaurants_by_phase": restaurants_by_phase,
+            # "restaurants_by_phase": restaurants_by_phase,
+            "restaurants": restaurants,
             "restaurants_json": mark_safe(serializers.serialize("json", restaurants))
         }
     )
