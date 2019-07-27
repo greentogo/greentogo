@@ -95,22 +95,22 @@ def handle_invoice_payment_succeeded(event):
     invoice = event.data.object
     customer = User.objects.filter(stripe_id=invoice.customer).first()
     if not customer:
-        logger.warn(
+        return logger.warn(
             "Customer {} not found for invoice.payment_succeeded webhook".format(invoice.customer)
         )
-        return
 
     if not invoice.lines.data:
         return
     for line in invoice.lines.data:
         if line.id.startswith("sub_"):
-            subscription = Subscription.objects.filter(stripe_id=line.id).first()
-            if not subscription:
-                logger.warn(
-                    "Subscription {} not found for invoice.payment_succeeded webhook".
-                    format(line.id)
-                )
-            subscription.sync_with_stripe()
+            try:
+                subscription = Subscription.objects.filter(stripe_id=line.id).first()
+                if not subscription:
+                    logger.warn("Subscription {} not found for invoice.payment_succeeded webhook".format(line.id))
+                subscription.sync_with_stripe()
+            except Exception as ex:
+                rollbar.report_message(ex, "error")
+                logger.error(ex)
 
 
 @handle_event('invoice.payment_failed')
