@@ -2,6 +2,7 @@ import rollbar, sys
 from django.core.management.base import BaseCommand
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
+from django.utils import timezone
 
 from core.models import LocationTag, User, send_push_message
 
@@ -10,6 +11,7 @@ class Command(BaseCommand):
     help = "Command to send emails to people who have not checked in boxes"
 
     def handle(self, *args, **options):
+      print('BEGINNING CRON JOB: {}'.format(timezone.now()))
       try:
         days = 7
         users_that_have_checkin_since_last_week = LocationTag.objects.all().checkin().tags_since_days_ago(days).values('subscription__user').distinct()
