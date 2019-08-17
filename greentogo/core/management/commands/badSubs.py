@@ -11,5 +11,15 @@ class Command(BaseCommand):
     help = "Command to send emails to people who have not checked in boxes"
 
     def handle(self, *args, **options):
-      stuff = Subscription.objects.filter(cancelled=True, stripe_status='active')
-      print(stuff)
+      subs = Subscription.objects.filter(cancelled=True, stripe_status='active')
+      print(subs)
+      for sub in subs:
+        try:
+          print('Cancelling:')
+          print(sub)
+          stripe_sub = sub.get_stripe_subscription()
+          stripe_sub.delete(at_period_end = True)
+        except Exception as ex:
+          print('UNABLE TO CANCEL:')
+          print(sub)
+          print(ex)
