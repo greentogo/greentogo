@@ -661,7 +661,7 @@ class Subscription(models.Model):
         if stripe_sub is None:
             return
 
-        if self.cancelled:
+        if self.cancelled and not stripe_sub.cancel_at_period_end:
             if not stripe_sub.status == 'cancelled' or not stripe_sub.status == 'canceled':
                 stripe_sub.delete(at_period_end = True)
         elif not self.cancelled and stripe_sub.cancel_at_period_end:
