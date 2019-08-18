@@ -654,9 +654,8 @@ class Subscription(models.Model):
             )
         self.save()
 
-    def update_stripe(self, stripe_sub=None):
-        if stripe_sub is None:
-            stripe_sub = self.get_stripe_subscription()
+    def update_stripe(self):
+        stripe_sub = self.get_stripe_subscription()
 
         if stripe_sub is None:
             return
