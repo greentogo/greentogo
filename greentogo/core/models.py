@@ -632,28 +632,17 @@ class Subscription(models.Model):
 
         return stripe.Subscription.retrieve(self.stripe_id)
 
-    def update_from_stripe_sub(self, stripe_subscription, force=False):
-        if self.stripe_id and not force:
-            raise SubscriptionUpdateException(
-                message="Subscription already has a Stripe subscription",
-                subscription=self,
-                stripe_subscription=stripe_subscription,
-            )
-
-        ends_at = datetime.fromtimestamp(stripe_subscription.current_period_end) + timedelta(days=3)
-        ends_at = timezone.make_aware(ends_at, is_dst=False)
-
-        self.stripe_id = stripe_subscription.id
-        self.stripe_status = stripe_subscription.status
-        self.ends_at = ends_at
-        self.save()
-
     def sync_with_stripe(self, stripe_sub=None):
         if stripe_sub is None:
             stripe_sub = self.get_stripe_subscription()
 
         if stripe_sub is None:
             return
+
+        if stripe_sub.cancel_at_period_end and not self.cancelled:
+            self.cancelled = True
+        elif not stripe_sub.cancel_at_period_end and self.cancelled:
+            self.cancelled = False
 
         self.stripe_id = stripe_sub.id
         self.stripe_status = stripe_sub.status
@@ -664,6 +653,35 @@ class Subscription(models.Model):
                 datetime.fromtimestamp(stripe_sub.current_period_end) + timedelta(days=3)
             )
         self.save()
+
+    def update_stripe(self, stripe_sub=None):
+        if stripe_sub is None:
+            stripe_sub = self.get_stripe_subscription()
+
+        if stripe_sub is None:
+            return
+
+        if self.cancelled:
+            if not stripe_sub.status == 'cancelled' or not stripe_sub.status == 'canceled':
+                stripe_sub.delete(at_period_end = True)
+        elif not self.cancelled and stripe_sub.cancel_at_period_end:
+            stripe_sub.modify(
+                stripe_sub.id,
+                metadata={'cancel_at_period_end': 'false'}
+            )
+
+        self.stripe_id = stripe_sub.id
+        self.stripe_status = stripe_sub.status
+        if stripe_sub.ended_at:
+            self.ends_at = timezone.make_aware(datetime.fromtimestamp(stripe_sub.ended_at))
+        else:
+            self.ends_at = timezone.make_aware(
+                datetime.fromtimestamp(stripe_sub.current_period_end) + timedelta(days=3)
+            )
+
+    def save(self, *args, **kwargs):
+        self.update_stripe()
+        super().save(*args, **kwargs)
 
 
 class SubscriptionUpdateException(Exception):

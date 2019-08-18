@@ -258,11 +258,6 @@ def cancel_subscription(request, sub_id):
     subscription = user.subscriptions.get(id=real_id)
     if request.method == "POST":
         #cancel the subscription
-        stripe_sub = subscription.get_stripe_subscription()
-
-        #delete the stripe sub
-        stripe_sub.delete(at_period_end = True)
-        #delete the sub in our database
         subscription.cancelled = True
         subscription.save()
 
@@ -354,7 +349,7 @@ def add_credit_card(request, sub_id):
 
             try:
                 stripe_subscription = stripe.Subscription.create(**sub_kwargs)
-                subscription.update_from_stripe_sub(stripe_subscription)
+                subscription.sync_with_stripe(stripe_subscription)
 
                 messages.success(
                     request, "Your credit card was added to your subscription successfully."
