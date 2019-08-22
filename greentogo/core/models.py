@@ -627,7 +627,7 @@ class Subscription(models.Model):
         return self.stripe_id
 
     def get_stripe_subscription(self):
-        if self.stripe_id is None:
+        if not self.stripe_id:
             return None
 
         return stripe.Subscription.retrieve(self.stripe_id)
