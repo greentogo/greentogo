@@ -40,6 +40,6 @@ class Command(BaseCommand):
               reply_to=["amy@durhamgreentogo.com"]
           ).send()
           if (user.expoPushToken):
-            send_push_message(user.expoPushToken, 'Box Reminder!', 'Dont forget to check in your boxes!')
+            send_push_message(user.expoPushToken, 'Box Reminder!', 'Dont forget to return your boxes!')
       except Exception as ex:
             rollbar.report_exc_info(sys.exc_info(), ex)
