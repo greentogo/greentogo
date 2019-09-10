@@ -1,6 +1,6 @@
 Dear {{user.username}},
 
-It’s time to rinse and return your container! Help us keep our reusable containers in circulation! Download the GreenToGo app (or go to app.durhamgreentogo.com/restaurants) to find a return station near you!
+It’s time to rinse and return your container! Help us keep our reusable containers in circulation! Download the GreenToGo app (or go to https://durhamgreentogo.com/return-stations/) to find a return station near you!
 You are reducing litter, carbon emissions, landfill trash! While helping our local economy and generating love.
 
 We hope you enjoyed your meal, thanks for using GreenToGo!
