@@ -107,6 +107,7 @@ def handle_invoice_payment_succeeded(event):
                 subscription = Subscription.objects.filter(stripe_id=line.id).first()
                 if not subscription:
                     logger.warn("Subscription {} not found for invoice.payment_succeeded webhook".format(line.id))
+                    return
                 subscription.sync_with_stripe()
             except Exception as ex:
                 rollbar.report_message(ex, "error")
@@ -134,6 +135,7 @@ def handle_invoice_payment_failed(event):
                 logger.warn(
                     "Subscription {} not found for invoice.payment_failed webhook".format(line.id)
                 )
+                return
             subscription.sync_with_stripe()
 
 @handle_event('invoice.upcoming')
