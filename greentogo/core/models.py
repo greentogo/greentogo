@@ -765,6 +765,8 @@ class Location(models.Model):
     phase = models.PositiveIntegerField(default=1)
     neighborhood = models.ForeignKey(Neighborhood, blank=True, null=True)
     preferred_delivery_time = models.CharField(max_length=25, choices=TIME_CHOICES, default=TIME_CHOICES[0][0])
+    has_boxes = models.BooleanField(default=True, help_text="If the location uses take out containers or not")
+    has_cups = models.BooleanField(default=False, help_text="If the location uses take out cups or not")
     maximum_boxes = models.IntegerField(default=40)
     minimum_boxes = models.IntegerField(
         default=15,
@@ -1005,12 +1007,20 @@ class LocationTagQuerySet(models.QuerySet):
 
 
 class LocationTag(models.Model):
+    CUP = 'CUP'
+    BOX = 'BOX'
+    ITEM_CHOICES = (
+        (CUP, 'Cup'),
+        (BOX, 'Box'),
+    )
+
     objects = LocationTagQuerySet.as_manager()
 
     subscription = models.ForeignKey(Subscription)
     location = models.ForeignKey(Location)
     created_at = models.DateTimeField(auto_now_add=True)
     emailed = models.BooleanField(default=False)
+    item_type = models.CharField(max_length=25, choices=ITEM_CHOICES, default=BOX,)
 
     def __str__(self):
         return "Location Tag - {} - {}".format(self.subscription.user, self.created_at)
