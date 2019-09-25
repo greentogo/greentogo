@@ -106,9 +106,8 @@ def send_push_message(token, title, message, extra=None):
     except (ConnectionError, HTTPError) as exc:
         # Encountered some Connection or HTTP error - retry a few times in
         # case it is transient.
-        rollbar.report_exc_info(
+        return rollbar.report_exc_info(
             extra_data={'token': token, 'message': message, 'extra': extra})
-        raise self.retry(exc=exc)
 
     try:
         # We got a response back, but we don't know whether it's an error yet.
@@ -116,20 +115,26 @@ def send_push_message(token, title, message, extra=None):
         # flows.
         response.validate_response()
     except DeviceNotRegisteredError:
-        print('Token Not Active')
+        rollbar.report_exc_info(
+            extra_data={
+                'token': token,
+                'message': 'INACTIVE TOKEN',
+                'extra': extra,
+                'errors': exc.errors,
+                'response_data': exc.response_data,
+            })
         # Mark the push token as inactive
         # from notifications.models import PushToken
         # PushToken.objects.filter(token=token).update(active=False)
     except PushResponseError as exc:
         # Encountered some other per-notification error.
-        rollbar.report_exc_info(
+        return rollbar.report_exc_info(
             extra_data={
                 'token': token,
                 'message': message,
                 'extra': extra,
                 'push_response': exc.push_response._asdict(),
             })
-        raise self.retry(exc=exc)
 
 def export_chart_data(start_date=False, end_date=False):
     begin_datetime_start_of_day = datetime.combine(datetime.strptime(start_date, '%Y-%m-%d'), datetime.min.time())
