@@ -991,7 +991,7 @@ class Location(models.Model):
 
 class LocationTagQuerySet(models.QuerySet):
     def tags_on_days_ago(self, days = 7):
-        day = timezone.now() - timedelta(days)
+        day = timezone.now() - timedelta(days=days)
         return self.filter(created_at__gte=day)
 
     def tags_since_days_ago(self, days = 7):
