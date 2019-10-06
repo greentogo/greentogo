@@ -10,6 +10,7 @@
 {% block content %}
 
 <div style="max-width: 960px;">
+    Number of active subs: {{ numberOfActiveSubs }}
     {% for user in data %}
         <p>{{user}}</p>
     {% endfor %}
@@ -22,8 +23,10 @@
 <style type="text/css">
 </style>
 <script>
-/* $(function () {
+$(function () {
     var data = {{ data_json|safe }};
+    console.log(data);
+/*
     window.data = data;
     var convertToXY = function (data) {
         return data.map(function (d) {
@@ -75,7 +78,7 @@
             }
         }
     });
-
-}); */
+*/
+});
 </script>
 {% endblock %}
