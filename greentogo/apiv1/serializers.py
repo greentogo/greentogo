@@ -78,12 +78,14 @@ class RatingSerializer(serializers.ModelSerializer):
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
-        fields = ('service', 'address', 'code', 'name')
+        fields = ('service', 'address', 'code', 'name', 'has_boxes', 'has_cups')
 
     service = serializers.CharField()
     address = serializers.CharField()
     code = serializers.CharField()
     name = serializers.CharField()
+    has_boxes = serializers.BooleanField()
+    has_cups = serializers.BooleanField()
 
 
 class LocationTagSerializer(serializers.Serializer):
