@@ -721,7 +721,7 @@ class LocationQuerySet(models.QuerySet):
         return self.filter(service=Location.CHECKOUT).order_by('name')
     
     def notRetiredOrAdmin(self):
-        return self.filter(retired=False, admin_location=False)
+        return self.filter(retired=False, admin_location=False).exclude(name='Apple Testing Location - OUT')
 
     def getTopUsedLocation(self, month, year):
         location = LocationTag.objects.filter(
