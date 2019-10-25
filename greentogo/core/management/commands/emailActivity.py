@@ -12,33 +12,33 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
       print('BEGINNING CRON JOB: {}'.format(timezone.now()))
-      try:
-        users_that_have_checkin_since_last_week = LocationTag.objects.all().checkin().tags_since_days_ago(8).values('subscription__user').distinct()
-        checkouts_one_week_ago = LocationTag.objects.all().checkout().tags_on_days_ago(7).tags_not_emailed()
+      # try:
+      #   users_that_have_checkin_since_last_week = LocationTag.objects.all().checkin().tags_since_days_ago(8).values('subscription__user').distinct()
+      #   checkouts_one_week_ago = LocationTag.objects.all().checkout().tags_on_days_ago(7).tags_not_emailed()
 
-        users_that_havent_checkedin = User.objects.filter(
-            id__in=checkouts_one_week_ago.values('subscription__user').distinct()
-          ).exclude(
-            id__in=users_that_have_checkin_since_last_week
-          )
+      #   users_that_havent_checkedin = User.objects.filter(
+      #       id__in=checkouts_one_week_ago.values('subscription__user').distinct()
+      #     ).exclude(
+      #       id__in=users_that_have_checkin_since_last_week
+      #     )
 
-        print(users_that_havent_checkedin)
-        for user in users_that_havent_checkedin:
-          checkout = checkouts_one_week_ago.filter(subscription__user=user).first()
-          print('{} has not checked in since they checked out at {}'.format(user.username,checkout.location.name))
-          checkout.emailed = True
-          checkout.save()
-          EmailMessage(
-              subject='GreenToGo Box Notification',
-              body=render_to_string('email/box_reminder.txt', {
-                'user': user,
-                'checkout': checkout,
-              }),
-              from_email='greentogo@app.durhamgreentogo.com',
-              to=[user.email],
-              reply_to=["amy@durhamgreentogo.com"]
-          ).send()
-          if (user.expoPushToken):
-            send_push_message(user.expoPushToken, 'Box Reminder!', 'Dont forget to return your boxes!')
-      except Exception as ex:
-            rollbar.report_exc_info(sys.exc_info(), ex)
+      #   print(users_that_havent_checkedin)
+      #   for user in users_that_havent_checkedin:
+      #     checkout = checkouts_one_week_ago.filter(subscription__user=user).first()
+      #     print('{} has not checked in since they checked out at {}'.format(user.username,checkout.location.name))
+      #     checkout.emailed = True
+      #     checkout.save()
+      #     EmailMessage(
+      #         subject='GreenToGo Box Notification',
+      #         body=render_to_string('email/box_reminder.txt', {
+      #           'user': user,
+      #           'checkout': checkout,
+      #         }),
+      #         from_email='greentogo@app.durhamgreentogo.com',
+      #         to=[user.email],
+      #         reply_to=["amy@durhamgreentogo.com"]
+      #     ).send()
+      #     if (user.expoPushToken):
+      #       send_push_message(user.expoPushToken, 'Box Reminder!', 'Dont forget to return your boxes!')
+      # except Exception as ex:
+      #       rollbar.report_exc_info(sys.exc_info(), ex)
