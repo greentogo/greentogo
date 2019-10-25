@@ -13,9 +13,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
       print('BEGINNING CRON JOB: {}'.format(timezone.now()))
       try:
-        days = 7
-        users_that_have_checkin_since_last_week = LocationTag.objects.all().checkin().tags_since_days_ago(days).values('subscription__user').distinct()
-        checkouts_one_week_ago = LocationTag.objects.all().checkout().tags_on_days_ago(days).tags_not_emailed()
+        users_that_have_checkin_since_last_week = LocationTag.objects.all().checkin().tags_since_days_ago(8).values('subscription__user').distinct()
+        checkouts_one_week_ago = LocationTag.objects.all().checkout().tags_on_days_ago(7).tags_not_emailed()
 
         users_that_havent_checkedin = User.objects.filter(
             id__in=checkouts_one_week_ago.values('subscription__user').distinct()
