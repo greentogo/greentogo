@@ -1244,6 +1244,8 @@ class GroupOrder(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def check_out(self):
+        if self.checked_out:
+            return self
         checkin = Location.objects.dumping_in()
         subscription.tag_location(checkin, self.count, self.subscription.user)
         subscription.tag_location(self.location, self.count, self.subscription.user)
@@ -1252,6 +1254,8 @@ class GroupOrder(models.Model):
         return self
 
     def check_in(self, code):
+        if self.checked_in:
+            return self
         checkin = Location.objects.filter(code=code)
         checkout = Location.objects.dumping_out()
         subscription.tag_location(checkin, self.count, self.subscription.user)
