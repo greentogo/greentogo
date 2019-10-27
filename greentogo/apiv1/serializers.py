@@ -6,7 +6,7 @@ from rest_framework.validators import UniqueValidator
 from core.forms import UserSignupForm
 from django.db.utils import IntegrityError
 
-from core.models import Location, LocationTag, Restaurant, Subscription, User, MobileAppRatings, Reward
+from core.models import Location, LocationTag, Restaurant, Subscription, User, MobileAppRatings, Reward, GroupOrder
 
 
 class CheckinCheckoutSerializer(serializers.Serializer):
@@ -46,9 +46,14 @@ class RewardsSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('name', 'email', 'username', 'is_corporate_user', 'reward_points', 'subscriptions', 'expoPushToken', 'rewards', )
+        fields = ('name', 'email', 'username', 'is_corporate_user', 'reward_points', 'subscriptions', 'expoPushToken', 'rewards', 'group_orders', )
     subscriptions = SubscriptionSerializer(many=True)
     rewards = RewardsSerializer(many=True)
+    group_orders = serializers.SerializerMethodField()
+
+    def get_group_orders(self, user):
+        return GroupOrderSerializer(GroupOrder.objects.filter(subscription__user=user), many=True).data
+
     def updateNameAndEmail(self, instance, data):
         try:
             instance.name = data['name']
@@ -118,3 +123,15 @@ class UserRegistrationSerializer(serializers.Serializer):
     email2 = serializers.CharField(max_length=255)
     password1 = serializers.CharField(max_length=255)
     password2 = serializers.CharField(max_length=255)
+
+class GroupOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GroupOrder
+        fields = ('subscription', 'location', 'expected_checkout', 'count', 'checked_out', 'checked_in',)
+
+    subscription = SubscriptionSerializer()
+    location = LocationSerializer()
+    expected_checkout = serializers.DateField()
+    count = serializers.FloatField()
+    checked_out = serializers.BooleanField()
+    checked_in = serializers.BooleanField()
