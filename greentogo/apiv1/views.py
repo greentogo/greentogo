@@ -15,12 +15,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import User, Location, LocationTag, Plan, Restaurant, Subscription, MobileAppRatings
+from core.models import User, Location, LocationTag, Plan, Restaurant, Subscription, MobileAppRatings, GroupOrder
 from core.forms import UserSignupForm, UserForm
 
 from .jsend import jsend_error, jsend_fail, jsend_success
 from .permissions import HasSubscription
-from .serializers import CheckinCheckoutSerializer, LocationTagSerializer, UserSerializer, LocationSerializer, RestaurantSerializer, UserRegistrationSerializer, RatingSerializer
+from .serializers import CheckinCheckoutSerializer, LocationTagSerializer, UserSerializer, LocationSerializer, RestaurantSerializer, UserRegistrationSerializer, RatingSerializer, CreateGroupOrderSerializer
 
 
 class CheckinCheckoutView(GenericAPIView):
@@ -368,3 +368,49 @@ class RfidView(APIView):
                 return jsend_fail({"error:": "User has no boxes left in subscription"}, status=403)
         else:
             return jsend_fail({"error:": "User exists but has no active subscriptions"}, status=403)
+
+class GroupOrders(GenericAPIView):
+    """Retrives group orders"""
+
+    permission_classes = (IsAuthenticated, )
+    serializer_class = CreateGroupOrderSerializer
+
+    def post(self, request):
+        try:
+            location = Location.objects.filter(code=request.data['location_code']).first()
+            if location.service == 'IN':
+                return jsend_fail({"error": "Recieved request to create group order at return bin, please check location code"}, status=400)
+            sub = Subscription.objects.filter(id=request.data['subscription_id']).first()
+            new_group_order = GroupOrder.objects.create(
+                subscription=sub,
+                corporate_code=sub.corporate_code,
+                location=location,
+                expected_checkout=request.data['expected_checkout'],
+                count=request.data['count'],
+            )
+            return jsend_success({"data": "received"})
+        except Exception as ex:
+            rollbar.report_exc_info(sys.exc_info(), request)
+            return jsend_fail({"error": "Unable to process request, please try again later"}, status=500)
+
+class GroupOrderCheckin(APIView):
+    """Checks out group order"""
+    permission_classes = (IsAuthenticated, )
+    def post(self, request, group_order_id):
+        try:
+            GroupOrder.objects.get(id=group_order_id).check_out()
+            return jsend_success({"data": "received"})
+        except Exception as ex:
+            rollbar.report_exc_info(sys.exc_info(), request)
+            return jsend_fail({"error": "Unable to process request, please try again later"}, status=500)
+
+class GroupOrderCheckin(APIView):
+    """Checks in group order"""
+    permission_classes = (IsAuthenticated, )
+    def post(self, request, group_order_id):
+        try:
+            GroupOrder.objects.get(id=group_order_id).check_in()
+            return jsend_success({"data": "received"})
+        except Exception as ex:
+            rollbar.report_exc_info(sys.exc_info(), request)
+            return jsend_fail({"error": "Unable to process request, please try again later"}, status=500)
