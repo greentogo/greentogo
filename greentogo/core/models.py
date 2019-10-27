@@ -736,6 +736,12 @@ class LocationQuerySet(models.QuerySet):
     def notRetiredOrAdmin(self):
         return self.filter(retired=False, admin_location=False).exclude(name='Apple Testing Location - OUT')
 
+    def dumping_in(self):
+        return self.filter(dumping_location=true, service='IN')
+
+    def dumping_out(self):
+        return self.filter(dumping_location=true, service='OUT')
+
     def getTopUsedLocation(self, month, year):
         location = LocationTag.objects.filter(
             location__service=Location.CHECKOUT,
@@ -1237,6 +1243,22 @@ class GroupOrder(models.Model):
     item_type = models.CharField(max_length=25, choices=ITEM_CHOICES, default=BOX,)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def check_out(self):
+        checkin = Location.objects.dumping_in()
+        subscription.tag_location(checkin, self.count, self.subscription.user)
+        subscription.tag_location(self.location, self.count, self.subscription.user)
+        self.checked_out = True
+        self.save()
+        return self
+
+    def check_in(self, code):
+        checkin = Location.objects.filter(code=code)
+        checkout = Location.objects.dumping_out()
+        subscription.tag_location(checkin, self.count, self.subscription.user)
+        subscription.tag_location(checkout, self.count, self.subscription.user)
+        self.checked_in = True
+        self.save()
+        return self
 
     def __str__(self):
         return "Group Order - {} - {}".format(self.corporate_code, self.location)
