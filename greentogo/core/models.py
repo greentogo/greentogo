@@ -32,6 +32,14 @@ from core.utils import decode_id, encode_nums
 
 logger = logging.getLogger('django')
 
+# Types for LocationTag and GroupOrder
+CUP = 'CUP'
+BOX = 'BOX'
+ITEM_CHOICES = (
+    (CUP, 'Cup'),
+    (BOX, 'Box'),
+)
+
 def one_year_from_now():
     return timezone.now() + timedelta(days=365)
 
@@ -1017,13 +1025,6 @@ class LocationTagQuerySet(models.QuerySet):
 
 
 class LocationTag(models.Model):
-    CUP = 'CUP'
-    BOX = 'BOX'
-    ITEM_CHOICES = (
-        (CUP, 'Cup'),
-        (BOX, 'Box'),
-    )
-
     objects = LocationTagQuerySet.as_manager()
 
     subscription = models.ForeignKey(Subscription)
@@ -1216,19 +1217,26 @@ class CorporateCode(models.Model):
         super().delete(*args, **kwargs)
 
 
-class GroupOrder(models.Model):
-    CUP = 'CUP'
-    BOX = 'BOX'
-    ITEM_CHOICES = (
-        (CUP, 'Cup'),
-        (BOX, 'Box'),
-    )
+# class CoporateSubscription(models.Model):
+#     name = models.CharField()
+#     corporate_codes = models.ManyToManyField(CorporateCode)
 
-    count = models.IntegerField()
+#     def __str__(self):
+#         return self.name
+
+
+class GroupOrder(models.Model):
+    # corporate_subscription = models.ForeignKey(CoporateSubscription)
+    subscription = models.ForeignKey(Subscription)
+    corporate_code = models.ForeignKey(CorporateCode)
     location = models.ForeignKey(Location)
-    created_at = models.DateTimeField(auto_now_add=True)
+    expected_checkout = models.DateField(blank=True)
+    count = models.IntegerField()
+    checked_out = models.BooleanField(default=False)
+    checked_in = models.BooleanField(default=False)
     item_type = models.CharField(max_length=25, choices=ITEM_CHOICES, default=BOX,)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
     def __str__(self):
-        return "Location Tag - {} - {}".format(self.subscription.user, self.created_at)
+        return "Group Order - {} - {}".format(self.corporate_code, self.location)
