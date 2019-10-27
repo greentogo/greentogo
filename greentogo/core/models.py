@@ -214,6 +214,9 @@ class User(AbstractUser):
     def get_subscriptions(self):
         return self.subscriptions.active().order_by("starts_at")
 
+    def is_corporate_user(self):
+        return self.subscriptions.active().is_corporate().count() > 0
+
     def create_stripe_customer(self, token=None):
         if self.stripe_id:
             return
@@ -419,6 +422,8 @@ class SubscriptionQuerySet(models.QuerySet):
     def owned_by(self, user):
         return self.filter(user=user)
 
+    def is_corporate(self):
+        return self.filter(corporate_code__isnull=False)
 
 class Subscription(models.Model):
     objects = SubscriptionQuerySet.as_manager()
@@ -1209,3 +1214,21 @@ class CorporateCode(models.Model):
         coupon = stripe.Coupon.retrieve(id=self.code)
         coupon.delete()
         super().delete(*args, **kwargs)
+
+
+class GroupOrder(models.Model):
+    CUP = 'CUP'
+    BOX = 'BOX'
+    ITEM_CHOICES = (
+        (CUP, 'Cup'),
+        (BOX, 'Box'),
+    )
+
+    count = models.IntegerField()
+    location = models.ForeignKey(Location)
+    created_at = models.DateTimeField(auto_now_add=True)
+    item_type = models.CharField(max_length=25, choices=ITEM_CHOICES, default=BOX,)
+
+
+    def __str__(self):
+        return "Location Tag - {} - {}".format(self.subscription.user, self.created_at)

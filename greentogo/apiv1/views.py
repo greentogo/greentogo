@@ -59,7 +59,7 @@ class CheckinCheckoutView(GenericAPIView):
         else:
             return jsend_fail({"subscription": "Not enough boxes available for checkout."})
 
-
+# /me/
 class UserView(GenericAPIView):
     """
     Get information about the current user, including subscriptions.

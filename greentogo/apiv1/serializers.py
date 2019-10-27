@@ -32,7 +32,7 @@ class CheckinCheckoutSerializer(serializers.Serializer):
 class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
-        fields = ('id', 'name', 'available_boxes', 'max_boxes', 'is_active', )
+        fields = ('id', 'name', 'available_boxes', 'max_boxes', 'is_active', 'corporate_code' )
     name = serializers.CharField(source="display_name")
 
 class RewardsSerializer(serializers.ModelSerializer):
@@ -46,8 +46,7 @@ class RewardsSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('name', 'email', 'username', 'reward_points', 'subscriptions', 'expoPushToken', 'rewards', )
-
+        fields = ('name', 'email', 'username', 'is_corporate_user', 'reward_points', 'subscriptions', 'expoPushToken', 'rewards', )
     subscriptions = SubscriptionSerializer(many=True)
     rewards = RewardsSerializer(many=True)
     def updateNameAndEmail(self, instance, data):
