@@ -1254,7 +1254,7 @@ class GroupOrder(models.Model):
         return self
 
     def check_in(self, code):
-        if self.checked_in:
+        if self.checked_in and not self.checked_out:
             return self
         checkin = Location.objects.filter(code=code)
         checkout = Location.objects.dumping_out()
