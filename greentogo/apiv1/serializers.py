@@ -127,7 +127,7 @@ class UserRegistrationSerializer(serializers.Serializer):
 class GroupOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroupOrder
-        fields = ('subscription', 'location', 'expected_checkout', 'count', 'checked_out', 'checked_in',)
+        fields = ('id', 'subscription', 'location', 'expected_checkout', 'count', 'checked_out', 'checked_in',)
 
     subscription = SubscriptionSerializer()
     location = LocationSerializer()
@@ -135,3 +135,13 @@ class GroupOrderSerializer(serializers.ModelSerializer):
     count = serializers.FloatField()
     checked_out = serializers.BooleanField()
     checked_in = serializers.BooleanField()
+
+class CreateGroupOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GroupOrder
+        fields = ('subscription_id', 'location_code', 'expected_checkout', 'count',)
+
+    subscription_id = serializers.FloatField()
+    location_code = serializers.CharField()
+    expected_checkout = serializers.DateField()
+    count = serializers.FloatField()
