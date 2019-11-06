@@ -393,7 +393,7 @@ class GroupOrders(GenericAPIView):
             rollbar.report_exc_info(sys.exc_info(), request)
             return jsend_fail({"error": "Unable to process request, please try again later"}, status=500)
 
-class GroupOrderCheckin(APIView):
+class GroupOrderCheckout(APIView):
     """Checks out group order"""
     permission_classes = (IsAuthenticated, )
     def post(self, request, group_order_id):
