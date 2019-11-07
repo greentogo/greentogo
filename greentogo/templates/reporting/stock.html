@@ -14,6 +14,7 @@
               <h5>Select a Return Station</h5>
               {% endif %}
               <select id="location_id" name="location" required>
+                <option disabled selected value>Select location</option>
                 {% for location in locations %}
                 <option value="{{ location.id }}">{{ location }}</option>
                 {% endfor %}

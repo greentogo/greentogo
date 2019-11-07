@@ -10,6 +10,7 @@
       <div class="reportrow">
         <h5>Select Restaurant for Update</h5>
         <select id="location_id" name="location" required>
+          <option disabled selected value>Select location</option>
           {% for location in locations %}
           <option value="{{ location.id }}">{{ location }}</option>
           {% endfor %}
