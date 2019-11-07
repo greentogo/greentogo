@@ -723,7 +723,7 @@ class SubscriptionUpdateException(Exception):
 
 @receiver(post_save, sender=Subscription)
 def new_subscription_email_to_admins(sender, instance, created, **kwargs):
-    if created:
+    if created and AdminSettings.objects.first():
         send_templated_mail(
             template_name='new_subscription',
             from_email=settings.DEFAULT_FROM_EMAIL,
