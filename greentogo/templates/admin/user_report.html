@@ -10,7 +10,12 @@
 {% block content %}
 
 <div style="max-width: 960px;">
-    Number of active subs: {{ numberOfActiveSubs }}
+    <strong>
+        <p>Number of users: {{ numberOfUsers }}</p>
+        <p>Number of active subs: {{ numberOfActiveSubs }}</p>
+        <p>Number of paying subs: {{ numberOfPayingSubs }}</p>
+    </strong>
+    <br>
     {% for user in data %}
         <p>{{user}}</p>
     {% endfor %}

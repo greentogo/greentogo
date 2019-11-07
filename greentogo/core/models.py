@@ -18,6 +18,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.mail import send_mail, EmailMessage
+from django.db.models.functions import Length
 from collections import Counter
 from exponent_server_sdk import PushClient, PushMessage, PushResponseError, PushServerError, DeviceNotRegisteredError
 from requests.exceptions import ConnectionError, HTTPError
@@ -438,6 +439,9 @@ class SubscriptionQuerySet(models.QuerySet):
 
     def owned_by(self, user):
         return self.filter(user=user)
+    
+    def is_paying(self):
+        return self.annotate(stripe_id_len=Length('stripe_id')).filter(stripe_id_len__gt=3)
 
     def is_corporate(self):
         return self.filter(corporate_code__isnull=False)

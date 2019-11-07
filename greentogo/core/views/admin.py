@@ -140,8 +140,16 @@ def restaurant_management(request, *args, **kwargs):
 
 
 def user_report(request,*args, **kwargs):
-    data = Subscription.objects.all().active()
-    view_data = {"data": data,"numberOfActiveSubs":len(data)}
+    allUsers = User.objects.all().count()
+    activeSubs = Subscription.objects.all().active()
+    payingSubs = activeSubs.is_paying()
+    view_data = {
+        "data": payingSubs,
+        "numberOfUsers":allUsers,
+        "numberOfActiveSubs":len(activeSubs),
+        "numberOfPayingSubs":len(payingSubs),
+    }
+    print(view_data)
     return render(request, 'admin/user_report.html', view_data)
 
 
