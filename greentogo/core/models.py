@@ -188,6 +188,12 @@ class AdminSettings(models.Model):
             blank=False,
             help_text="List of emails separated by commas for who should recieve alerts when stock is high at return stations")
 
+    newSubEmails = models.TextField(
+            max_length=1024,
+            blank=False,
+            default="info@dontwastedurham.com",
+            help_text="List of emails separated by commas for who should recieve alerts about new subscriptions")
+
     appVideo = models.FileField(upload_to='video/', blank=True, null=True)
 
     def get_restaurant_low_stock_emails_list(self):
@@ -195,6 +201,9 @@ class AdminSettings(models.Model):
 
     def get_return_high_stock_emails_list(self):
         return re.sub(",", " ",  self.highStockEmails).split()
+
+    def get_new_subscription_emails(self):
+        return re.sub(",", " ",  self.newSubEmails).split()
 
     def save(self, *args, **kwargs):
         if AdminSettings.objects.exists() and not self.pk:
@@ -714,7 +723,7 @@ def new_subscription_email_to_admins(sender, instance, created, **kwargs):
         send_templated_mail(
             template_name='new_subscription',
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=settings.EMAIL_ADMINS,
+            recipient_list=AdminSettings.objects.first().get_new_subscription_emails(),
             context={'subscription': instance}
         )
 
