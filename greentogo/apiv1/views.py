@@ -6,6 +6,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model, authenticate, login
 from django.core.mail import send_mail, EmailMultiAlternatives
+from django.utils.dateparse import parse_date
 import json, re, rollbar, urllib.parse, sys
 
 from registration.models import RegistrationProfile
@@ -375,7 +376,7 @@ class GroupOrders(GenericAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = CreateGroupOrderSerializer
 
-    def post(self, request):
+    def post(self, request, idToDelete=''):
         try:
             location = Location.objects.filter(code=request.data['location_code']).first()
             if location.service == 'IN':
@@ -388,6 +389,15 @@ class GroupOrders(GenericAPIView):
                 expected_checkout=parse_date(request.data['expected_checkout']),
                 count=request.data['count'],
             )
+            return jsend_success({"data": "received"})
+        except Exception as ex:
+            print(ex)
+            rollbar.report_exc_info(sys.exc_info(), request)
+            return jsend_fail({"error": "Unable to process request, please try again later"}, status=500)
+
+    def delete(self, request, idToDelete):
+        try:
+            GroupOrder.objects.get(id=idToDelete).delete()
             return jsend_success({"data": "received"})
         except Exception as ex:
             rollbar.report_exc_info(sys.exc_info(), request)
