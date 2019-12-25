@@ -385,7 +385,7 @@ class GroupOrders(GenericAPIView):
                 subscription=sub,
                 corporate_code=sub.corporate_code,
                 location=location,
-                expected_checkout=request.data['expected_checkout'],
+                expected_checkout=parse_date(request.data['expected_checkout']),
                 count=request.data['count'],
             )
             return jsend_success({"data": "received"})
