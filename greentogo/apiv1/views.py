@@ -376,7 +376,7 @@ class GroupOrders(GenericAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = CreateGroupOrderSerializer
 
-    def post(self, request, idToDelete=''):
+    def post(self, request, idToUpdate=''):
         try:
             location = Location.objects.filter(code=request.data['location_code']).first()
             if location.service == 'IN':
@@ -395,9 +395,22 @@ class GroupOrders(GenericAPIView):
             rollbar.report_exc_info(sys.exc_info(), request)
             return jsend_fail({"error": "Unable to process request, please try again later"}, status=500)
 
-    def delete(self, request, idToDelete):
+    def put(self, request, idToUpdate):
         try:
-            GroupOrder.objects.get(id=idToDelete).delete()
+            order = GroupOrder.objects.get(id=idToUpdate)
+            order.location = Location.objects.filter(code=request.data['location_code']).first()
+            order.expected_checkout = parse_date(request.data['expected_checkout'])
+            order.count = request.data['count']
+            order.save()
+            return jsend_success({"data": "received"})
+        except Exception as ex:
+            print(ex)
+            rollbar.report_exc_info(sys.exc_info(), request)
+            return jsend_fail({"error": "Unable to process request, please try again later"}, status=500)
+
+    def delete(self, request, idToUpdate):
+        try:
+            GroupOrder.objects.get(id=idToUpdate).delete()
             return jsend_success({"data": "received"})
         except Exception as ex:
             rollbar.report_exc_info(sys.exc_info(), request)
