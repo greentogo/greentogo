@@ -750,10 +750,10 @@ class LocationQuerySet(models.QuerySet):
         return self.filter(retired=False, admin_location=False).exclude(name='Apple Testing Location - OUT')
 
     def dumping_in(self):
-        return self.filter(dumping_location=true, service='IN')
+        return self.filter(dumping_location=True, service='IN')
 
     def dumping_out(self):
-        return self.filter(dumping_location=true, service='OUT')
+        return self.filter(dumping_location=True, service='OUT')
 
     def getTopUsedLocation(self, month, year):
         location = LocationTag.objects.filter(
