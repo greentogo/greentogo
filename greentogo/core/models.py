@@ -1260,8 +1260,8 @@ class GroupOrder(models.Model):
         if self.checked_out:
             return self
         checkin = Location.objects.dumping_in()
-        subscription.tag_location(checkin, self.count, self.subscription.user)
-        subscription.tag_location(self.location, self.count, self.subscription.user)
+        self.subscription.tag_location(checkin, self.count, self.subscription.user)
+        self.subscription.tag_location(self.location, self.count, self.subscription.user)
         self.checked_out = True
         self.save()
         return self
@@ -1271,8 +1271,8 @@ class GroupOrder(models.Model):
             return self
         checkin = Location.objects.filter(code=code)
         checkout = Location.objects.dumping_out()
-        subscription.tag_location(checkin, self.count, self.subscription.user)
-        subscription.tag_location(checkout, self.count, self.subscription.user)
+        self.subscription.tag_location(checkin, self.count, self.subscription.user)
+        self.subscription.tag_location(checkout, self.count, self.subscription.user)
         self.checked_in = True
         self.save()
         return self
