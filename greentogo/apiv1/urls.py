@@ -29,8 +29,8 @@ urlpatterns = [
     url(r'^password/reset/$',  views.PasswordReset.as_view(), name="PasswordReset"),
     url(r'^register/', views.Register.as_view(), name="Register"),
     url(r'^log/$',  views.Log.as_view(), name="Log"),
-    url(r'^group/(?P<idToUpdate>[A-Za-z0-9]+)?$',  views.GroupOrders.as_view(), name="Group Orders"),
+    url(r'^group/(?P<idToUpdate>[A-Za-z0-9]+)?$',  views.GroupOrders.as_view(), name="Update Group Orders"),
     url(r'^group/',  views.GroupOrders.as_view(), name="Group Orders"),
-    url(r'^group/out/(?P<group_order_id>[A-Za-z0-9]+)/$',  views.GroupOrderCheckout.as_view(), name="Group Orders"),
-    url(r'^group/in/(?P<group_order_id>[A-Za-z0-9]+)/$',  views.GroupOrderCheckin.as_view(), name="Group Orders"),
+    url(r'^out/group/(?P<group_order_id>[A-Za-z0-9]+)$',  views.GroupOrderCheckout.as_view(), name="Check Out Group Orders"),
+    url(r'^in/group/(?P<group_order_id>[A-Za-z0-9]+)$',  views.GroupOrderCheckin.as_view(), name="Check In Group Orders"),
 ]
