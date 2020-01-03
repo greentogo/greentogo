@@ -55,6 +55,7 @@ class RestaurantManagerInline(admin.TabularInline):
 class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'reward_points', 'is_staff', )
     inlines = [SubscriptionInline,RestaurantManagerInline]
+    UserAdmin.fieldsets[0][1]['fields'] = UserAdmin.fieldsets[0][1]['fields'] + ('referred_by', )
 
 class isActiveFilter(SimpleListFilter):
     title = 'Active'
