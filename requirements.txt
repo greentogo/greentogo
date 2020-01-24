@@ -22,7 +22,7 @@ django-registration-redux==1.7
 django-render-block==0.5  # via django-templated-email
 django-templated-email==2.2.0
 django==1.10.6
-djangorestframework==3.6.4
+djangorestframework==3.9.1
 djoser==0.5.4
 et-xmlfile==1.0.1         # via openpyxl
 exponent-server-sdk==0.2.0
