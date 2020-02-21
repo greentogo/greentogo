@@ -15,6 +15,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import authentication_classes, permission_classes
 
 from core.models import User, Location, LocationTag, Plan, Restaurant, Subscription, MobileAppRatings, GroupOrder
 from core.forms import UserSignupForm, UserForm
@@ -121,7 +122,7 @@ class LocationView(GenericAPIView):
             return jsend_fail({"error": "Location does not exist"}, status=200)
 
         serializer = LocationSerializer(location)
-        return jsend_success(serializer.data)    
+        return jsend_success(serializer.data)
 
 
 # /subscriptions/:id
@@ -186,6 +187,8 @@ class RestaurantsView(APIView):
             location['name'] = filtered
         return jsend_success(serializer.data)
 
+@authentication_classes([])
+@permission_classes([])
 class Log(APIView):
     """Logs Errors"""
 
@@ -257,6 +260,8 @@ class PasswordReset(APIView):
             rollbar.report_exc_info(sys.exc_info(), request)
             return jsend_fail({"error": "Unable to reset password"}, status=500)
 
+@authentication_classes([])
+@permission_classes([])
 class Register(GenericAPIView):
     """
     User Registration
