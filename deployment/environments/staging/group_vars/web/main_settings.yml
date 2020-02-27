@@ -25,4 +25,4 @@ django:
 
 repo:
   branch: master
-  url: "git@github.com:greentogo/greentogo.git"
+  url: "https://github.com/greentogo/greentogo.git"
