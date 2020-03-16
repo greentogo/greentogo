@@ -3,6 +3,7 @@
 A new GreenToGo subscription was purchased or created.
 
 Customer: {{ subscription.user.username }}
+Email: {{ subscription.user.email }}
 Plan: {{ subscription.plan }}
 Stripe id: {% if subscription.has_stripe_subscription %}{{ subscription.stripe_id }}{% else %}Not a Stripe subscription{% endif %}
 Referred By: {% if subscription.user.referred_by %}{{ subscription.user.referred_by }}{% else %}No referral{% endif %}
