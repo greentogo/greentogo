@@ -10,7 +10,7 @@ var slider_actual = noUiSlider.create(document.getElementById('sliderActual'), {
 	connect: [ true, false ],
 	range: {
 		'min': 0,
-		'max': 50
+		'max': 150
 	},
 });
 
@@ -29,7 +29,7 @@ if (slider_stock_textinput){
     connect: [ true, false ],
     range: {
       'min': 0,
-      'max': 50
+      'max': 150
     },
   });
 
